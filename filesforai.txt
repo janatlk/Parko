@@ -1,0 +1,296 @@
+import os
+
+from django.db import models
+from django.contrib.auth.models import AbstractUser
+import calendar, locale
+from DataBase.choices import car_parts
+
+locale.setlocale(locale.LC_TIME, 'ru_RU')
+def get_upload_path(instance, filename):
+    return os.path.join('car_photos', filename)
+
+REGIONS = (tuple((x, x) for x in ['Баткен', 'Чуй', 'Иссык-Куль', 'Джалал-Абад','Бишкек','Джалал-Абад']))
+FUELS = (tuple((x,x) for x in ['Бензин','Газ','Газ/Бензин','Дизель']))
+CARBRANDS = (tuple((x,x) for x in [
+    "Toyota", "Volkswagen", "Ford", "Honda", "Hyundai",
+    "Chevrolet", "Nissan", "BMW", "Mercedes-Benz", "Kia",
+    "Audi", "Tesla", "Lexus", "Mazda", "Subaru",
+    "Jeep", "Renault", "Peugeot", "Mitsubishi", "Suzuki",
+    "Volvo", "Land Rover", "Jaguar", "Fiat", "Dodge",
+    "GMC", "Chrysler", "Cadillac", "Acura", "Infiniti",
+    "Porsche", "Mini", "Alfa Romeo", "Genesis", "Buick",
+    "Ram", "Seat", "Skoda", "Citroën", "Saab",
+    "Opel", "Holden", "Isuzu", "Hummer", "Lincoln",
+    "Maserati", "Bentley", "Rolls-Royce", "Aston Martin", "Ferrari",
+    "Lamborghini", "McLaren", "Bugatti", "Pagani", "Koenigsegg",
+    "ГАЗ", "Lada", "Специальный"
+]))
+class User(AbstractUser):
+    region = models.CharField(max_length=100,choices=REGIONS)
+
+    groups = models.ManyToManyField(
+        'auth.Group',
+        related_name='database_user_set',
+        blank=True,
+        help_text='The groups this user belongs to.',
+        related_query_name='user'
+    )
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        related_name='database_user_set',
+        blank=True,
+        help_text='Specific permissions for this user.',
+        related_query_name='user'
+    )
+
+    def __str__(self):
+        return self.username
+class Car(models.Model):
+    region = models.CharField(max_length=20, choices=REGIONS, verbose_name='Регион авто')
+    brand = models.CharField(max_length=65, verbose_name='Марка авто', choices=CARBRANDS)
+    title = models.CharField(max_length=50,verbose_name="Модель авто")
+    numplate = models.CharField(max_length=20,verbose_name='Номер',unique=True)
+    year = models.IntegerField(verbose_name="Год выпуска")
+    vin = models.CharField(max_length=50,verbose_name="VIN Номер",unique=True)
+    fueltype = models.CharField(max_length=20,choices=FUELS,verbose_name="тип топлива")
+
+    # Водитель ФИО НОМЕР ТЕЛЕФОНА, Топливная карта (готово)
+    # Страховка номер дата (готово)
+    # Тех Осмотр: Номер и дата (готово)
+    # Отчет для приема передачи Авто7глб думаю готово (не точно))
+    # Превышения скорости Incomtek
+    CHOICES = (tuple((x, x) for x in ['Легковой','Грузовой','Специальный']))
+    type = models.CharField(max_length=20, choices=CHOICES, verbose_name="Тип т/c")
+    driver = models.CharField(max_length=100, verbose_name="ФИО Водителя",default="-")
+    drivers_phone = models.CharField(blank=True,null=True,help_text='Указывать в удобном для чтения формате',verbose_name="Номер телефона водителя",max_length=20)
+    fuel_card = models.CharField(max_length=40, verbose_name="Топливная карта",default="-")
+    # photos = models.ManyToManyField('CarPhoto', blank=True, verbose_name='Фотографии', help_text="Можно добавить позже (добавлять в другую модель - Фотографии машин)")
+    def __str__(self):
+        return f"{self.brand} {self.title} [{self.numplate}]"
+
+    def save(self, *args, **kwargs):
+        self.numplate = self.numplate.upper()
+        self.driver = self.driver.capitalize()
+        super().save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = "Машина"
+        verbose_name_plural = "Машины"
+
+class CarPhoto(models.Model):
+    car = models.ForeignKey(Car, on_delete=models.CASCADE, verbose_name="Машина", related_name="photos")
+    photo = models.ImageField(upload_to='car_photos/', verbose_name='Фотография')
+    def __str__(self):
+        count = self.car.photos.filter(car=self.car).count()
+        suffix = f" ({count})" if count > 1 else ""
+        return f"{self.car.title}{suffix}"
+    class Meta:
+        verbose_name = "Фотография машины"
+        verbose_name_plural = "Фотографии машин"
+class Spare(models.Model):
+    car = models.ForeignKey(Car, on_delete=models.CASCADE, related_name='spare_parts', verbose_name='Относится к машине')
+    choices = []
+    for i in list(car_parts.values()):
+        for x in i:
+            choices.append(x)
+    choices = (tuple((x, x) for x in choices))
+    title = models.CharField(max_length=80, verbose_name='Наименование запчасти',choices=choices)
+    description = models.TextField(blank=True, null=True, verbose_name='Описание или Комментарий (не обязательно)')
+    price = models.IntegerField(verbose_name="Стоимость",help_text='сом')
+    job = models.CharField(max_length=150, verbose_name='Описание работы')
+    job_price = models.IntegerField(verbose_name="Стоимость Работы",help_text='сом')
+    date = models.DateField(verbose_name="Дата установки")
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = "Запчасти"
+        verbose_name_plural = "Запчасти"
+class Tires(models.Model):
+    car = models.ForeignKey(Car, on_delete=models.CASCADE, verbose_name='Относится к машине')
+    Tire = models.CharField(max_length=85, verbose_name='Модель')
+    size = models.IntegerField(verbose_name='Размер')
+    price = models.IntegerField(verbose_name='Стоимость',help_text='сом')
+    photo = models.ImageField(upload_to='tire_photos/', verbose_name='Фотография шины', blank=True, null=True)
+    date = models.DateField(verbose_name="Дата установки")
+    exp_date = models.DateField(verbose_name="Дата эксплуатации до")
+
+    class Meta:
+        verbose_name = "Шины"
+        verbose_name_plural = "Шины"
+
+
+class Accumulator(models.Model):
+    car = models.ForeignKey(Car, on_delete=models.CASCADE, verbose_name='Относится к машине')
+    Accumulator = models.CharField(max_length=85, verbose_name='Модель')
+    serial_number = models.CharField(max_length=100,verbose_name='Серийний номер')
+    Battery = models.CharField(max_length=50,verbose_name='Ёмкость')
+    price = models.IntegerField(verbose_name='Стоимость',help_text='сом')
+    date = models.DateField(verbose_name="Дата установки")
+    photo = models.ImageField(upload_to='accum_photos/', verbose_name='Фотография', blank=True, null=True)
+    exp_date = models.DateField(verbose_name="Дата эксплуатации до")
+    def __str__(self):
+        return (self.Accumulator + ' ' + self.serial_number)
+    class Meta:
+        verbose_name = "Аккумулятор"
+        verbose_name_plural = "Аккумуляторы"
+class Fuel(models.Model):
+    MONTH_CHOICES = (("01","Январь"),
+                   ("02", "Февраль"),
+                    ("03", "Март"),
+                    ("04", "Апрель"),
+                    ("05", "Май"),
+                    ("06", "Июнь"),
+                    ("07", "Июль"),
+                    ("08", "Август"),
+                    ("09", "Сентябрь"),
+                    ("10", "Октябрь"),
+                    ("11","Ноябрь"),
+                    ("12", "Декабрь"))
+    car = models.ForeignKey(Car, on_delete=models.CASCADE, verbose_name='Относится к машине')
+    create_field_date = models.DateField(auto_now=True)
+    month = models.CharField(choices=MONTH_CHOICES, verbose_name="Месяц",max_length=2)
+    year = models.IntegerField(verbose_name="Год")
+    amount = models.IntegerField(verbose_name="Количество",help_text='литр')
+    price = models.IntegerField(verbose_name="Стоимость общая",help_text='сом')
+    Mileage = models.IntegerField(verbose_name="Пробег за месяц",help_text='км')
+    fuel_consumption = models.FloatField(verbose_name="Расход", editable=False, null=True, blank=True)
+    month_name = models.CharField(editable=False, blank=True,null=True,max_length=50)
+    def num_to_month(self,month):
+        months = {"01": "Январь",
+        "02": "Февраль",
+        "03": "Март",
+        "04": "Апрель",
+        "05": "Май",
+        "06": "Июнь",
+        "07": "Июль",
+        "08": "Август",
+        "09": "Сентябрь",
+        "10": "Октябрь",
+        "11": "Ноябрь",
+        "12": "Декабрь"}
+        return months[month]
+    def __str__(self):
+        return (str(calendar.month_name[int(self.month)]) + ' ' + str(self.car) )
+
+    def save(self, *args, **kwargs):
+        if self.amount and self.Mileage:
+            self.fuel_consumption = round(((self.amount / self.Mileage) * 100),2)
+        self.month_name = self.num_to_month(str(self.month))
+        super(Fuel, self).save(*args, **kwargs)
+    class Meta:
+        verbose_name = "Топливо"
+        verbose_name_plural = "Топливо"
+
+class Insurance(models.Model):
+    car = models.ForeignKey(Car, on_delete=models.CASCADE, verbose_name='Относится к машине')
+    CHOICES = (tuple((x, x) for x in ['КАСКО', 'ОСАГО']))
+    ins_type = models.CharField(choices=CHOICES[:], max_length=25, verbose_name='Вид страховки',default="КАСКО")
+    date = models.DateField(verbose_name="Дата установки")
+    end_date = models.DateField(verbose_name="Окончание страховки", help_text="Возможен ввод вручную (дд.мм.гггг) ")
+    number = models.CharField(max_length=30, verbose_name="Номер страховки")
+    price = models.IntegerField(verbose_name="Стоимость страховки",help_text="сом")
+    def __str__(self):
+        return (self.car.title + '  |  ' + str(self.date) + ' --> ' + str(self.end_date))
+    class Meta:
+        verbose_name = "Страховка"
+        verbose_name_plural = "Страховки"
+
+class Inspection(models.Model):
+    car = models.ForeignKey(Car, on_delete=models.CASCADE, verbose_name='Относится к машине')
+    number = models.CharField(max_length=30, verbose_name="Номер технического осмотра")
+    date = models.DateField(verbose_name="Дата проведения", help_text="формат: гггг-мм-дд")
+    price = models.IntegerField(verbose_name='Стоимость тех осмотра',help_text="сом")
+    def __str__(self):
+        return (str(self.car) + " " + str(calendar.month_name[int(self.date.month)]) + " " + str(self.date.day))
+    class Meta:
+        verbose_name = "Тех. Осмотр"
+        verbose_name_plural = "Тех. Осмотры"
+
+
+
+# Видеорегистратор: Модель, Серийный номер, дата установки.
+class Recorder(models.Model):
+    car = models.OneToOneField(Car, on_delete=models.CASCADE, verbose_name='Установлен на машине', help_text="Привязка возможна только к одной машине (2 видеорегистратора на машину быть не может)")
+    model = models.CharField(max_length=40, verbose_name="Модель")
+    serial_num = models.CharField(max_length=50,verbose_name="Серийный номер")
+    photo = models.ImageField(upload_to='recorder_photos/', verbose_name='Фотография', blank=True, null=True)
+    date = models.DateField(verbose_name="Дата устновки",help_text='формат: (гггг-мм-дд)')
+
+    def __str__(self):
+        return (str(self.car) + " " + str(self.model) + " " + str(self.date))
+
+    class Meta:
+        verbose_name = "Видео Регистратор"
+        verbose_name_plural = "Видео Регистаторы"
+class Kit(models.Model):
+    Choices = ((True,"Есть"),(False,"Нет"))
+    car = models.OneToOneField(Car, on_delete=models.CASCADE, verbose_name='Относится к машине',help_text="К одной машине возможна только одна привязка Компектации (2 комплекта на одну машину быть не может)")
+    donkrat = models.BooleanField(verbose_name="Донкрат", choices=Choices,default=Choices[1])
+    balonKey = models.BooleanField(verbose_name="Балонный ключ", choices=Choices,default=Choices[1])
+    tools = models.BooleanField(verbose_name="Инструменты", choices=Choices,default=Choices[1])
+    dangerSign = models.BooleanField(verbose_name="Аварийный Знак", choices=Choices,default=Choices[1])
+    FireExt = models.BooleanField(verbose_name="Огнетушитель", choices=Choices,default=Choices[1])
+    fireDate = models.DateField(verbose_name="Конец срока годности Огнетушителя", help_text="Если Огнетушителя нет оставьте поле пустым", blank=True, null=True)
+    Aid = models.BooleanField(verbose_name="Аптечка", choices=Choices,default=Choices[1])
+    aidDate = models.DateField(verbose_name="Конец срока годности Аптечки", help_text="Если Аптечки нет оставьте данное поле пустым", blank=True, null=True)
+    def __str__(self):
+        return str(self.car)
+#Аккуумлятор срок эксплуатации до (ДАТА) + шины Готово ###
+# КАСКО, ОСАГО. - вид страховки + даты сроков. + номер страховки + цена страховки ГОТОВО
+    #Цена тех осмотры ГОТОВО №№№
+# Уведомления ГОТОВО№№№№
+    #галочки фильтрамесяца топливо ГОТОВО№
+    #excel распечатка любого с фильтрами ГОТОВО;;;
+    #машина-запчасть поменять ГОТОВО №№№
+    #ВИДЕО ИНСТРУМЕНТЫ ДОНКРАТ	БАЛОННЫЙ КЛЮЧ	АВАРИЙНЫЙ ЗНАК ГОТОВО№№№
+    #pie-chart машина, месяцы. ЗАПЧАСТИ ЗЕЛЕНЫМ Бензин красным, ГОТОВО№№№
+
+#История ДТП к каждой машине
+    # 2) Причина ДТП
+    # 3) Дата ДТП
+    # 4) Размер УЩЕРБА
+    # 1) Описание ДТП
+
+# Водитель ПОТОМ
+    #ФИО
+    #Категория прав
+    #Возраст
+    #Фотография водителя
+    # Машина
+
+    #Принял передал
+
+#ОПределоенные пользователи ГОТОВО№№№
+
+#К каждой машине 8 фотографий (вкладка фото) #Готово
+
+
+#Акт приема передачи.
+#К каждой машине акт приема передачи:
+    #Водитель приняваший машину
+    #Дата принятия авто
+
+    # Галочка к ДТП
+#Серийный номер и кол-во шин. (список номеров)
+    def save(self, *args, **kwargs):
+        if self.FireExt == False:
+            self.fireDate = None
+        if self.Aid == False:
+            self.aidDate = None
+        super(Kit, self).save(*args, **kwargs)
+    class Meta:
+        verbose_name = "Комплектность"
+        verbose_name_plural = "Комплектность"
+
+
+class MonthlyMileage(models.Model):
+    car = models.ForeignKey(Car, on_delete=models.CASCADE)
+    month = models.CharField(max_length=7,help_text="Формат: 'YYYY-MM' (2024-07)")  # Формат 'YYYY-MM'
+    mileage = models.FloatField()
+
+    class Meta:
+        unique_together = ('car', 'month')
+        verbose_name = "Пробег за месяц"
+        verbose_name_plural = "Пробег за месяца"
