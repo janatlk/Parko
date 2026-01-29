@@ -20,5 +20,21 @@ DATABASES = {
     }
 }
 
+# Cache for demo sessions
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'demo_cache_table',
+        'TIMEOUT': 7200,  # 2 hours
+        'OPTIONS': {
+            'MAX_ENTRIES': 1000
+        }
+    }
+}
+
+# Demo session settings
+DEMO_SESSION_LIMIT = 100
+DEMO_SESSION_TTL = 7200  # 2 hours in seconds
+
 # CORS settings
 CORS_ALLOW_ALL_ORIGINS = True  # Only for development!
