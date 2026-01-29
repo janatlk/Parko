@@ -56,20 +56,20 @@ export function FuelPage() {
         />
       </Group>
 
-      {isLoading && <Text c="dimmed">Loading...</Text>}
-      {isError && <Text c="red">Failed to load fuel records</Text>}
+      {isLoading && <Text c="dimmed">{t('common.loading')}</Text>}
+      {isError && <Text c="red">{t('common.error_loading')}</Text>}
 
       {!isLoading && !isError && (
         <>
           <Table withTableBorder withColumnBorders striped highlightOnHover>
             <Table.Thead>
               <Table.Tr>
-                <Table.Th>Car</Table.Th>
-                <Table.Th>Period</Table.Th>
-                <Table.Th>Liters</Table.Th>
-                <Table.Th>Mileage</Table.Th>
-                <Table.Th>Consumption</Table.Th>
-                <Table.Th>Total cost</Table.Th>
+                <Table.Th>{t('fuel.table.car')}</Table.Th>
+                <Table.Th>{t('fuel.table.period')}</Table.Th>
+                <Table.Th>{t('fuel.table.liters')}</Table.Th>
+                <Table.Th>{t('fuel.table.mileage')}</Table.Th>
+                <Table.Th>{t('fuel.table.consumption')}</Table.Th>
+                <Table.Th>{t('fuel.table.total_cost')}</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>

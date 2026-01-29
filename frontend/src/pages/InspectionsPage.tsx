@@ -52,18 +52,18 @@ export function InspectionsPage() {
         />
       </Group>
 
-      {isLoading && <Text c="dimmed">Loading...</Text>}
-      {isError && <Text c="red">Failed to load inspections</Text>}
+      {isLoading && <Text c="dimmed">{t('common.loading')}</Text>}
+      {isError && <Text c="red">{t('common.error_loading')}</Text>}
 
       {!isLoading && !isError && (
         <>
           <Table withTableBorder withColumnBorders striped highlightOnHover>
             <Table.Thead>
               <Table.Tr>
-                <Table.Th>Car</Table.Th>
-                <Table.Th>Number</Table.Th>
-                <Table.Th>Date</Table.Th>
-                <Table.Th>Cost</Table.Th>
+                <Table.Th>{t('inspections.table.car')}</Table.Th>
+                <Table.Th>{t('inspections.table.number')}</Table.Th>
+                <Table.Th>{t('inspections.table.date')}</Table.Th>
+                <Table.Th>{t('inspections.table.cost')}</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>

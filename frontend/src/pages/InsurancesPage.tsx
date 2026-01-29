@@ -52,20 +52,20 @@ export function InsurancesPage() {
         />
       </Group>
 
-      {isLoading && <Text c="dimmed">Loading...</Text>}
-      {isError && <Text c="red">Failed to load insurances</Text>}
+      {isLoading && <Text c="dimmed">{t('common.loading')}</Text>}
+      {isError && <Text c="red">{t('common.error_loading')}</Text>}
 
       {!isLoading && !isError && (
         <>
           <Table withTableBorder withColumnBorders striped highlightOnHover>
             <Table.Thead>
               <Table.Tr>
-                <Table.Th>Car</Table.Th>
-                <Table.Th>Type</Table.Th>
-                <Table.Th>Number</Table.Th>
-                <Table.Th>Start</Table.Th>
-                <Table.Th>End</Table.Th>
-                <Table.Th>Cost</Table.Th>
+                <Table.Th>{t('insurances.table.car')}</Table.Th>
+                <Table.Th>{t('insurances.table.type')}</Table.Th>
+                <Table.Th>{t('insurances.table.number')}</Table.Th>
+                <Table.Th>{t('insurances.table.start')}</Table.Th>
+                <Table.Th>{t('insurances.table.end')}</Table.Th>
+                <Table.Th>{t('insurances.table.cost')}</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
