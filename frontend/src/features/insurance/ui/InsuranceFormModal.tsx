@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 
 import { Button, Group, Modal, NumberInput, Select, Stack, Text, TextInput } from '@mantine/core'
 import { DateInput } from '@mantine/dates'
+import { useTranslation } from 'react-i18next'
 
 import { useCarsQuery } from '@features/cars/hooks/useCars'
 
@@ -15,6 +16,7 @@ type Props = {
 }
 
 export function InsuranceFormModal({ opened, onClose, onCreate, isSubmitting }: Props) {
+  const { t } = useTranslation()
   const today = useMemo(() => new Date(), [])
   const initial = useMemo(
     () => ({
@@ -63,13 +65,13 @@ export function InsuranceFormModal({ opened, onClose, onCreate, isSubmitting }: 
   }
 
   return (
-    <Modal opened={opened} onClose={onClose} title="Add insurance" centered>
+    <Modal opened={opened} onClose={onClose} title={t('insurances.form.title')} centered>
       <Stack>
-        {isCarsLoading && <Text c="dimmed">Loading cars...</Text>}
-        {isCarsError && <Text c="red">Failed to load cars</Text>}
+        {isCarsLoading && <Text c="dimmed">{t('common.loading')}</Text>}
+        {isCarsError && <Text c="red">{t('insurances.form.failed_to_load_cars')}</Text>}
 
         <Select
-          label="Car"
+          label={t('insurances.form.car')}
           data={carOptions}
           value={form.car}
           onChange={(value) => setForm((s) => ({ ...s, car: value }))}
@@ -79,7 +81,7 @@ export function InsuranceFormModal({ opened, onClose, onCreate, isSubmitting }: 
         />
 
         <Select
-          label="Type"
+          label={t('insurances.form.type')}
           data={[
             { value: 'OSAGO', label: 'OSAGO' },
             { value: 'KASKO', label: 'KASKO' },
@@ -90,30 +92,30 @@ export function InsuranceFormModal({ opened, onClose, onCreate, isSubmitting }: 
         />
 
         <TextInput
-          label="Number"
+          label={t('insurances.form.number')}
           value={form.number}
           onChange={(e) => setForm((s) => ({ ...s, number: e.target.value }))}
           required
         />
 
         <DateInput
-          label="Start date"
-          placeholder="Select date"
+          label={t('insurances.form.start_date')}
+          placeholder={t('insurances.form.start_date')}
           value={form.start_date}
           onChange={(value) => value && setForm((s) => ({ ...s, start_date: value }))}
           required
         />
 
         <DateInput
-          label="End date"
-          placeholder="Select date"
+          label={t('insurances.form.end_date')}
+          placeholder={t('insurances.form.end_date')}
           value={form.end_date}
           onChange={(value) => value && setForm((s) => ({ ...s, end_date: value }))}
           required
         />
 
         <NumberInput
-          label="Cost"
+          label={t('insurances.form.cost')}
           value={form.cost}
           onChange={(value) => setForm((s) => ({ ...s, cost: Number(value || 0) }))}
           min={0}
@@ -122,10 +124,10 @@ export function InsuranceFormModal({ opened, onClose, onCreate, isSubmitting }: 
 
         <Group justify="flex-end">
           <Button variant="default" onClick={onClose} disabled={isSubmitting}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button onClick={() => void submit()} loading={isSubmitting}>
-            Create
+            {t('common.create')}
           </Button>
         </Group>
       </Stack>

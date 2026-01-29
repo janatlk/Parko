@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 
 import { Button, Group, Modal, NumberInput, Select, Stack, Text, TextInput } from '@mantine/core'
 import { DateInput } from '@mantine/dates'
+import { useTranslation } from 'react-i18next'
 
 import { useCarsQuery } from '@features/cars/hooks/useCars'
 
@@ -15,6 +16,7 @@ type Props = {
 }
 
 export function InspectionFormModal({ opened, onClose, onCreate, isSubmitting }: Props) {
+  const { t } = useTranslation()
   const today = useMemo(() => new Date(), [])
   const initial = useMemo(
     () => ({
@@ -59,13 +61,13 @@ export function InspectionFormModal({ opened, onClose, onCreate, isSubmitting }:
   }
 
   return (
-    <Modal opened={opened} onClose={onClose} title="Add inspection" centered>
+    <Modal opened={opened} onClose={onClose} title={t('inspections.form.title')} centered>
       <Stack>
-        {isCarsLoading && <Text c="dimmed">Loading cars...</Text>}
-        {isCarsError && <Text c="red">Failed to load cars</Text>}
+        {isCarsLoading && <Text c="dimmed">{t('common.loading')}</Text>}
+        {isCarsError && <Text c="red">{t('inspections.form.failed_to_load_cars')}</Text>}
 
         <Select
-          label="Car"
+          label={t('inspections.form.car')}
           data={carOptions}
           value={form.car}
           onChange={(value) => setForm((s) => ({ ...s, car: value }))}
@@ -75,22 +77,22 @@ export function InspectionFormModal({ opened, onClose, onCreate, isSubmitting }:
         />
 
         <TextInput
-          label="Number"
+          label={t('inspections.form.number')}
           value={form.number}
           onChange={(e) => setForm((s) => ({ ...s, number: e.target.value }))}
           required
         />
 
         <DateInput
-          label="Date"
-          placeholder="Select date"
+          label={t('inspections.form.inspected_at')}
+          placeholder={t('inspections.form.inspected_at')}
           value={form.inspected_at}
           onChange={(value) => value && setForm((s) => ({ ...s, inspected_at: value }))}
           required
         />
 
         <NumberInput
-          label="Cost"
+          label={t('inspections.form.cost')}
           value={form.cost}
           onChange={(value) => setForm((s) => ({ ...s, cost: Number(value || 0) }))}
           min={0}
@@ -99,10 +101,10 @@ export function InspectionFormModal({ opened, onClose, onCreate, isSubmitting }:
 
         <Group justify="flex-end">
           <Button variant="default" onClick={onClose} disabled={isSubmitting}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button onClick={() => void submit()} loading={isSubmitting}>
-            Create
+            {t('common.create')}
           </Button>
         </Group>
       </Stack>
