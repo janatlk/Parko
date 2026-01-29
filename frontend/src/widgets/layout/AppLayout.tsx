@@ -6,9 +6,10 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '@features/auth/hooks/useAuth'
 import { patchMeApi } from '@features/auth/api/authApi'
 import { LANGUAGES } from '@shared/constants/languages'
+import { showSuccess } from '@shared/utils/toast'
 
 export function AppLayout() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [opened, { toggle }] = useDisclosure(false)
   const location = useLocation()
   const navigate = useNavigate()
@@ -40,11 +41,16 @@ export function AppLayout() {
               onChange={(value) => {
                 if (!value) return
                 if (!user) return
+                // Change i18n language immediately
+                void i18n.changeLanguage(value)
+                showSuccess(`Язык изменён на ${value.toUpperCase()}`)
+                // Save to user profile
                 void (async () => {
                   try {
                     const updated = await patchMeApi({ language: value as typeof user.language })
                     setUser(updated)
                   } catch {
+                    // Even if API fails, keep the local i18n change
                     setUser({ ...user, language: value as typeof user.language })
                   }
                 })()
@@ -80,21 +86,21 @@ export function AppLayout() {
         <NavLink
           component={RouterNavLink}
           to="/fuel"
-          label="Fuel"
+          label={t('fuel.title')}
           active={activePath.startsWith('/fuel')}
           onClick={() => toggle()}
         />
         <NavLink
           component={RouterNavLink}
           to="/insurances"
-          label="Insurances"
+          label={t('insurances.title')}
           active={activePath.startsWith('/insurances')}
           onClick={() => toggle()}
         />
         <NavLink
           component={RouterNavLink}
           to="/inspections"
-          label="Inspections"
+          label={t('inspections.title')}
           active={activePath.startsWith('/inspections')}
           onClick={() => toggle()}
         />
@@ -115,7 +121,7 @@ export function AppLayout() {
         <NavLink
           component={RouterNavLink}
           to="/profile"
-          label="Profile"
+          label={t('profile.title')}
           active={activePath.startsWith('/profile')}
           onClick={() => toggle()}
         />

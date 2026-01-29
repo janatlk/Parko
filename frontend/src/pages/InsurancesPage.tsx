@@ -1,12 +1,14 @@
 import { useMemo, useState } from 'react'
 
 import { Button, Container, Group, Pagination, Select, Table, Text, Title } from '@mantine/core'
+import { useTranslation } from 'react-i18next'
 
 import { useCarsQuery } from '@features/cars/hooks/useCars'
 import { useCreateInsuranceMutation, useInsurancesQuery } from '@features/insurance/hooks/useInsurance'
 import { InsuranceFormModal } from '@features/insurance/ui/InsuranceFormModal'
 
 export function InsurancesPage() {
+  const { t } = useTranslation()
   const [page, setPage] = useState(1)
   const [carFilter, setCarFilter] = useState<string | null>(null)
 
@@ -33,8 +35,8 @@ export function InsurancesPage() {
   return (
     <Container>
       <Group justify="space-between" align="center" mb="xs">
-        <Title order={2}>Insurances</Title>
-        <Button onClick={() => setModalOpened(true)}>Add insurance</Button>
+        <Title order={2}>{t('insurances.title')}</Title>
+        <Button onClick={() => setModalOpened(true)}>{t('insurances.add')}</Button>
       </Group>
 
       <Group align="flex-end" mb="md">

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 
 import { Button, Group, Modal, NumberInput, Select, Stack, Text, TextInput } from '@mantine/core'
+import { DateInput } from '@mantine/dates'
 
 import { useCarsQuery } from '@features/cars/hooks/useCars'
 
@@ -14,7 +15,7 @@ type Props = {
 }
 
 export function InspectionFormModal({ opened, onClose, onCreate, isSubmitting }: Props) {
-  const today = useMemo(() => new Date().toISOString().slice(0, 10), [])
+  const today = useMemo(() => new Date(), [])
   const initial = useMemo(
     () => ({
       car: null as string | null,
@@ -49,7 +50,7 @@ export function InspectionFormModal({ opened, onClose, onCreate, isSubmitting }:
     const payload: InspectionCreatePayload = {
       car: carId,
       number: form.number.trim(),
-      inspected_at: form.inspected_at,
+      inspected_at: form.inspected_at.toISOString().slice(0, 10),
       cost: form.cost,
     }
 
@@ -76,15 +77,15 @@ export function InspectionFormModal({ opened, onClose, onCreate, isSubmitting }:
         <TextInput
           label="Number"
           value={form.number}
-          onChange={(e) => setForm((s) => ({ ...s, number: e.currentTarget.value }))}
+          onChange={(e) => setForm((s) => ({ ...s, number: e.target.value }))}
           required
         />
 
-        <TextInput
-          label="Inspected at"
-          placeholder="YYYY-MM-DD"
+        <DateInput
+          label="Date"
+          placeholder="Select date"
           value={form.inspected_at}
-          onChange={(e) => setForm((s) => ({ ...s, inspected_at: e.currentTarget.value }))}
+          onChange={(value) => value && setForm((s) => ({ ...s, inspected_at: value }))}
           required
         />
 

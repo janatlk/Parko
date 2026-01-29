@@ -1,12 +1,14 @@
 import { useMemo, useState } from 'react'
 
 import { Button, Container, Group, Pagination, Select, Table, Text, Title } from '@mantine/core'
+import { useTranslation } from 'react-i18next'
 
 import { useCarsQuery } from '@features/cars/hooks/useCars'
 import { useCreateInspectionMutation, useInspectionsQuery } from '@features/inspections/hooks/useInspections'
 import { InspectionFormModal } from '@features/inspections/ui/InspectionFormModal'
 
 export function InspectionsPage() {
+  const { t } = useTranslation()
   const [page, setPage] = useState(1)
   const [carFilter, setCarFilter] = useState<string | null>(null)
 
@@ -33,8 +35,8 @@ export function InspectionsPage() {
   return (
     <Container>
       <Group justify="space-between" align="center" mb="xs">
-        <Title order={2}>Inspections</Title>
-        <Button onClick={() => setModalOpened(true)}>Add inspection</Button>
+        <Title order={2}>{t('inspections.title')}</Title>
+        <Button onClick={() => setModalOpened(true)}>{t('inspections.add')}</Button>
       </Group>
 
       <Group align="flex-end" mb="md">

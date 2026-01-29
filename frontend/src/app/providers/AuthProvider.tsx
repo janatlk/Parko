@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import type { LoginRequest } from '@entities/auth/types'
 import type { User } from '@entities/user/types'
 import { clearTokens, getAccessToken, getRefreshToken, setTokens } from '@shared/api/tokenStorage'
+import { i18n } from '@shared/i18n'
 
 import { loginApi, logoutApi, meApi, refreshApi } from '@features/auth/api/authApi'
 
@@ -37,6 +38,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     void bootstrap()
   }, [bootstrap])
+
+  // Sync i18n with user language on user change
+  useEffect(() => {
+    if (user?.language) {
+      void i18n.changeLanguage(user.language)
+    }
+  }, [user?.language])
 
   const login = useCallback(async (payload: LoginRequest) => {
     const data = await loginApi(payload)

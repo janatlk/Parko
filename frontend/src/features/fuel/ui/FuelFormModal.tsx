@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 
 import { Button, Group, Modal, NumberInput, Select, Stack, Text } from '@mantine/core'
+import { MonthPickerInput } from '@mantine/dates'
+import { useTranslation } from 'react-i18next'
 
 import { useCarsQuery } from '@features/cars/hooks/useCars'
 
@@ -14,12 +16,12 @@ type Props = {
 }
 
 export function FuelFormModal({ opened, onClose, onCreate, isSubmitting }: Props) {
+  const { t } = useTranslation()
   const now = useMemo(() => new Date(), [])
   const initial = useMemo(
     () => ({
       car: null as string | null,
-      year: now.getFullYear(),
-      month: now.getMonth() + 1,
+      date: now,
       liters: 0,
       total_cost: 0,
       monthly_mileage: 0,
@@ -46,12 +48,12 @@ export function FuelFormModal({ opened, onClose, onCreate, isSubmitting }: Props
   const submit = async () => {
     const carId = form.car ? Number(form.car) : NaN
     if (!carId || Number.isNaN(carId)) return
-    if (!form.year || !form.month) return
+    if (!form.date) return
 
     const payload: FuelCreatePayload = {
       car: carId,
-      year: form.year,
-      month: form.month,
+      year: form.date.getFullYear(),
+      month: form.date.getMonth() + 1,
       liters: form.liters,
       total_cost: form.total_cost,
       monthly_mileage: form.monthly_mileage,
@@ -62,13 +64,13 @@ export function FuelFormModal({ opened, onClose, onCreate, isSubmitting }: Props
   }
 
   return (
-    <Modal opened={opened} onClose={onClose} title="Add fuel record" centered>
+    <Modal opened={opened} onClose={onClose} title={t('fuel.form.title')} centered>
       <Stack>
-        {isCarsLoading && <Text c="dimmed">Loading cars...</Text>}
-        {isCarsError && <Text c="red">Failed to load cars</Text>}
+        {isCarsLoading && <Text c="dimmed">{t('common.loading')}</Text>}
+        {isCarsError && <Text c="red">{t('fuel.form.failed_to_load_cars')}</Text>}
 
         <Select
-          label="Car"
+          label={t('fuel.form.car')}
           data={carOptions}
           value={form.car}
           onChange={(value) => setForm((s) => ({ ...s, car: value }))}
@@ -77,26 +79,16 @@ export function FuelFormModal({ opened, onClose, onCreate, isSubmitting }: Props
           disabled={isCarsLoading || isCarsError}
         />
 
-        <NumberInput
-          label="Year"
-          value={form.year}
-          onChange={(value) => setForm((s) => ({ ...s, year: Number(value || 0) }))}
-          min={2000}
-          max={2100}
+        <MonthPickerInput
+          label={t('fuel.form.period')}
+          placeholder={t('fuel.form.select_period')}
+          value={form.date}
+          onChange={(value) => value && setForm((s) => ({ ...s, date: value }))}
           required
         />
 
         <NumberInput
-          label="Month"
-          value={form.month}
-          onChange={(value) => setForm((s) => ({ ...s, month: Number(value || 0) }))}
-          min={1}
-          max={12}
-          required
-        />
-
-        <NumberInput
-          label="Liters"
+          label={t('fuel.form.liters')}
           value={form.liters}
           onChange={(value) => setForm((s) => ({ ...s, liters: Number(value || 0) }))}
           min={0}
@@ -104,7 +96,7 @@ export function FuelFormModal({ opened, onClose, onCreate, isSubmitting }: Props
         />
 
         <NumberInput
-          label="Total cost"
+          label={t('fuel.form.total_cost')}
           value={form.total_cost}
           onChange={(value) => setForm((s) => ({ ...s, total_cost: Number(value || 0) }))}
           min={0}
@@ -112,7 +104,7 @@ export function FuelFormModal({ opened, onClose, onCreate, isSubmitting }: Props
         />
 
         <NumberInput
-          label="Monthly mileage"
+          label={t('fuel.form.monthly_mileage')}
           value={form.monthly_mileage}
           onChange={(value) => setForm((s) => ({ ...s, monthly_mileage: Number(value || 0) }))}
           min={0}
@@ -121,10 +113,10 @@ export function FuelFormModal({ opened, onClose, onCreate, isSubmitting }: Props
 
         <Group justify="flex-end">
           <Button variant="default" onClick={onClose} disabled={isSubmitting}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button onClick={() => void submit()} loading={isSubmitting}>
-            Create
+            {t('common.create')}
           </Button>
         </Group>
       </Stack>

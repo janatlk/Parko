@@ -3,9 +3,10 @@ import { useEffect, useState } from 'react'
 
 import { Alert, Button, Container, Paper, PasswordInput, Stack, TextInput, Title } from '@mantine/core'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 
 import { useAuth } from '@features/auth/hooks/useAuth'
+import { showSuccess, showError } from '@shared/utils/toast'
 
 type FormState = {
   username: string
@@ -16,8 +17,13 @@ export function LoginPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { login, user } = useAuth()
+  const [searchParams] = useSearchParams()
+  const isDemo = searchParams.get('demo') === 'true'
 
-  const [form, setForm] = useState<FormState>({ username: '', password: '' })
+  const [form, setForm] = useState<FormState>({
+    username: isDemo ? 'demo' : '',
+    password: isDemo ? 'demo' : ''
+  })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errors, setErrors] = useState<{ username?: string; password?: string }>({})
   const [serverError, setServerError] = useState<string | null>(null)
@@ -69,9 +75,12 @@ export function LoginPage() {
     setIsSubmitting(true)
     try {
       await login({ username: form.username, password: form.password })
+      showSuccess('Вы успешно вошли в систему')
       navigate('/dashboard', { replace: true })
     } catch (err) {
-      setServerError(extractErrorMessage(err))
+      const errorMsg = extractErrorMessage(err)
+      setServerError(errorMsg)
+      showError(errorMsg, 'Ошибка входа')
     } finally {
       setIsSubmitting(false)
     }

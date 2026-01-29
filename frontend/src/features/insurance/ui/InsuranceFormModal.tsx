@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 
 import { Button, Group, Modal, NumberInput, Select, Stack, Text, TextInput } from '@mantine/core'
+import { DateInput } from '@mantine/dates'
 
 import { useCarsQuery } from '@features/cars/hooks/useCars'
 
@@ -14,7 +15,7 @@ type Props = {
 }
 
 export function InsuranceFormModal({ opened, onClose, onCreate, isSubmitting }: Props) {
-  const today = useMemo(() => new Date().toISOString().slice(0, 10), [])
+  const today = useMemo(() => new Date(), [])
   const initial = useMemo(
     () => ({
       car: null as string | null,
@@ -52,8 +53,8 @@ export function InsuranceFormModal({ opened, onClose, onCreate, isSubmitting }: 
       car: carId,
       insurance_type: form.insurance_type,
       number: form.number.trim(),
-      start_date: form.start_date,
-      end_date: form.end_date,
+      start_date: form.start_date.toISOString().slice(0, 10),
+      end_date: form.end_date.toISOString().slice(0, 10),
       cost: form.cost,
     }
 
@@ -91,23 +92,23 @@ export function InsuranceFormModal({ opened, onClose, onCreate, isSubmitting }: 
         <TextInput
           label="Number"
           value={form.number}
-          onChange={(e) => setForm((s) => ({ ...s, number: e.currentTarget.value }))}
+          onChange={(e) => setForm((s) => ({ ...s, number: e.target.value }))}
           required
         />
 
-        <TextInput
+        <DateInput
           label="Start date"
-          placeholder="YYYY-MM-DD"
+          placeholder="Select date"
           value={form.start_date}
-          onChange={(e) => setForm((s) => ({ ...s, start_date: e.currentTarget.value }))}
+          onChange={(value) => value && setForm((s) => ({ ...s, start_date: value }))}
           required
         />
 
-        <TextInput
+        <DateInput
           label="End date"
-          placeholder="YYYY-MM-DD"
+          placeholder="Select date"
           value={form.end_date}
-          onChange={(e) => setForm((s) => ({ ...s, end_date: e.currentTarget.value }))}
+          onChange={(value) => value && setForm((s) => ({ ...s, end_date: value }))}
           required
         />
 

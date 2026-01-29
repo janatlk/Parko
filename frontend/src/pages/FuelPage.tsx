@@ -1,12 +1,14 @@
 import { useMemo, useState } from 'react'
 
 import { Button, Container, Group, Pagination, Select, Table, Text, Title } from '@mantine/core'
+import { useTranslation } from 'react-i18next'
 
 import { useCarsQuery } from '@features/cars/hooks/useCars'
 import { useCreateFuelMutation, useFuelQuery } from '@features/fuel/hooks/useFuel'
 import { FuelFormModal } from '@features/fuel/ui/FuelFormModal'
 
 export function FuelPage() {
+  const { t } = useTranslation()
   const [page, setPage] = useState(1)
   const [carFilter, setCarFilter] = useState<string | null>(null)
 
@@ -37,8 +39,8 @@ export function FuelPage() {
   return (
     <Container>
       <Group justify="space-between" align="center" mb="xs">
-        <Title order={2}>Fuel</Title>
-        <Button onClick={() => setModalOpened(true)}>Add fuel</Button>
+        <Title order={2}>{t('fuel.title')}</Title>
+        <Button onClick={() => setModalOpened(true)}>{t('fuel.add')}</Button>
       </Group>
 
       <Group align="flex-end" mb="md">

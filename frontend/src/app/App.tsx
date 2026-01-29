@@ -1,5 +1,9 @@
 import { MantineProvider } from '@mantine/core'
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { Notifications } from '@mantine/notifications'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+
+import '@mantine/notifications/styles.css'
+import '@mantine/dates/styles.css'
 
 import { ProtectedRoute } from '@app/router/ProtectedRoute'
 import { AppLayout } from '@widgets/layout/AppLayout'
@@ -9,6 +13,7 @@ import { DashboardPage } from '@pages/DashboardPage'
 import { FuelPage } from '@pages/FuelPage'
 import { InspectionsPage } from '@pages/InspectionsPage'
 import { InsurancesPage } from '@pages/InsurancesPage'
+import { LandingPage } from '@pages/LandingPage'
 import { LoginPage } from '@pages/LoginPage'
 import { NotFoundPage } from '@pages/NotFoundPage'
 import { ProfilePage } from '@pages/ProfilePage'
@@ -23,9 +28,22 @@ export function App() {
         primaryColor: 'blue',
       }}
     >
+      <Notifications
+        position="top-right"
+        autoClose={3000}
+        styles={{
+          notification: {
+            opacity: 0.9,
+            pointerEvents: 'auto',
+          },
+          root: {
+            pointerEvents: 'none',
+          },
+        }}
+      />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route
             element={
@@ -50,3 +68,4 @@ export function App() {
     </MantineProvider>
   )
 }
+
