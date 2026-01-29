@@ -37,10 +37,19 @@ const resources = {
         loading_error: 'Не удалось загрузить пользователей',
       },
       cars: {
-        title: 'Машины',
-        add: 'Добавить машину',
+        title: 'Автомобили',
+        add: 'Добавить автомобиль',
         search: 'Поиск',
         status: 'Статус',
+        loading_error: 'Не удалось загрузить машины',
+        table: {
+          id: 'ID',
+          numplate: 'Номер',
+          brand: 'Марка',
+          title: 'Название',
+          driver: 'Водитель',
+          status: 'Статус',
+        },
       },
       fuel: {
         title: 'Топливо',
@@ -176,6 +185,15 @@ const resources = {
         add: 'Add car',
         search: 'Search',
         status: 'Status',
+        loading_error: 'Failed to load cars',
+        table: {
+          id: 'ID',
+          numplate: 'Numplate',
+          brand: 'Brand',
+          title: 'Title',
+          driver: 'Driver',
+          status: 'Status',
+        },
       },
       fuel: {
         title: 'Fuel',

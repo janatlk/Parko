@@ -76,12 +76,12 @@ export function CarsPage() {
           <Table withTableBorder withColumnBorders striped highlightOnHover>
             <Table.Thead>
               <Table.Tr>
-                <Table.Th>ID</Table.Th>
-                <Table.Th>Numplate</Table.Th>
-                <Table.Th>Brand</Table.Th>
-                <Table.Th>Title</Table.Th>
-                <Table.Th>Driver</Table.Th>
-                <Table.Th>Status</Table.Th>
+                <Table.Th>{t('cars.table.id')}</Table.Th>
+                <Table.Th>{t('cars.table.numplate')}</Table.Th>
+                <Table.Th>{t('cars.table.brand')}</Table.Th>
+                <Table.Th>{t('cars.table.title')}</Table.Th>
+                <Table.Th>{t('cars.table.driver')}</Table.Th>
+                <Table.Th>{t('cars.table.status')}</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
