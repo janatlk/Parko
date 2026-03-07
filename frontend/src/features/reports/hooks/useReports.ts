@@ -1,16 +1,207 @@
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-import { getMaintenanceCostsReport } from '../api/reportsApi'
-import type { MaintenanceCostsParams, MaintenanceCostsReport } from '../api/reportsApi'
+import {
+  generateReport,
+  getSavedReports,
+  getSavedReport,
+  getSavedReportData,
+  createSavedReport,
+  updateSavedReport,
+  deleteSavedReport,
+  exportSavedReport,
+  getReportTemplates,
+  createReportTemplate,
+  updateReportTemplate,
+  deleteReportTemplate,
+  type GenerateReportParams,
+  type ReportResponse,
+  type SavedReport,
+  type SavedReportList,
+  type ReportTemplate,
+  type ReportType,
+  type ChartType,
+  type ReportSummary,
+} from '../api/reportsApi'
 
-const reportsKeys = {
+/**
+ * Query keys factory for reports
+ */
+export const reportsKeys = {
   all: ['reports'] as const,
-  maintenanceCosts: (args: MaintenanceCostsParams) => [...reportsKeys.all, 'maintenance-costs', args] as const,
+  generated: (params: GenerateReportParams) => ['reports', 'generated', params] as const,
+  saved: {
+    all: ['reports', 'saved'] as const,
+    list: () => ['reports', 'saved', 'list'] as const,
+    detail: (id: number) => ['reports', 'saved', 'detail', id] as const,
+    data: (id: number) => ['reports', 'saved', 'data', id] as const,
+  },
+  templates: {
+    all: ['reports', 'templates'] as const,
+    list: () => ['reports', 'templates', 'list'] as const,
+  },
 }
 
-export function useMaintenanceCostsReportQuery(args: MaintenanceCostsParams) {
-  return useQuery<MaintenanceCostsReport>({
-    queryKey: reportsKeys.maintenanceCosts(args),
-    queryFn: () => getMaintenanceCostsReport(args),
+/**
+ * Hook for generating reports
+ */
+export function useGenerateReport() {
+  return useMutation<ReportResponse, Error, GenerateReportParams>({
+    mutationFn: generateReport,
+  })
+}
+
+/**
+ * Hook for getting list of saved reports
+ */
+export function useSavedReportsQuery() {
+  return useQuery<SavedReportList[]>({
+    queryKey: reportsKeys.saved.list(),
+    queryFn: getSavedReports,
+    retry: false,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    select: (data) => data || [],
+  })
+}
+
+/**
+ * Hook for getting single saved report
+ */
+export function useSavedReportQuery(id: number) {
+  return useQuery<SavedReport>({
+    queryKey: reportsKeys.saved.detail(id),
+    queryFn: () => getSavedReport(id),
+    enabled: !!id,
+  })
+}
+
+/**
+ * Hook for getting full data of a saved report
+ */
+export function useSavedReportDataQuery(id: number | null) {
+  return useQuery<ReportResponse>({
+    queryKey: reportsKeys.saved.data(id || 0),
+    queryFn: () => getSavedReportData(id as number),
+    enabled: !!id,
+    retry: false,
+  })
+}
+
+/**
+ * Hook for creating a saved report
+ */
+export function useCreateSavedReport() {
+  const qc = useQueryClient()
+  return useMutation<SavedReport, Error, {
+    name: string
+    report_type: ReportType
+    from_date: string
+    to_date: string
+    car_ids: number[] | null
+    filters: Record<string, unknown>
+    summary: ReportSummary
+  }>({
+    mutationFn: createSavedReport,
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: reportsKeys.saved.all })
+    },
+  })
+}
+
+/**
+ * Hook for updating a saved report
+ */
+export function useUpdateSavedReport() {
+  const qc = useQueryClient()
+  return useMutation<SavedReport, Error, {
+    id: number
+    payload: Partial<{ name: string; filters: Record<string, unknown> }>
+  }>({
+    mutationFn: ({ id, payload }) => updateSavedReport(id, payload),
+    onSuccess: (_, { id }) => {
+      qc.invalidateQueries({ queryKey: reportsKeys.saved.detail(id) })
+      qc.invalidateQueries({ queryKey: reportsKeys.saved.all })
+    },
+  })
+}
+
+/**
+ * Hook for deleting a saved report
+ */
+export function useDeleteSavedReport() {
+  const qc = useQueryClient()
+  return useMutation<void, Error, number>({
+    mutationFn: deleteSavedReport,
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: reportsKeys.saved.all })
+    },
+  })
+}
+
+/**
+ * Hook for exporting a saved report
+ */
+export function useExportSavedReport() {
+  return useMutation<Blob | ReportResponse, Error, { id: number; format: 'json' | 'csv' | 'xlsx' }>({
+    mutationFn: ({ id, format }) => exportSavedReport(id, format),
+  })
+}
+
+/**
+ * Hook for getting report templates
+ */
+export function useReportTemplatesQuery() {
+  return useQuery<ReportTemplate[]>({
+    queryKey: reportsKeys.templates.list(),
+    queryFn: getReportTemplates,
+  })
+}
+
+/**
+ * Hook for creating a report template
+ */
+export function useCreateReportTemplate() {
+  const qc = useQueryClient()
+  return useMutation<ReportTemplate, Error, {
+    name: string
+    description?: string
+    report_type: ReportType
+    default_from_date: string
+    default_to_date: string
+    default_car_ids?: number[] | null
+    default_filters?: Record<string, unknown>
+    show_charts?: boolean
+    chart_types?: ChartType[]
+    is_public?: boolean
+  }>({
+    mutationFn: createReportTemplate,
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: reportsKeys.templates.all })
+    },
+  })
+}
+
+/**
+ * Hook for updating a report template
+ */
+export function useUpdateReportTemplate() {
+  const qc = useQueryClient()
+  return useMutation<ReportTemplate, Error, { id: number; payload: Partial<ReportTemplate> }>({
+    mutationFn: ({ id, payload }) => updateReportTemplate(id, payload),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: reportsKeys.templates.all })
+    },
+  })
+}
+
+/**
+ * Hook for deleting a report template
+ */
+export function useDeleteReportTemplate() {
+  const qc = useQueryClient()
+  return useMutation<void, Error, number>({
+    mutationFn: deleteReportTemplate,
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: reportsKeys.templates.all })
+    },
   })
 }

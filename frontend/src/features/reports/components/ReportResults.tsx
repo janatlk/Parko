@@ -1,0 +1,309 @@
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Legend,
+  Line,
+  LineChart,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts'
+import {
+  ActionIcon,
+  Button,
+  Group,
+  Paper,
+  SimpleGrid,
+  Stack,
+  Table,
+  Text,
+  Title,
+} from '@mantine/core'
+import { IconDownload, IconFileExport, IconTable } from '@tabler/icons-react'
+import { useTranslation } from 'react-i18next'
+
+import type { ChartData, ReportResponse } from '../api/reportsApi'
+
+interface ReportResultsProps {
+  report: ReportResponse
+  onExport: (format: 'json' | 'csv' | 'xlsx') => void
+}
+
+const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316']
+
+/**
+ * Render different chart types based on data
+ */
+function ChartRenderer({ chart }: { chart: ChartData }) {
+  const { type, title, data } = chart
+
+  if (type === 'bar') {
+    return (
+      <Paper p="md" withBorder>
+        <Title order={5} mb="md" ta="center">
+          {title}
+        </Title>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={prepareBarChartData(data)}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            {data.datasets?.map((dataset, idx) => (
+              <Bar
+                key={idx}
+                dataKey={dataset.label}
+                fill={dataset.backgroundColor as string}
+                name={dataset.label}
+              />
+            ))}
+          </BarChart>
+        </ResponsiveContainer>
+      </Paper>
+    )
+  }
+
+  if (type === 'line') {
+    return (
+      <Paper p="md" withBorder>
+        <Title order={5} mb="md" ta="center">
+          {title}
+        </Title>
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart data={prepareLineChartData(data)}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            {data.datasets?.map((dataset, idx) => (
+              <Line
+                key={idx}
+                type="monotone"
+                dataKey={dataset.label}
+                stroke={dataset.borderColor as string}
+                fill={dataset.backgroundColor as string}
+                name={dataset.label}
+              />
+            ))}
+          </LineChart>
+        </ResponsiveContainer>
+      </Paper>
+    )
+  }
+
+  if (type === 'pie' || type === 'doughnut') {
+    return (
+      <Paper p="md" withBorder>
+        <Title order={5} mb="md" ta="center">
+          {title}
+        </Title>
+        <ResponsiveContainer width="100%" height={300}>
+          <PieChart>
+            <Pie
+              data={preparePieChartData(data)}
+              cx="50%"
+              cy="50%"
+              labelLine={false}
+              label={({ name, value }) => `${name}: ${formatNumber(value)}`}
+              outerRadius={type === 'doughnut' ? 80 : 100}
+              fill="#8884d8"
+              dataKey="value"
+              nameKey="name"
+            >
+              {preparePieChartData(data).map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.fill || COLORS[index % COLORS.length]} />
+              ))}
+            </Pie>
+            <Tooltip formatter={(value) => formatNumber(value as number)} />
+            <Legend />
+          </PieChart>
+        </ResponsiveContainer>
+      </Paper>
+    )
+  }
+
+  return null
+}
+
+/**
+ * Prepare data for bar charts
+ */
+function prepareBarChartData(data: ChartData['data']) {
+  if (!data.labels || !data.datasets) return []
+
+  return data.labels.map((label, idx) => {
+    const entry: Record<string, string | number | null> = { name: label }
+    data.datasets?.forEach((dataset) => {
+      entry[dataset.label] = dataset.data?.[idx] ?? null
+    })
+    return entry
+  })
+}
+
+/**
+ * Prepare data for line charts
+ */
+function prepareLineChartData(data: ChartData['data']) {
+  return prepareBarChartData(data)
+}
+
+/**
+ * Prepare data for pie charts
+ */
+function preparePieChartData(data: ChartData['data']) {
+  if (!data.data || !data.labels) return []
+
+  return data.labels.map((label, idx) => ({
+    name: label,
+    value: data.data?.[idx] ?? 0,
+    fill: data.backgroundColor?.[idx] || COLORS[idx % COLORS.length],
+  }))
+}
+
+/**
+ * Format large numbers for display
+ */
+function formatNumber(num: number): string {
+  if (num >= 1000000) {
+    return `${(num / 1000000).toFixed(1)}M`
+  }
+  if (num >= 1000) {
+    return `${(num / 1000).toFixed(1)}K`
+  }
+  return num.toFixed(1)
+}
+
+/**
+ * Summary Card Component
+ */
+function SummaryCard({ label, value }: { label: string; value: string | number }) {
+  return (
+    <Paper p="md" withBorder>
+      <Text size="sm" c="dimmed">
+        {label}
+      </Text>
+      <Text size="xl" fw={700}>
+        {typeof value === 'number' ? formatNumber(value) : value}
+      </Text>
+    </Paper>
+  )
+}
+
+export function ReportResults({ report, onExport }: ReportResultsProps) {
+  const { t } = useTranslation()
+  const { data, summary, charts } = report
+
+  const hasData = data && data.length > 0
+  const hasCharts = charts && charts.length > 0
+  const hasSummary = summary && Object.keys(summary).length > 0
+
+  if (!hasData) {
+    return (
+      <Paper p="md" withBorder>
+        <Text c="dimmed" ta="center">
+          {t('reports.no_data') || 'No data available for selected criteria'}
+        </Text>
+      </Paper>
+    )
+  }
+
+  return (
+    <Stack gap="md">
+      {/* Export Actions */}
+      <Group justify="flex-end">
+        <Button
+          variant="subtle"
+          size="sm"
+          leftSection={<IconFileExport size={16} />}
+          onClick={() => onExport('json')}
+        >
+          {t('reports.export_json') || 'JSON'}
+        </Button>
+        <Button
+          variant="subtle"
+          size="sm"
+          leftSection={<IconDownload size={16} />}
+          onClick={() => onExport('csv')}
+        >
+          {t('reports.export_csv') || 'CSV'}
+        </Button>
+        <Button
+          variant="subtle"
+          size="sm"
+          leftSection={<IconDownload size={16} />}
+          onClick={() => onExport('xlsx')}
+        >
+          {t('reports.export_xlsx') || 'Excel'}
+        </Button>
+      </Group>
+
+      {/* Summary Cards */}
+      {hasSummary && (
+        <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="md">
+          {Object.entries(summary).slice(0, 4).map(([key, value]) => (
+            <SummaryCard key={key} label={formatLabel(key)} value={value as number} />
+          ))}
+        </SimpleGrid>
+      )}
+
+      {/* Charts */}
+      {hasCharts && (
+        <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="md">
+          {charts?.map((chart, idx) => (
+            <ChartRenderer key={idx} chart={chart} />
+          ))}
+        </SimpleGrid>
+      )}
+
+      {/* Data Table */}
+      <Paper p="md" withBorder>
+        <Group justify="space-between" mb="md">
+          <Title order={4}>
+            {t('reports.data_table') || 'Data Table'}
+          </Title>
+          <ActionIcon variant="subtle">
+            <IconTable size={18} />
+          </ActionIcon>
+        </Group>
+
+        <Table striped highlightOnHover withTableBorder>
+          <Table.Thead>
+            <Table.Tr>
+              {Object.keys(data[0]).map((key) => (
+                <Table.Th key={key}>{formatLabel(key)}</Table.Th>
+              ))}
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>
+            {data.map((row, idx) => (
+              <Table.Tr key={idx}>
+                {Object.values(row).map((value, i) => (
+                  <Table.Td key={i}>
+                    {typeof value === 'number' ? formatNumber(value) : String(value)}
+                  </Table.Td>
+                ))}
+              </Table.Tr>
+            ))}
+          </Table.Tbody>
+        </Table>
+      </Paper>
+    </Stack>
+  )
+}
+
+/**
+ * Format camelCase/snake_case labels to readable text
+ */
+function formatLabel(key: string): string {
+  return key
+    .replace(/([A-Z])/g, ' $1')
+    .replace(/_/g, ' ')
+    .replace(/^./, (str) => str.toUpperCase())
+}

@@ -34,6 +34,11 @@ export const http: AxiosInstance = axios.create({
 })
 
 http.interceptors.response.use((response) => {
+  // Don't process blob responses
+  if (response.data instanceof Blob) {
+    return response
+  }
+
   const payload = response.data as unknown
 
   if (payload && typeof payload === 'object') {

@@ -113,6 +113,8 @@ REST_FRAMEWORK = {
         'rest_framework.filters.OrderingFilter',
     ],
     'EXCEPTION_HANDLER': 'core.exceptions.custom_exception_handler',
+    'UNICODE_JSON': True,
+    'STRICT_JSON': False,
 }
 
 # Spectacular settings

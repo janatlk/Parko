@@ -1,221 +1,280 @@
 import { useState } from 'react'
 
-import {
-  Button,
-  Container,
-  Group,
-  MultiSelect,
-  Paper,
-  Select,
-  Stack,
-  Table,
-  Text,
-  Title,
-} from '@mantine/core'
-import { DatePickerInput } from '@mantine/dates'
+import { Container, Tabs, Title, Stack, Notification } from '@mantine/core'
+import { IconChartBar, IconFolderOpen, IconExclamationCircle, IconCheck } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
+import { notifications } from '@mantine/notifications'
 
 import { useCarsQuery } from '@features/cars/hooks/useCars'
-
-type ReportType = 'fuel_consumption' | 'maintenance_costs' | 'insurance_inspection' | 'vehicle_utilization' | 'cost_analysis'
+import {
+  useGenerateReport,
+  useSavedReportsQuery,
+  useCreateSavedReport,
+  useExportSavedReport,
+  useSavedReportDataQuery,
+} from '@features/reports/hooks/useReports'
+import { ReportBuilder } from '@features/reports/components/ReportBuilder'
+import { ReportResults } from '@features/reports/components/ReportResults'
+import { SavedReportsList } from '@features/reports/components/SavedReportsList'
+import type { ReportResponse, SavedReportList, ReportType } from '@features/reports/api/reportsApi'
 
 export function ReportsPage() {
   const { t } = useTranslation()
-  const [dateRange, setDateRange] = useState<[string | null, string | null]>([null, null])
-  const [selectedCars, setSelectedCars] = useState<string[]>([])
-  const [reportType, setReportType] = useState<ReportType | null>(null)
-  const [reportData, setReportData] = useState<any>(null)
-  const [isLoading, setIsLoading] = useState(false)
+  const [activeTab, setActiveTab] = useState<string | null>('new')
+  const [generatedReport, setGeneratedReport] = useState<ReportResponse | null>(null)
+  const [selectedSavedReport, setSelectedSavedReport] = useState<SavedReportList | null>(null)
 
-  const { data: carsData } = useCarsQuery({ page: 1 })
+  // Queries
+  const { data: carsData, isLoading: isLoadingCars } = useCarsQuery({ page: 1 })
+  const { data: savedReports, isLoading: isLoadingSaved } = useSavedReportsQuery()
+  const { data: savedReportData } = useSavedReportDataQuery(selectedSavedReport?.id ?? null)
+
+  // Mutations
+  const generateMutation = useGenerateReport()
+  const createSavedMutation = useCreateSavedReport()
+  const exportMutation = useExportSavedReport()
+
+  // Prepare car options for the builder
   const carOptions =
     carsData?.results.map((car) => ({
       value: String(car.id),
       label: `${car.numplate} - ${car.brand}`,
     })) || []
 
-  const reportTypes = [
-    { value: 'fuel_consumption', label: t('reports.fuel_consumption') || 'Fuel Consumption' },
-    { value: 'maintenance_costs', label: t('reports.maintenance_costs') || 'Maintenance Costs' },
-    {
-      value: 'insurance_inspection',
-      label: t('reports.insurance_inspection') || 'Insurance & Inspections',
-    },
-    {
-      value: 'vehicle_utilization',
-      label: t('reports.vehicle_utilization') || 'Vehicle Utilization',
-    },
-    { value: 'cost_analysis', label: t('reports.cost_analysis') || 'Cost Analysis' },
-  ]
+  // Show loading state
+  if (isLoadingCars) {
+    return (
+      <Container size="xl" py="lg">
+        <Stack align="center" justify="center" style={{ minHeight: '200px' }}>
+          <Title order={2}>{t('common.loading') || 'Loading...'}</Title>
+        </Stack>
+      </Container>
+    )
+  }
 
-  const handleGenerate = async () => {
-    if (!reportType || !dateRange[0] || !dateRange[1]) {
-      return
-    }
+  /**
+   * Handle report generation
+   */
+  const handleGenerate = async (params: {
+    report_type: string
+    from_date: string
+    to_date: string
+    car_ids: number[] | null
+    save_report: boolean
+    report_name?: string
+  }) => {
+    console.log('Generating report with params:', params)
+    
+    generateMutation.mutate(
+      {
+        report_type: params.report_type as ReportType,
+        from_date: params.from_date,
+        to_date: params.to_date,
+        car_ids: params.car_ids,
+        include_charts: true,
+      },
+      {
+        onSuccess: (data) => {
+          console.log('Report generated successfully:', data)
+          setGeneratedReport(data)
 
-    setIsLoading(true)
-    try {
-      // TODO: Call API /api/v1/reports/generate/
-      const response = await fetch('/api/v1/reports/generate/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+          // Save report if requested
+          if (params.save_report && params.report_name) {
+            createSavedMutation.mutate(
+              {
+                name: params.report_name,
+                report_type: params.report_type as ReportType,
+                from_date: params.from_date,
+                to_date: params.to_date,
+                car_ids: params.car_ids,
+                filters: {},
+                summary: data.summary,
+              },
+              {
+                onSuccess: () => {
+                  notifications.show({
+                    title: t('reports.report_saved') || 'Report Saved',
+                    message: t('reports.report_saved_message') || 'Your report has been saved successfully',
+                    icon: <IconCheck />,
+                    color: 'green',
+                  })
+                },
+                onError: (error) => {
+                  console.error('Save error:', error)
+                  notifications.show({
+                    title: t('reports.save_failed') || 'Save Failed',
+                    message: t('reports.save_failed_message') || 'Failed to save the report',
+                    icon: <IconExclamationCircle />,
+                    color: 'red',
+                  })
+                },
+              },
+            )
+          }
+
+          notifications.show({
+            title: t('reports.report_generated') || 'Report Generated',
+            message: t('reports.report_generated_message') || 'Your report is ready to view',
+            icon: <IconCheck />,
+            color: 'green',
+          })
         },
-        body: JSON.stringify({
-          report_type: reportType,
-          from_date: dateRange[0] ? new Date(dateRange[0]).toISOString().split('T')[0] : null,
-          to_date: dateRange[1] ? new Date(dateRange[1]).toISOString().split('T')[0] : null,
-          car_ids: selectedCars.length > 0 ? selectedCars.map(Number) : null,
-          export_format: 'json',
-        }),
+        onError: (error) => {
+          console.error('Generate report error:', error)
+          notifications.show({
+            title: t('reports.generation_failed') || 'Generation Failed',
+            message: error instanceof Error ? error.message : (t('reports.generation_failed_message') || 'Failed to generate the report'),
+            icon: <IconExclamationCircle />,
+            color: 'red',
+          })
+        },
+      },
+    )
+  }
+
+  /**
+   * Handle export
+   */
+  const handleExport = async (format: 'json' | 'csv' | 'xlsx') => {
+    if (!generatedReport) return
+
+    try {
+      const blob = await exportMutation.mutateAsync({
+        id: 0, // Not used for new reports
+        format,
       })
 
-      const data = await response.json()
-      setReportData(data)
-    } catch (error) {
-      console.error('Failed to generate report:', error)
-    } finally {
-      setIsLoading(false)
+      // For JSON format, we need to handle differently
+      if (format === 'json' && typeof blob === 'object') {
+        const jsonBlob = new Blob([JSON.stringify(blob, null, 2)], { type: 'application/json' })
+        downloadBlob(jsonBlob, `report_${generatedReport.report_type}_${Date.now()}.json`)
+      } else {
+        downloadBlob(blob as Blob, `report_${generatedReport.report_type}_${Date.now()}.${format}`)
+      }
+
+      notifications.show({
+        title: t('reports.export_success') || 'Export Successful',
+        message: t('reports.export_success_message') || 'Your report has been downloaded',
+        icon: <IconCheck />,
+        color: 'green',
+      })
+    } catch {
+      notifications.show({
+        title: t('reports.export_failed') || 'Export Failed',
+        message: t('reports.export_failed_message') || 'Failed to export the report',
+        icon: <IconExclamationCircle />,
+        color: 'red',
+      })
     }
   }
 
-  const handleExport = async (format: 'csv' | 'xlsx' | 'json') => {
-    if (!reportType || !dateRange[0] || !dateRange[1]) return
+  /**
+   * Handle viewing a saved report
+   */
+  const handleViewSaved = (report: SavedReportList) => {
+    setSelectedSavedReport(report)
+    setActiveTab('results')
+  }
 
-    const response = await fetch('/api/v1/reports/generate/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-      },
-      body: JSON.stringify({
-        report_type: reportType,
-        from_date: dateRange[0] ? new Date(dateRange[0]).toISOString().split('T')[0] : null,
-        to_date: dateRange[1] ? new Date(dateRange[1]).toISOString().split('T')[0] : null,
-        car_ids: selectedCars.length > 0 ? selectedCars.map(Number) : null,
-        export_format: format,
-      }),
-    })
+  /**
+   * Handle exporting a saved report
+   */
+  const handleExportSaved = async (report: SavedReportList, format: 'json' | 'csv' | 'xlsx') => {
+    try {
+      const blob = await exportMutation.mutateAsync({ id: report.id, format })
 
-    if (format === 'json') {
-      const data = await response.json()
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `report_${reportType}_${Date.now()}.json`
-      a.click()
-    } else {
-      const blob = await response.blob()
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `report_${reportType}_${Date.now()}.${format}`
-      a.click()
+      if (format === 'json' && typeof blob === 'object') {
+        const jsonBlob = new Blob([JSON.stringify(blob, null, 2)], { type: 'application/json' })
+        downloadBlob(jsonBlob, `report_${report.name}_${Date.now()}.json`)
+      } else {
+        downloadBlob(blob as Blob, `report_${report.name}_${Date.now()}.${format}`)
+      }
+
+      notifications.show({
+        title: t('reports.export_success') || 'Export Successful',
+        message: t('reports.export_success_message') || 'Your report has been downloaded',
+        icon: <IconCheck />,
+        color: 'green',
+      })
+    } catch {
+      notifications.show({
+        title: t('reports.export_failed') || 'Export Failed',
+        message: t('reports.export_failed_message') || 'Failed to export the report',
+        icon: <IconExclamationCircle />,
+        color: 'red',
+      })
     }
+  }
+
+  /**
+   * Helper to download blob
+   */
+  const downloadBlob = (blob: Blob, filename: string) => {
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = filename
+    link.click()
+    window.URL.revokeObjectURL(url)
   }
 
   return (
-    <Container size="xl">
-      <Group justify="space-between" mb="lg">
-        <Title order={1}>{t('reports.title')}</Title>
-        <Group gap="xs">
-          <Button variant="subtle" size="sm" onClick={() => handleExport('json')}>
-            Export JSON
-          </Button>
-          <Button variant="subtle" size="sm" onClick={() => handleExport('csv')}>
-            Export CSV
-          </Button>
-          <Button variant="subtle" size="sm" onClick={() => handleExport('xlsx')}>
-            Export Excel
-          </Button>
-        </Group>
-      </Group>
+    <Container size="xl" py="lg">
+      <Stack gap="md">
+        <Title order={1}>{t('reports.title') || 'Reports'}</Title>
 
-      <Paper p="md" shadow="xs" mb="lg">
-        <Stack gap="md">
-          <Title order={3}>Filters</Title>
+        <Tabs value={activeTab} onChange={setActiveTab} color="blue">
+          <Tabs.List>
+            <Tabs.Tab
+              value="new"
+              leftSection={<IconChartBar size={16} />}
+              onClick={() => {
+                setGeneratedReport(null)
+                setSelectedSavedReport(null)
+              }}
+            >
+              {t('reports.new_report') || 'New Report'}
+            </Tabs.Tab>
+            <Tabs.Tab
+              value="saved"
+              leftSection={<IconFolderOpen size={16} />}
+              onClick={() => setSelectedSavedReport(null)}
+            >
+              {t('reports.saved_reports') || 'Saved Reports'}
+            </Tabs.Tab>
+            <Tabs.Tab value="results" disabled={!generatedReport && !selectedSavedReport}>
+              {t('reports.results') || 'Results'}
+            </Tabs.Tab>
+          </Tabs.List>
 
-          <DatePickerInput
-            type="range"
-            label="Date Range"
-            placeholder="Select period"
-            value={dateRange}
-            onChange={setDateRange}
-            clearable
-          />
+          <Tabs.Panel value="new" pt="md">
+            <ReportBuilder carOptions={carOptions} onGenerate={handleGenerate} isLoading={generateMutation.isPending} />
+          </Tabs.Panel>
 
-          <MultiSelect
-            label="Vehicles"
-            placeholder="Select vehicles or leave empty for all"
-            data={carOptions}
-            value={selectedCars}
-            onChange={setSelectedCars}
-            searchable
-            clearable
-          />
+          <Tabs.Panel value="saved" pt="md">
+            <SavedReportsList
+              reports={savedReports || []}
+              isLoading={isLoadingSaved}
+              onView={handleViewSaved}
+              onExport={handleExportSaved}
+            />
+          </Tabs.Panel>
 
-          <Select
-            label="Report Type"
-            placeholder="Select report type"
-            data={reportTypes}
-            value={reportType}
-            onChange={(value) => setReportType(value as ReportType)}
-            clearable
-          />
-
-          <Button onClick={handleGenerate} loading={isLoading} disabled={!reportType || !dateRange[0] || !dateRange[1]}>
-            Generate Report
-          </Button>
-        </Stack>
-      </Paper>
-
-      {reportData && (
-        <Paper p="md" shadow="xs">
-          <Title order={3} mb="md">
-            Results
-          </Title>
-
-          {reportData.data && reportData.data.length > 0 ? (
-            <>
-              <Table striped highlightOnHover withTableBorder>
-                <Table.Thead>
-                  <Table.Tr>
-                    {Object.keys(reportData.data[0]).map((key) => (
-                      <Table.Th key={key}>{key}</Table.Th>
-                    ))}
-                  </Table.Tr>
-                </Table.Thead>
-                <Table.Tbody>
-                  {reportData.data.map((row: any, idx: number) => (
-                    <Table.Tr key={idx}>
-                      {Object.values(row).map((value: any, i: number) => (
-                        <Table.Td key={i}>{String(value)}</Table.Td>
-                      ))}
-                    </Table.Tr>
-                  ))}
-                </Table.Tbody>
-              </Table>
-
-              {reportData.summary && (
-                <Paper p="md" mt="md" bg="gray.0">
-                  <Title order={4} mb="sm">
-                    Summary
-                  </Title>
-                  {Object.entries(reportData.summary).map(([key, value]) => (
-                    <Text key={key}>
-                      <strong>{key}:</strong> {String(value)}
-                    </Text>
-                  ))}
-                </Paper>
-              )}
-            </>
-          ) : (
-            <Text c="dimmed">No data available for selected criteria</Text>
-          )}
-        </Paper>
-      )}
+          <Tabs.Panel value="results" pt="md">
+            {generatedReport && (
+              <ReportResults report={generatedReport} onExport={handleExport} />
+            )}
+            {selectedSavedReport && savedReportData && (
+              <ReportResults report={savedReportData} onExport={(format) => handleExportSaved(selectedSavedReport, format)} />
+            )}
+            {!generatedReport && !savedReportData && (
+              <Notification icon={<IconExclamationCircle />} color="gray">
+                {t('reports.no_report_selected') || 'No report selected'}
+              </Notification>
+            )}
+          </Tabs.Panel>
+        </Tabs>
+      </Stack>
     </Container>
   )
 }

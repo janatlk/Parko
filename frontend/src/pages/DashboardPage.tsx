@@ -168,11 +168,14 @@ export function DashboardPage() {
                 active={stats?.active_cars}
                 maintenance={stats?.maintenance_cars}
                 inactive={stats?.inactive_cars}
+
               />
             </Paper>
           </Stack>
         </SimpleGrid>
       </Stack>
     </Container>
+    
   )
 }
+
