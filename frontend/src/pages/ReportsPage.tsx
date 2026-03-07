@@ -21,7 +21,7 @@ type ReportType = 'fuel_consumption' | 'maintenance_costs' | 'insurance_inspecti
 
 export function ReportsPage() {
   const { t } = useTranslation()
-  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null])
+  const [dateRange, setDateRange] = useState<[string | null, string | null]>([null, null])
   const [selectedCars, setSelectedCars] = useState<string[]>([])
   const [reportType, setReportType] = useState<ReportType | null>(null)
   const [reportData, setReportData] = useState<any>(null)
@@ -64,8 +64,8 @@ export function ReportsPage() {
         },
         body: JSON.stringify({
           report_type: reportType,
-          from_date: dateRange[0].toISOString().split('T')[0],
-          to_date: dateRange[1].toISOString().split('T')[0],
+          from_date: dateRange[0] ? new Date(dateRange[0]).toISOString().split('T')[0] : null,
+          to_date: dateRange[1] ? new Date(dateRange[1]).toISOString().split('T')[0] : null,
           car_ids: selectedCars.length > 0 ? selectedCars.map(Number) : null,
           export_format: 'json',
         }),
@@ -91,8 +91,8 @@ export function ReportsPage() {
       },
       body: JSON.stringify({
         report_type: reportType,
-        from_date: dateRange[0].toISOString().split('T')[0],
-        to_date: dateRange[1].toISOString().split('T')[0],
+        from_date: dateRange[0] ? new Date(dateRange[0]).toISOString().split('T')[0] : null,
+        to_date: dateRange[1] ? new Date(dateRange[1]).toISOString().split('T')[0] : null,
         car_ids: selectedCars.length > 0 ? selectedCars.map(Number) : null,
         export_format: format,
       }),

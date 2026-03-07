@@ -22,13 +22,13 @@ export function InspectionFormModal({ opened, onClose, onCreate, isSubmitting }:
     () => ({
       car: null as string | null,
       number: '',
-      inspected_at: today,
+      inspected_at: today as Date | string,
       cost: 0,
     }),
     [today],
   )
 
-  const [form, setForm] = useState(initial)
+  const [form, setForm] = useState<typeof initial>(initial)
 
   useEffect(() => {
     if (opened) setForm(initial)
@@ -49,10 +49,12 @@ export function InspectionFormModal({ opened, onClose, onCreate, isSubmitting }:
     if (!carId || Number.isNaN(carId)) return
     if (!form.number.trim()) return
 
+    const dateObj = form.inspected_at instanceof Date ? form.inspected_at : new Date(form.inspected_at)
+
     const payload: InspectionCreatePayload = {
       car: carId,
       number: form.number.trim(),
-      inspected_at: form.inspected_at.toISOString().slice(0, 10),
+      inspected_at: dateObj.toISOString().slice(0, 10),
       cost: form.cost,
     }
 
@@ -87,7 +89,11 @@ export function InspectionFormModal({ opened, onClose, onCreate, isSubmitting }:
           label={t('inspections.form.inspected_at')}
           placeholder={t('inspections.form.inspected_at')}
           value={form.inspected_at}
-          onChange={(value) => value && setForm((s) => ({ ...s, inspected_at: value }))}
+          onChange={(value) => {
+            if (value) {
+              setForm((s) => ({ ...s, inspected_at: value }))
+            }
+          }}
           required
         />
 

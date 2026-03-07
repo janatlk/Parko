@@ -23,14 +23,14 @@ export function InsuranceFormModal({ opened, onClose, onCreate, isSubmitting }: 
       car: null as string | null,
       insurance_type: 'OSAGO',
       number: '',
-      start_date: today,
-      end_date: today,
+      start_date: today as Date | string,
+      end_date: today as Date | string,
       cost: 0,
     }),
     [today],
   )
 
-  const [form, setForm] = useState(initial)
+  const [form, setForm] = useState<typeof initial>(initial)
 
   useEffect(() => {
     if (opened) setForm(initial)
@@ -51,12 +51,15 @@ export function InsuranceFormModal({ opened, onClose, onCreate, isSubmitting }: 
     if (!carId || Number.isNaN(carId)) return
     if (!form.number.trim()) return
 
+    const startDateObj = form.start_date instanceof Date ? form.start_date : new Date(form.start_date)
+    const endDateObj = form.end_date instanceof Date ? form.end_date : new Date(form.end_date)
+
     const payload: InsuranceCreatePayload = {
       car: carId,
       insurance_type: form.insurance_type,
       number: form.number.trim(),
-      start_date: form.start_date.toISOString().slice(0, 10),
-      end_date: form.end_date.toISOString().slice(0, 10),
+      start_date: startDateObj.toISOString().slice(0, 10),
+      end_date: endDateObj.toISOString().slice(0, 10),
       cost: form.cost,
     }
 
@@ -102,7 +105,11 @@ export function InsuranceFormModal({ opened, onClose, onCreate, isSubmitting }: 
           label={t('insurances.form.start_date')}
           placeholder={t('insurances.form.start_date')}
           value={form.start_date}
-          onChange={(value) => value && setForm((s) => ({ ...s, start_date: value }))}
+          onChange={(value) => {
+            if (value) {
+              setForm((s) => ({ ...s, start_date: value }))
+            }
+          }}
           required
         />
 
@@ -110,7 +117,11 @@ export function InsuranceFormModal({ opened, onClose, onCreate, isSubmitting }: 
           label={t('insurances.form.end_date')}
           placeholder={t('insurances.form.end_date')}
           value={form.end_date}
-          onChange={(value) => value && setForm((s) => ({ ...s, end_date: value }))}
+          onChange={(value) => {
+            if (value) {
+              setForm((s) => ({ ...s, end_date: value }))
+            }
+          }}
           required
         />
 

@@ -48,7 +48,7 @@ export function ProfilePage() {
             label="Language"
             data={languageOptions}
             value={language}
-            onChange={setLanguage}
+            onChange={(value) => setLanguage(value as Language | null)}
             w={160}
           />
 

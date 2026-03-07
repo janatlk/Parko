@@ -21,7 +21,7 @@ export function FuelFormModal({ opened, onClose, onCreate, isSubmitting }: Props
   const initial = useMemo(
     () => ({
       car: null as string | null,
-      date: now,
+      date: now as Date | string,
       liters: 0,
       total_cost: 0,
       monthly_mileage: 0,
@@ -29,7 +29,7 @@ export function FuelFormModal({ opened, onClose, onCreate, isSubmitting }: Props
     [now],
   )
 
-  const [form, setForm] = useState(initial)
+  const [form, setForm] = useState<typeof initial>(initial)
 
   useEffect(() => {
     if (opened) setForm(initial)
@@ -50,10 +50,12 @@ export function FuelFormModal({ opened, onClose, onCreate, isSubmitting }: Props
     if (!carId || Number.isNaN(carId)) return
     if (!form.date) return
 
+    const dateObj = form.date instanceof Date ? form.date : new Date(form.date)
+
     const payload: FuelCreatePayload = {
       car: carId,
-      year: form.date.getFullYear(),
-      month: form.date.getMonth() + 1,
+      year: dateObj.getFullYear(),
+      month: dateObj.getMonth() + 1,
       liters: form.liters,
       total_cost: form.total_cost,
       monthly_mileage: form.monthly_mileage,
@@ -83,7 +85,11 @@ export function FuelFormModal({ opened, onClose, onCreate, isSubmitting }: Props
           label={t('fuel.form.period')}
           placeholder={t('fuel.form.select_period')}
           value={form.date}
-          onChange={(value) => value && setForm((s) => ({ ...s, date: value }))}
+          onChange={(value) => {
+            if (value) {
+              setForm((s) => ({ ...s, date: value }))
+            }
+          }}
           required
         />
 
