@@ -1,5 +1,20 @@
 from rest_framework import serializers
-from .models import SavedReport, ReportTemplate
+from .models import SavedReport, ReportTemplate, ExportLog
+
+
+class ExportLogSerializer(serializers.ModelSerializer):
+    """Serializer for ExportLog model"""
+    user_name = serializers.CharField(source='user.username', read_only=True)
+    company_name = serializers.CharField(source='company.name', read_only=True)
+
+    class Meta:
+        model = ExportLog
+        fields = [
+            'id', 'company', 'company_name', 'user', 'user_name',
+            'report_type', 'export_format', 'record_count', 'file_size',
+            'filters', 'created_at'
+        ]
+        read_only_fields = ['company', 'user', 'file_size']
 
 
 class SavedReportSerializer(serializers.ModelSerializer):

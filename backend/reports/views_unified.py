@@ -9,7 +9,14 @@ import traceback
 
 from core.permissions import IsCompanyStaff
 from .report_generator import ReportGenerator
-from .exporters import export_to_csv, export_to_xlsx
+from .exporters import (
+    export_to_csv,
+    export_to_xlsx,
+    export_to_pdf,
+    export_to_json,
+    get_export_preparator,
+)
+from .models import ExportLog
 
 logger = logging.getLogger(__name__)
 
@@ -100,16 +107,114 @@ class GenerateReportView(APIView):
 
         # Handle export format
         try:
+            # Prepare data for export based on format
+            export_filename = f"report_{report_type}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+            
             if export_format == 'csv':
                 logger.info("Exporting to CSV")
-                return export_to_csv(report_data['data'], f'report_{report_type}')
+                # Get preparator function for this report type
+                preparator = get_export_preparator(report_type)
+                if preparator:
+                    export_data = preparator(report_data)
+                else:
+                    export_data = report_data.get('data', [])
+                
+                response = export_to_csv(export_data, f"{export_filename}.csv")
+                # Log export
+                ExportLog.objects.create(
+                    company=company,
+                    user=request.user,
+                    report_type=report_type,
+                    export_format='csv',
+                    record_count=len(export_data),
+                    filters=filters
+                )
+                return response
+                
             elif export_format == 'xlsx':
                 logger.info("Exporting to XLSX")
-                return export_to_xlsx(report_data['data'], f'report_{report_type}')
+                preparator = get_export_preparator(report_type)
+                if preparator:
+                    export_data = preparator(report_data)
+                else:
+                    export_data = report_data.get('data', [])
+                
+                response = export_to_xlsx(export_data, f"{export_filename}.xlsx", sheet_name=report_type)
+                # Log export
+                ExportLog.objects.create(
+                    company=company,
+                    user=request.user,
+                    report_type=report_type,
+                    export_format='xlsx',
+                    record_count=len(export_data),
+                    filters=filters
+                )
+                return response
+                
+            elif export_format == 'pdf':
+                logger.info("Exporting to PDF")
+                preparator = get_export_preparator(report_type)
+                if preparator:
+                    export_data = preparator(report_data)
+                else:
+                    export_data = report_data.get('data', [])
+                
+                # Prepare header info
+                header_info = {
+                    'Period': f"{from_date} - {to_date}",
+                    'Generated': datetime.now().strftime('%Y-%m-%d %H:%M'),
+                }
+                if car_ids:
+                    header_info['Vehicles'] = f"{len(car_ids)} selected"
+                else:
+                    header_info['Vehicles'] = 'All vehicles'
+                
+                response = export_to_pdf(
+                    export_data,
+                    f"{export_filename}.pdf",
+                    title=report_type.replace('_', ' ').title(),
+                    company_name=company.name,
+                    header_info=header_info
+                )
+                # Log export
+                ExportLog.objects.create(
+                    company=company,
+                    user=request.user,
+                    report_type=report_type,
+                    export_format='pdf',
+                    record_count=len(export_data),
+                    filters=filters
+                )
+                return response
+                
+            elif export_format == 'json':
+                logger.info("Exporting to JSON")
+                metadata = {
+                    'report_type': report_type,
+                    'from_date': str(from_date),
+                    'to_date': str(to_date),
+                    'company': company.name,
+                    'generated_at': datetime.now().isoformat(),
+                }
+                
+                response = export_to_json(
+                    report_data.get('data', []),
+                    f"{export_filename}.json",
+                    metadata=metadata
+                )
+                # Log export
+                ExportLog.objects.create(
+                    company=company,
+                    user=request.user,
+                    report_type=report_type,
+                    export_format='json',
+                    record_count=len(report_data.get('data', [])),
+                    filters=filters
+                )
+                return response
             else:
                 # JSON format - return report_data directly
-                # StandardJSONRenderer will wrap it with {"status": "success", "data": report_data}
-                logger.info("Returning JSON response")
+                logger.info("Returning JSON response (default)")
                 logger.info(f"Response data keys: {list(report_data.keys())}")
                 return Response(report_data, status=status.HTTP_200_OK)
         except Exception as e:

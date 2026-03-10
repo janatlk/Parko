@@ -40,7 +40,7 @@ export interface GenerateReportParams {
   to_date: string
   car_ids?: number[] | null
   filters?: Record<string, unknown>
-  export_format?: 'json' | 'csv' | 'xlsx'
+  export_format?: 'json' | 'csv' | 'xlsx' | 'pdf'
   include_charts?: boolean
   save_report?: boolean
   report_name?: string
@@ -126,9 +126,15 @@ export async function generateReport(params: GenerateReportParams): Promise<Repo
 /**
  * Generate and download report in specific format
  */
-export async function downloadReport(params: GenerateReportParams, format: 'csv' | 'xlsx'): Promise<Blob> {
+export async function downloadReport(
+  params: GenerateReportParams,
+  format: 'csv' | 'xlsx' | 'pdf',
+): Promise<Blob> {
   const response = await http.post(`generate/`, params, {
     responseType: 'blob',
+    headers: {
+      'Content-Type': 'application/json',
+    },
     params: {
       export_format: format,
     },
@@ -207,17 +213,56 @@ export async function deleteSavedReport(id: number): Promise<void> {
 /**
  * Export saved report in specific format
  */
-export async function exportSavedReport(id: number, format: 'json' | 'csv' | 'xlsx'): Promise<Blob | ReportResponse> {
+export async function exportSavedReport(
+  id: number,
+  format: 'json' | 'csv' | 'xlsx' | 'pdf',
+): Promise<Blob | ReportResponse> {
   if (format === 'json') {
     const { data } = await http.get<ReportResponse>(`saved/${id}/export/`)
     return data
   }
-  
+
   const response = await http.get(`saved/${id}/export/`, {
     responseType: 'blob',
     params: { format },
   })
   return response.data as Blob
+}
+
+/**
+ * Export history types
+ */
+export interface ExportLog {
+  id: number
+  company: number
+  company_name: string
+  user: number
+  user_name: string
+  report_type: ReportType
+  export_format: 'csv' | 'xlsx' | 'pdf' | 'json'
+  record_count: number
+  file_size: number | null
+  filters: Record<string, unknown>
+  created_at: string
+}
+
+/**
+ * Get export history
+ */
+export async function getExportHistory(): Promise<ExportLog[]> {
+  const response = await http.get<ExportLog[] | { results: ExportLog[] }>('export-log/')
+  // Handle both paginated and non-paginated responses
+  if (response.data && 'results' in response.data) {
+    return response.data.results || []
+  }
+  return response.data || []
+}
+
+/**
+ * Delete export log entry
+ */
+export async function deleteExportLog(id: number): Promise<void> {
+  await http.delete(`export-log/${id}/`)
 }
 
 /**

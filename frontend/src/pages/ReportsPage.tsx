@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import { Container, Tabs, Title, Stack, Notification } from '@mantine/core'
+import { Container, Tabs, Title, Stack, Notification, Group } from '@mantine/core'
 import { IconChartBar, IconFolderOpen, IconExclamationCircle, IconCheck } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
 import { notifications } from '@mantine/notifications'
@@ -16,6 +16,7 @@ import {
 import { ReportBuilder } from '@features/reports/components/ReportBuilder'
 import { ReportResults } from '@features/reports/components/ReportResults'
 import { SavedReportsList } from '@features/reports/components/SavedReportsList'
+import { ExportHistory } from '@features/reports/components/ExportHistory'
 import type { ReportResponse, SavedReportList, ReportType } from '@features/reports/api/reportsApi'
 
 export function ReportsPage() {
@@ -135,7 +136,7 @@ export function ReportsPage() {
   /**
    * Handle export
    */
-  const handleExport = async (format: 'json' | 'csv' | 'xlsx') => {
+  const handleExport = async (format: 'json' | 'csv' | 'xlsx' | 'pdf') => {
     if (!generatedReport) return
 
     try {
@@ -179,7 +180,7 @@ export function ReportsPage() {
   /**
    * Handle exporting a saved report
    */
-  const handleExportSaved = async (report: SavedReportList, format: 'json' | 'csv' | 'xlsx') => {
+  const handleExportSaved = async (report: SavedReportList, format: 'json' | 'csv' | 'xlsx' | 'pdf') => {
     try {
       const blob = await exportMutation.mutateAsync({ id: report.id, format })
 
@@ -221,7 +222,10 @@ export function ReportsPage() {
   return (
     <Container size="xl" py="lg">
       <Stack gap="md">
-        <Title order={1}>{t('reports.title') || 'Reports'}</Title>
+        <Group justify="space-between">
+          <Title order={1}>{t('reports.title') || 'Reports'}</Title>
+          <ExportHistory />
+        </Group>
 
         <Tabs value={activeTab} onChange={setActiveTab} color="blue">
           <Tabs.List>

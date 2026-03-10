@@ -100,3 +100,43 @@ class ReportTemplate(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class ExportLog(models.Model):
+    """Model for tracking report exports for audit and analytics"""
+
+    EXPORT_FORMATS = [
+        ('csv', 'CSV'),
+        ('xlsx', 'Excel (XLSX)'),
+        ('pdf', 'PDF'),
+        ('json', 'JSON'),
+    ]
+
+    company = models.ForeignKey(
+        Company,
+        on_delete=models.CASCADE,
+        related_name='export_logs'
+    )
+    user = models.ForeignKey(
+        'accounts.User',
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='export_logs'
+    )
+    report_type = models.CharField(max_length=50)
+    export_format = models.CharField(max_length=10, choices=EXPORT_FORMATS)
+    record_count = models.IntegerField(default=0, help_text='Number of records exported')
+    file_size = models.IntegerField(null=True, blank=True, help_text='File size in bytes')
+    filters = models.JSONField(default=dict, blank=True, help_text='Filters applied to the report')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['company', '-created_at']),
+            models.Index(fields=['user', '-created_at']),
+            models.Index(fields=['report_type']),
+        ]
+
+    def __str__(self):
+        return f"{self.report_type} ({self.export_format}) - {self.created_at.strftime('%Y-%m-%d %H:%M')}"

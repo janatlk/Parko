@@ -7,11 +7,12 @@ from .views import (
     MaintenanceCostsReportView,
 )
 from .views_unified import GenerateReportView
-from .views import SavedReportViewSet, ReportTemplateViewSet
+from .views import SavedReportViewSet, ReportTemplateViewSet, ExportLogViewSet
 
 router = DefaultRouter()
 router.register(r'saved', SavedReportViewSet, basename='saved-report')
 router.register(r'templates', ReportTemplateViewSet, basename='report-template')
+router.register(r'export-log', ExportLogViewSet, basename='export-log')
 
 urlpatterns = [
     path('maintenance-costs/', MaintenanceCostsReportView.as_view(), name='maintenance-costs'),

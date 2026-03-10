@@ -13,6 +13,8 @@ import {
   createReportTemplate,
   updateReportTemplate,
   deleteReportTemplate,
+  getExportHistory,
+  deleteExportLog,
   type GenerateReportParams,
   type ReportResponse,
   type SavedReport,
@@ -21,6 +23,7 @@ import {
   type ReportType,
   type ChartType,
   type ReportSummary,
+  type ExportLog,
 } from '../api/reportsApi'
 
 /**
@@ -38,6 +41,10 @@ export const reportsKeys = {
   templates: {
     all: ['reports', 'templates'] as const,
     list: () => ['reports', 'templates', 'list'] as const,
+  },
+  exportHistory: {
+    all: ['reports', 'export-history'] as const,
+    list: () => ['reports', 'export-history', 'list'] as const,
   },
 }
 
@@ -141,8 +148,33 @@ export function useDeleteSavedReport() {
  * Hook for exporting a saved report
  */
 export function useExportSavedReport() {
-  return useMutation<Blob | ReportResponse, Error, { id: number; format: 'json' | 'csv' | 'xlsx' }>({
+  return useMutation<Blob | ReportResponse, Error, { id: number; format: 'json' | 'csv' | 'xlsx' | 'pdf' }>({
     mutationFn: ({ id, format }) => exportSavedReport(id, format),
+  })
+}
+
+/**
+ * Hook for getting export history
+ */
+export function useExportHistoryQuery() {
+  return useQuery<ExportLog[]>({
+    queryKey: reportsKeys.exportHistory.list(),
+    queryFn: getExportHistory,
+    retry: false,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+  })
+}
+
+/**
+ * Hook for deleting an export log entry
+ */
+export function useDeleteExportLog() {
+  const qc = useQueryClient()
+  return useMutation<void, Error, number>({
+    mutationFn: deleteExportLog,
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: reportsKeys.exportHistory.all })
+    },
   })
 }
 

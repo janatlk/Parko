@@ -17,6 +17,7 @@ import {
   ActionIcon,
   Button,
   Group,
+  Menu,
   Paper,
   SimpleGrid,
   Stack,
@@ -24,14 +25,14 @@ import {
   Text,
   Title,
 } from '@mantine/core'
-import { IconDownload, IconFileExport, IconTable } from '@tabler/icons-react'
+import { IconDownload, IconFileExport, IconFileDescription, IconTable, IconFileCode } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
 
 import type { ChartData, ReportResponse } from '../api/reportsApi'
 
 interface ReportResultsProps {
   report: ReportResponse
-  onExport: (format: 'json' | 'csv' | 'xlsx') => void
+  onExport: (format: 'json' | 'csv' | 'xlsx' | 'pdf') => void
 }
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316']
@@ -218,30 +219,42 @@ export function ReportResults({ report, onExport }: ReportResultsProps) {
     <Stack gap="md">
       {/* Export Actions */}
       <Group justify="flex-end">
-        <Button
-          variant="subtle"
-          size="sm"
-          leftSection={<IconFileExport size={16} />}
-          onClick={() => onExport('json')}
-        >
-          {t('reports.export_json') || 'JSON'}
-        </Button>
-        <Button
-          variant="subtle"
-          size="sm"
-          leftSection={<IconDownload size={16} />}
-          onClick={() => onExport('csv')}
-        >
-          {t('reports.export_csv') || 'CSV'}
-        </Button>
-        <Button
-          variant="subtle"
-          size="sm"
-          leftSection={<IconDownload size={16} />}
-          onClick={() => onExport('xlsx')}
-        >
-          {t('reports.export_xlsx') || 'Excel'}
-        </Button>
+        <Text size="sm" c="dimmed" mr="sm">
+          {t('reports.export') || 'Export:'}
+        </Text>
+        <Menu shadow="md" width={200}>
+          <Menu.Target>
+            <Button variant="outline" size="sm" leftSection={<IconFileExport size={16} />}>
+              {t('reports.export_as') || 'Export As'}
+            </Button>
+          </Menu.Target>
+          <Menu.Dropdown>
+            <Menu.Item
+              leftSection={<IconFileCode size={16} />}
+              onClick={() => onExport('json')}
+            >
+              JSON
+            </Menu.Item>
+            <Menu.Item
+              leftSection={<IconDownload size={16} />}
+              onClick={() => onExport('csv')}
+            >
+              CSV
+            </Menu.Item>
+            <Menu.Item
+              leftSection={<IconDownload size={16} />}
+              onClick={() => onExport('xlsx')}
+            >
+              Excel (XLSX)
+            </Menu.Item>
+            <Menu.Item
+              leftSection={<IconFileDescription size={16} />}
+              onClick={() => onExport('pdf')}
+            >
+              PDF
+            </Menu.Item>
+          </Menu.Dropdown>
+        </Menu>
       </Group>
 
       {/* Summary Cards */}
