@@ -130,13 +130,13 @@ export async function downloadReport(
   params: GenerateReportParams,
   format: 'csv' | 'xlsx' | 'pdf',
 ): Promise<Blob> {
-  const response = await http.post(`generate/`, params, {
+  const response = await http.post(`generate/`, {
+    ...params,
+    export_format: format,
+  }, {
     responseType: 'blob',
     headers: {
       'Content-Type': 'application/json',
-    },
-    params: {
-      export_format: format,
     },
   })
   return response.data as Blob

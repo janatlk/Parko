@@ -9,6 +9,23 @@ from core.permissions import IsCompanyStaff
 
 from .services import get_maintenance_costs_report
 from .services_additional import get_fuel_consumption_report, get_insurance_inspection_report
+
+
+class ReportTypesView(APIView):
+    """Get available report types"""
+    permission_classes = [IsCompanyStaff]
+
+    def get(self, request):
+        """Return list of available report types"""
+        return Response({
+            'types': [
+                {'value': 'fuel_consumption', 'label': 'Fuel Consumption'},
+                {'value': 'maintenance_costs', 'label': 'Maintenance Costs'},
+                {'value': 'insurance_inspection', 'label': 'Insurance & Inspection'},
+                {'value': 'vehicle_utilization', 'label': 'Vehicle Utilization'},
+                {'value': 'cost_analysis', 'label': 'Cost Analysis'},
+            ]
+        })
 from .exporters import (
     export_to_csv,
     export_to_xlsx,

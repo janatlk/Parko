@@ -184,11 +184,12 @@ function formatNumber(num: number): string {
 /**
  * Summary Card Component
  */
-function SummaryCard({ label, value }: { label: string; value: string | number }) {
+function SummaryCard({ label, value, t }: { label: string; value: string | number; t: (key: string) => string }) {
+  const translatedLabel = label.startsWith('reports.') ? t(label) : label
   return (
     <Paper p="md" withBorder>
       <Text size="sm" c="dimmed">
-        {label}
+        {translatedLabel}
       </Text>
       <Text size="xl" fw={700}>
         {typeof value === 'number' ? formatNumber(value) : value}
@@ -261,7 +262,7 @@ export function ReportResults({ report, onExport }: ReportResultsProps) {
       {hasSummary && (
         <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="md">
           {Object.entries(summary).slice(0, 4).map(([key, value]) => (
-            <SummaryCard key={key} label={formatLabel(key)} value={value as number} />
+            <SummaryCard key={key} label={formatLabel(key)} value={value as number} t={t} />
           ))}
         </SimpleGrid>
       )}
@@ -290,7 +291,7 @@ export function ReportResults({ report, onExport }: ReportResultsProps) {
           <Table.Thead>
             <Table.Tr>
               {Object.keys(data[0]).map((key) => (
-                <Table.Th key={key}>{formatLabel(key)}</Table.Th>
+                <Table.Th key={key}>{translateLabel(formatLabel(key), t)}</Table.Th>
               ))}
             </Table.Tr>
           </Table.Thead>
@@ -315,8 +316,51 @@ export function ReportResults({ report, onExport }: ReportResultsProps) {
  * Format camelCase/snake_case labels to readable text
  */
 function formatLabel(key: string): string {
-  return key
+  // Translation map for report labels
+  const translationMap: Record<string, string> = {
+    // Cost Analysis
+    car_numplate: 'reports.car',
+    fuel_cost: 'reports.fuel_cost',
+    maintenance_cost: 'reports.maintenance_costs',
+    insurance_cost: 'reports.insurance_cost',
+    inspection_cost: 'reports.inspection_cost',
+    total_cost: 'reports.total_cost',
+    parts_cost: 'reports.parts_cost',
+    labor_cost: 'reports.labor_cost',
+    total_vehicles: 'reports.total_vehicles',
+    total_liters: 'reports.total_liters',
+    total_mileage: 'reports.total_mileage',
+    avg_consumption: 'reports.avg_consumption',
+    total_fuel_cost: 'reports.total_parts_cost',
+    total_maintenance_cost: 'reports.total_labor_cost',
+    total_insurance_cost: 'reports.insurance_cost',
+    total_inspection_cost: 'reports.inspection_cost',
+    grand_total: 'reports.grand_total',
+    total_parts_cost: 'reports.total_parts_cost',
+    total_labor_cost: 'reports.total_labor_cost',
+    // Insurance/Inspection
+    type: 'reports.type_label',
+    status: 'reports.status',
+    number: 'reports.number',
+    start_date: 'reports.start_date',
+    end_date: 'reports.end_date',
+    // Common
+    car_id: 'reports.car',
+  }
+
+  // Return translation key if exists, otherwise format normally
+  return translationMap[key] || key
     .replace(/([A-Z])/g, ' $1')
     .replace(/_/g, ' ')
     .replace(/^./, (str) => str.toUpperCase())
+}
+
+/**
+ * Translate label if it's a translation key
+ */
+function translateLabel(label: string, t: (key: string) => string): string {
+  if (label.startsWith('reports.')) {
+    return t(label)
+  }
+  return label
 }

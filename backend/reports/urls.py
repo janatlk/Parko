@@ -5,6 +5,7 @@ from .views import (
     FuelConsumptionReportView,
     InsuranceInspectionReportView,
     MaintenanceCostsReportView,
+    ReportTypesView,
 )
 from .views_unified import GenerateReportView
 from .views import SavedReportViewSet, ReportTemplateViewSet, ExportLogViewSet
@@ -15,6 +16,7 @@ router.register(r'templates', ReportTemplateViewSet, basename='report-template')
 router.register(r'export-log', ExportLogViewSet, basename='export-log')
 
 urlpatterns = [
+    path('types/', ReportTypesView.as_view(), name='report-types'),
     path('maintenance-costs/', MaintenanceCostsReportView.as_view(), name='maintenance-costs'),
     path('fuel-consumption/', FuelConsumptionReportView.as_view(), name='fuel-consumption'),
     path('insurance-inspection/', InsuranceInspectionReportView.as_view(), name='insurance-inspection'),

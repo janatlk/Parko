@@ -13,6 +13,7 @@ import {
   useExportSavedReport,
   useSavedReportDataQuery,
 } from '@features/reports/hooks/useReports'
+import { downloadReport } from '@features/reports/api/reportsApi'
 import { ReportBuilder } from '@features/reports/components/ReportBuilder'
 import { ReportResults } from '@features/reports/components/ReportResults'
 import { SavedReportsList } from '@features/reports/components/SavedReportsList'
@@ -140,17 +141,24 @@ export function ReportsPage() {
     if (!generatedReport) return
 
     try {
-      const blob = await exportMutation.mutateAsync({
-        id: 0, // Not used for new reports
-        format,
-      })
-
-      // For JSON format, we need to handle differently
-      if (format === 'json' && typeof blob === 'object') {
-        const jsonBlob = new Blob([JSON.stringify(blob, null, 2)], { type: 'application/json' })
+      // For newly generated reports, we need to regenerate with export format
+      if (format === 'json') {
+        // For JSON, we already have the data, just download it
+        const jsonBlob = new Blob([JSON.stringify(generatedReport, null, 2)], { type: 'application/json' })
         downloadBlob(jsonBlob, `report_${generatedReport.report_type}_${Date.now()}.json`)
       } else {
-        downloadBlob(blob as Blob, `report_${generatedReport.report_type}_${Date.now()}.${format}`)
+        // For CSV, XLSX, PDF - regenerate the report with export format
+        const blob = await downloadReport(
+          {
+            report_type: generatedReport.report_type,
+            from_date: generatedReport.from_date,
+            to_date: generatedReport.to_date,
+            car_ids: null, // Will be ignored for now - would need to store this in state
+            export_format: format,
+          },
+          format
+        )
+        downloadBlob(blob, `report_${generatedReport.report_type}_${Date.now()}.${format}`)
       }
 
       notifications.show({

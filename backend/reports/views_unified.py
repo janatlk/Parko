@@ -45,8 +45,8 @@ class GenerateReportView(APIView):
         to_date_str = request.data.get('to_date')
         car_ids = request.data.get('car_ids')  # None or list of IDs
         filters = request.data.get('filters', {})
-        export_format = request.data.get('export_format', 'json')
-        
+        export_format = request.data.get('export_format')  # None means return JSON data directly
+
         logger.info(f"Report params: type={report_type}, from={from_date_str}, to={to_date_str}, car_ids={car_ids}")
 
         # Validate required fields
@@ -186,9 +186,9 @@ class GenerateReportView(APIView):
                     filters=filters
                 )
                 return response
-                
+
             elif export_format == 'json':
-                logger.info("Exporting to JSON")
+                logger.info("Exporting to JSON file")
                 metadata = {
                     'report_type': report_type,
                     'from_date': str(from_date),
@@ -196,7 +196,7 @@ class GenerateReportView(APIView):
                     'company': company.name,
                     'generated_at': datetime.now().isoformat(),
                 }
-                
+
                 response = export_to_json(
                     report_data.get('data', []),
                     f"{export_filename}.json",
@@ -213,7 +213,7 @@ class GenerateReportView(APIView):
                 )
                 return response
             else:
-                # JSON format - return report_data directly
+                # No export format specified - return JSON data directly (for API consumption)
                 logger.info("Returning JSON response (default)")
                 logger.info(f"Response data keys: {list(report_data.keys())}")
                 return Response(report_data, status=status.HTTP_200_OK)

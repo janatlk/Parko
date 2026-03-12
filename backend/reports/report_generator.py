@@ -212,7 +212,6 @@ class MaintenanceCostsReportGenerator:
     def generate(from_date, to_date, company, car_ids, filters):
         # Use existing service logic
         from .services import get_maintenance_costs_report
-        from .exporters import prepare_maintenance_costs_for_export
 
         try:
             # The service expects: company_id, from_date, to_date, car_id (as keyword args)
@@ -222,14 +221,34 @@ class MaintenanceCostsReportGenerator:
                 to_date=str(to_date) if to_date else None,
                 car_id=car_ids[0] if car_ids else None
             )
-            data = prepare_maintenance_costs_for_export(raw_data)
+            # Use raw data directly, not the export-prepared version
+            data = []
+            for car_row in raw_data.get('by_car', []):
+                data.append({
+                    'car_id': car_row.get('car_id'),
+                    'car_numplate': car_row.get('car__numplate', ''),
+                    'parts_cost': float(car_row.get('part_total', 0)),
+                    'labor_cost': float(car_row.get('job_total', 0)),
+                    'total_cost': float(car_row.get('total', 0)),
+                })
+            # Add totals row
+            totals = raw_data.get('totals', {})
+            data.append({
+                'car_id': None,
+                'car_numplate': 'TOTAL',
+                'parts_cost': float(totals.get('part_total', 0)),
+                'labor_cost': float(totals.get('job_total', 0)),
+                'total_cost': float(totals.get('total', 0)),
+            })
         except Exception as e:
             # Return empty data if there's an error
             data = []
 
         summary = {
-            'total_vehicles': len(set(d.get('car_id') for d in data if 'car_id' in d)),
-            'total_cost': sum(float(d.get('total_cost', 0)) for d in data),
+            'total_vehicles': len([d for d in data if d.get('car_id') is not None]),
+            'total_parts_cost': sum(d.get('parts_cost', 0) for d in data),
+            'total_labor_cost': sum(d.get('labor_cost', 0) for d in data),
+            'total_cost': sum(d.get('total_cost', 0) for d in data),
         }
 
         return {
@@ -249,17 +268,17 @@ class MaintenanceCostsReportGenerator:
         if not data:
             return charts
 
-        # Filter out the total row - check for both Russian and English keys
-        car_data = [d for d in data if d.get('Машина (номер)', d.get('car_numplate', '')) != 'ИТОГО']
+        # Filter out the total row
+        car_data = [d for d in data if d.get('car_numplate', '') != 'TOTAL']
 
         if not car_data:
             return charts
 
         # Chart 1: Maintenance Costs by Vehicle (Bar Chart)
-        cars = [d.get('Машина (номер)', d.get('car_numplate', 'Unknown')) for d in car_data]
-        part_costs = [float(d.get('Стоимость запчастей (сом)', d.get('parts_cost', 0))) for d in car_data]
-        job_costs = [float(d.get('Стоимость работ (сом)', d.get('labor_cost', 0))) for d in car_data]
-        totals = [float(d.get('Итого (сом)', d.get('total', 0))) for d in car_data]
+        cars = [d.get('car_numplate', 'Unknown') for d in car_data]
+        part_costs = [float(d.get('parts_cost', 0)) for d in car_data]
+        job_costs = [float(d.get('labor_cost', 0)) for d in car_data]
+        totals = [float(d.get('total_cost', 0)) for d in car_data]
 
         charts.append({
             'type': 'bar',
@@ -496,45 +515,56 @@ class CostAnalysisReportGenerator:
     def generate(from_date, to_date, company, car_ids, filters):
         # Aggregate costs from different sources
         from decimal import Decimal
+        from django.db.models import Sum
+        from datetime import date
         
-        try:
-            qs_cars = Car.objects.filter(company=company)
-            if car_ids:
-                qs_cars = qs_cars.filter(id__in=car_ids)
+        # Handle string dates
+        if isinstance(from_date, str):
+            from_date = date.fromisoformat(from_date)
+        if isinstance(to_date, str):
+            to_date = date.fromisoformat(to_date)
 
-            data = []
-            for car in qs_cars:
-                # Fuel costs
-                fuel_agg = Fuel.objects.filter(car=car).aggregate(
-                    total=Sum('total_cost')
-                )
-                fuel_cost = fuel_agg['total'] or 0
-                if isinstance(fuel_cost, Decimal):
-                    fuel_cost = float(fuel_cost)
+        qs_cars = Car.objects.filter(company=company)
+        if car_ids:
+            qs_cars = qs_cars.filter(id__in=car_ids)
 
-                # Maintenance costs (spares)
-                spare_agg = Spare.objects.filter(car=car).aggregate(
-                    total=Sum('price')
-                )
-                spare_cost = spare_agg['total'] or 0
-                if isinstance(spare_cost, Decimal):
-                    spare_cost = float(spare_cost)
+        data = []
+        for car in qs_cars:
+            try:
+                # Fuel costs - filter by date range
+                fuel_agg = Fuel.objects.filter(
+                    car=car,
+                    year__gte=from_date.year,
+                    year__lte=to_date.year
+                ).aggregate(total=Sum('total_cost'))
+                fuel_cost = float(fuel_agg['total']) if fuel_agg['total'] else 0.0
 
-                # Insurance costs
-                insurance_agg = Insurance.objects.filter(car=car).aggregate(
-                    total=Sum('cost')
+                # Maintenance costs (spares) - filter by date range
+                spare_agg = Spare.objects.filter(
+                    car=car,
+                    installed_at__gte=from_date,
+                    installed_at__lte=to_date
+                ).aggregate(
+                    part_total=Sum('part_price'),
+                    job_total=Sum('job_price')
                 )
-                insurance_cost = insurance_agg['total'] or 0
-                if isinstance(insurance_cost, Decimal):
-                    insurance_cost = float(insurance_cost)
+                spare_cost = float((spare_agg['part_total'] or 0) + (spare_agg['job_total'] or 0))
 
-                # Inspection costs
-                inspection_agg = Inspection.objects.filter(car=car).aggregate(
-                    total=Sum('cost')
-                )
-                inspection_cost = inspection_agg['total'] or 0
-                if isinstance(inspection_cost, Decimal):
-                    inspection_cost = float(inspection_cost)
+                # Insurance costs - filter by date range (active during the period)
+                insurance_agg = Insurance.objects.filter(
+                    car=car,
+                    start_date__lte=to_date,
+                    end_date__gte=from_date
+                ).aggregate(total=Sum('cost'))
+                insurance_cost = float(insurance_agg['total']) if insurance_agg['total'] else 0.0
+
+                # Inspection costs - filter by date range
+                # Inspection is valid for 1 year from inspected_at
+                inspection_agg = Inspection.objects.filter(
+                    car=car,
+                    inspected_at__lte=to_date
+                ).aggregate(total=Sum('cost'))
+                inspection_cost = float(inspection_agg['total']) if inspection_agg['total'] else 0.0
 
                 total = fuel_cost + spare_cost + insurance_cost + inspection_cost
 
@@ -547,9 +577,21 @@ class CostAnalysisReportGenerator:
                     'inspection_cost': inspection_cost,
                     'total_cost': total,
                 })
-        except Exception as e:
-            # Return empty data if there's an error
-            data = []
+            except Exception as e:
+                # Log error but continue with other cars
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(f"Error processing car {car.id}: {e}")
+                # Still add the car with 0 costs
+                data.append({
+                    'car_id': car.id,
+                    'car_numplate': car.numplate,
+                    'fuel_cost': 0.0,
+                    'maintenance_cost': 0.0,
+                    'insurance_cost': 0.0,
+                    'inspection_cost': 0.0,
+                    'total_cost': 0.0,
+                })
 
         summary = {
             'total_vehicles': len(data),
