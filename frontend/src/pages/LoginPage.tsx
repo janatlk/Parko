@@ -1,7 +1,8 @@
 import type { AxiosError } from 'axios'
 import { useEffect, useState } from 'react'
 
-import { Alert, Button, Container, Paper, PasswordInput, Stack, TextInput, Title } from '@mantine/core'
+import { Alert, Button, Container, Group, Paper, PasswordInput, Stack, Text, TextInput, Title, Box, ThemeIcon } from '@mantine/core'
+import { IconCar, IconUser, IconLock, IconAlertCircle } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 
@@ -75,12 +76,12 @@ export function LoginPage() {
     setIsSubmitting(true)
     try {
       await login({ username: form.username, password: form.password })
-      showSuccess('Вы успешно вошли в систему')
+      showSuccess(t('auth.login_success') || 'Вы успешно вошли в систему')
       navigate('/dashboard', { replace: true })
     } catch (err) {
       const errorMsg = extractErrorMessage(err)
       setServerError(errorMsg)
-      showError(errorMsg, 'Ошибка входа')
+      showError(errorMsg, t('auth.login_failed') || 'Ошибка входа')
     } finally {
       setIsSubmitting(false)
     }
@@ -88,34 +89,66 @@ export function LoginPage() {
 
   return (
     <Container size={420} py="xl">
-      <Title ta="center" order={2} mb="md">
-        Parko
-      </Title>
-      <Paper withBorder shadow="sm" p="lg" radius="md">
+      <Box ta="center" mb="xl">
+        <Group justify="center" gap="xs" mb="md">
+          <ThemeIcon variant="light" size="xl" radius="xl" color="blue">
+            <IconCar size={32} stroke={1.5} />
+          </ThemeIcon>
+        </Group>
+        <Title order={2} fw={700}>
+          {t('auth.title')}
+        </Title>
+        <Text size="sm" c="dimmed" mt="xs">
+          {t('auth.subtitle') || 'Войдите в свой аккаунт'}
+        </Text>
+      </Box>
+
+      <Paper withBorder shadow="md" p="xl" radius="lg">
         <form onSubmit={onSubmit}>
-          <Stack>
-            {serverError && <Alert color="red">{serverError}</Alert>}
+          <Stack gap="md">
+            {serverError && (
+              <Alert
+                icon={<IconAlertCircle size={18} />}
+                color="red"
+                variant="light"
+                radius="md"
+              >
+                {serverError}
+              </Alert>
+            )}
             <TextInput
               label={t('auth.username')}
+              placeholder={t('auth.username_placeholder') || 'Введите логин'}
               value={form.username}
               onChange={(valueOrEvent) =>
                 setForm((s) => ({ ...s, username: getInputValue(valueOrEvent) }))
               }
               error={errors.username}
+              leftSection={<IconUser size={16} />}
               required
               autoComplete="username"
+              size="md"
             />
             <PasswordInput
               label={t('auth.password')}
+              placeholder={t('auth.password_placeholder') || 'Введите пароль'}
               value={form.password}
               onChange={(valueOrEvent) =>
                 setForm((s) => ({ ...s, password: getInputValue(valueOrEvent) }))
               }
               error={errors.password}
+              leftSection={<IconLock size={16} />}
               required
               autoComplete="current-password"
+              size="md"
             />
-            <Button type="submit" loading={isSubmitting}>
+            <Button
+              type="submit"
+              loading={isSubmitting}
+              size="md"
+              radius="md"
+              mt="sm"
+            >
               {t('auth.login')}
             </Button>
           </Stack>

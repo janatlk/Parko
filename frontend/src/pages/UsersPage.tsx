@@ -80,7 +80,7 @@ export function UsersPage() {
       <Group align="flex-end" mb="md">
         <Select
           label={t('users.role')}
-          placeholder="All"
+          placeholder={t('common.all') || 'All'}
           data={USER_ROLES.map((r) => ({ value: r, label: r }))}
           value={roleFilter}
           onChange={setRoleFilter}
@@ -89,7 +89,7 @@ export function UsersPage() {
         />
         <Select
           label={t('users.status')}
-          placeholder="All"
+          placeholder={t('common.all') || 'All'}
           data={[
             { value: 'active', label: t('users.active') },
             { value: 'inactive', label: t('users.inactive') },
@@ -110,10 +110,10 @@ export function UsersPage() {
             <Table.Thead>
               <Table.Tr>
                 <Table.Th>ID</Table.Th>
-                <Table.Th>Username</Table.Th>
-                <Table.Th>Role</Table.Th>
-                <Table.Th>Language</Table.Th>
-                <Table.Th>Status</Table.Th>
+                <Table.Th>{t('auth.username')}</Table.Th>
+                <Table.Th>{t('users.role')}</Table.Th>
+                <Table.Th>{t('users.language')}</Table.Th>
+                <Table.Th>{t('users.status')}</Table.Th>
                 <Table.Th></Table.Th>
               </Table.Tr>
             </Table.Thead>

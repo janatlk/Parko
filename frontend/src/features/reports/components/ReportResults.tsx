@@ -25,10 +25,12 @@ import {
   Text,
   Title,
 } from '@mantine/core'
-import { IconDownload, IconFileExport, IconFileDescription, IconTable, IconFileCode } from '@tabler/icons-react'
+import { IconDownload, IconFileExport, IconFileDescription, IconTable, IconFileCode, IconShare } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
+import { useState } from 'react'
 
 import type { ChartData, ReportResponse } from '../api/reportsApi'
+import { ShareReportModal } from './ShareReportModal'
 
 interface ReportResultsProps {
   report: ReportResponse
@@ -201,6 +203,7 @@ function SummaryCard({ label, value, t }: { label: string; value: string | numbe
 export function ReportResults({ report, onExport }: ReportResultsProps) {
   const { t } = useTranslation()
   const { data, summary, charts } = report
+  const [shareModalOpened, setShareModalOpened] = useState(false)
 
   const hasData = data && data.length > 0
   const hasCharts = charts && charts.length > 0
@@ -223,6 +226,14 @@ export function ReportResults({ report, onExport }: ReportResultsProps) {
         <Text size="sm" c="dimmed" mr="sm">
           {t('reports.export') || 'Export:'}
         </Text>
+        <Button
+          variant="outline"
+          size="sm"
+          leftSection={<IconShare size={16} />}
+          onClick={() => setShareModalOpened(true)}
+        >
+          {t('reports.share_email') || 'Share'}
+        </Button>
         <Menu shadow="md" width={200}>
           <Menu.Target>
             <Button variant="outline" size="sm" leftSection={<IconFileExport size={16} />}>
@@ -257,6 +268,13 @@ export function ReportResults({ report, onExport }: ReportResultsProps) {
           </Menu.Dropdown>
         </Menu>
       </Group>
+
+      {/* Share Modal */}
+      <ShareReportModal
+        opened={shareModalOpened}
+        onClose={() => setShareModalOpened(false)}
+        report={report}
+      />
 
       {/* Summary Cards */}
       {hasSummary && (

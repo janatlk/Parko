@@ -6,27 +6,43 @@ import { useTranslation } from 'react-i18next'
 
 import { useCarsQuery } from '@features/cars/hooks/useCars'
 
-import type { FuelCreatePayload } from '../api/fuelApi'
+import type { FuelCreatePayload, FuelUpdatePayload } from '../api/fuelApi'
+import type { Fuel } from '@entities/fleet/types'
+
+type Mode = 'create' | 'edit'
 
 type Props = {
   opened: boolean
   onClose: () => void
+  mode: Mode
+  record?: Fuel
   onCreate: (payload: FuelCreatePayload) => Promise<void>
+  onUpdate: (fuelId: number, payload: FuelUpdatePayload) => Promise<void>
   isSubmitting?: boolean
 }
 
-export function FuelFormModal({ opened, onClose, onCreate, isSubmitting }: Props) {
+export function FuelFormModal({
+  opened,
+  onClose,
+  mode,
+  record,
+  onCreate,
+  onUpdate,
+  isSubmitting,
+}: Props) {
   const { t } = useTranslation()
   const now = useMemo(() => new Date(), [])
   const initial = useMemo(
     () => ({
-      car: null as string | null,
-      date: now as Date | string,
-      liters: 0,
-      total_cost: 0,
-      monthly_mileage: 0,
+      car: record ? String(record.car) : null as string | null,
+      date: record
+        ? new Date(record.year, (record.month || 1) - 1)
+        : (now as Date | string),
+      liters: record?.liters ?? 0,
+      total_cost: record?.total_cost ?? 0,
+      monthly_mileage: record?.monthly_mileage ?? 0,
     }),
-    [now],
+    [record, now],
   )
 
   const [form, setForm] = useState<typeof initial>(initial)
@@ -40,7 +56,7 @@ export function FuelFormModal({ opened, onClose, onCreate, isSubmitting }: Props
     () =>
       (carsData?.results ?? []).map((c) => ({
         value: String(c.id),
-        label: `${c.numplate} (${c.brand})`,
+        label: `${c.numplate} - ${c.brand} ${c.title}`,
       })),
     [carsData],
   )
@@ -51,6 +67,19 @@ export function FuelFormModal({ opened, onClose, onCreate, isSubmitting }: Props
     if (!form.date) return
 
     const dateObj = form.date instanceof Date ? form.date : new Date(form.date)
+
+    if (mode === 'edit' && record) {
+      await onUpdate(record.id, {
+        car: carId,
+        year: dateObj.getFullYear(),
+        month: dateObj.getMonth() + 1,
+        liters: form.liters,
+        total_cost: form.total_cost,
+        monthly_mileage: form.monthly_mileage,
+      })
+      onClose()
+      return
+    }
 
     const payload: FuelCreatePayload = {
       car: carId,
@@ -66,7 +95,12 @@ export function FuelFormModal({ opened, onClose, onCreate, isSubmitting }: Props
   }
 
   return (
-    <Modal opened={opened} onClose={onClose} title={t('fuel.form.title')} centered>
+    <Modal
+      opened={opened}
+      onClose={onClose}
+      title={mode === 'create' ? t('fuel.form.title') : t('fuel.form.edit_title')}
+      centered
+    >
       <Stack>
         {isCarsLoading && <Text c="dimmed">{t('common.loading')}</Text>}
         {isCarsError && <Text c="red">{t('fuel.form.failed_to_load_cars')}</Text>}
@@ -122,7 +156,7 @@ export function FuelFormModal({ opened, onClose, onCreate, isSubmitting }: Props
             {t('common.cancel')}
           </Button>
           <Button onClick={() => void submit()} loading={isSubmitting}>
-            {t('common.create')}
+            {mode === 'create' ? t('common.create') : t('common.save')}
           </Button>
         </Group>
       </Stack>

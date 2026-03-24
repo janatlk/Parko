@@ -18,6 +18,8 @@ export type InspectionCreatePayload = {
   cost: number
 }
 
+export type InspectionUpdatePayload = Partial<InspectionCreatePayload>
+
 export async function listInspections(
   params: ListInspectionsParams = {},
 ): Promise<PaginatedResponse<Inspection>> {
@@ -29,5 +31,13 @@ export async function listInspections(
 
 export async function createInspection(payload: InspectionCreatePayload): Promise<Inspection> {
   const { data } = await http.post<Inspection>('inspections/', payload)
+  return data
+}
+
+export async function updateInspection(
+  inspectionId: number,
+  payload: InspectionUpdatePayload,
+): Promise<Inspection> {
+  const { data } = await http.patch<Inspection>(`inspections/${inspectionId}/`, payload)
   return data
 }

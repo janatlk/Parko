@@ -6,26 +6,42 @@ import { useTranslation } from 'react-i18next'
 
 import { useCarsQuery } from '@features/cars/hooks/useCars'
 
-import type { InspectionCreatePayload } from '../api/inspectionsApi'
+import type { InspectionCreatePayload, InspectionUpdatePayload } from '../api/inspectionsApi'
+import type { Inspection } from '@entities/fleet/types'
+
+type Mode = 'create' | 'edit'
 
 type Props = {
   opened: boolean
   onClose: () => void
+  mode: Mode
+  record?: Inspection
   onCreate: (payload: InspectionCreatePayload) => Promise<void>
+  onUpdate: (inspectionId: number, payload: InspectionUpdatePayload) => Promise<void>
   isSubmitting?: boolean
 }
 
-export function InspectionFormModal({ opened, onClose, onCreate, isSubmitting }: Props) {
+export function InspectionFormModal({
+  opened,
+  onClose,
+  mode,
+  record,
+  onCreate,
+  onUpdate,
+  isSubmitting,
+}: Props) {
   const { t } = useTranslation()
   const today = useMemo(() => new Date(), [])
   const initial = useMemo(
     () => ({
-      car: null as string | null,
-      number: '',
-      inspected_at: today as Date | string,
-      cost: 0,
+      car: record ? String(record.car) : null as string | null,
+      number: record?.number ?? '',
+      inspected_at: record?.inspected_at
+        ? new Date(record.inspected_at)
+        : (today as Date | string),
+      cost: record?.cost ?? 0,
     }),
-    [today],
+    [record, today],
   )
 
   const [form, setForm] = useState<typeof initial>(initial)
@@ -39,7 +55,7 @@ export function InspectionFormModal({ opened, onClose, onCreate, isSubmitting }:
     () =>
       (carsData?.results ?? []).map((c) => ({
         value: String(c.id),
-        label: `${c.numplate} (${c.brand})`,
+        label: `${c.numplate} - ${c.brand} ${c.title}`,
       })),
     [carsData],
   )
@@ -50,6 +66,17 @@ export function InspectionFormModal({ opened, onClose, onCreate, isSubmitting }:
     if (!form.number.trim()) return
 
     const dateObj = form.inspected_at instanceof Date ? form.inspected_at : new Date(form.inspected_at)
+
+    if (mode === 'edit' && record) {
+      await onUpdate(record.id, {
+        car: carId,
+        number: form.number.trim(),
+        inspected_at: dateObj.toISOString().slice(0, 10),
+        cost: form.cost,
+      })
+      onClose()
+      return
+    }
 
     const payload: InspectionCreatePayload = {
       car: carId,
@@ -63,7 +90,12 @@ export function InspectionFormModal({ opened, onClose, onCreate, isSubmitting }:
   }
 
   return (
-    <Modal opened={opened} onClose={onClose} title={t('inspections.form.title')} centered>
+    <Modal
+      opened={opened}
+      onClose={onClose}
+      title={mode === 'create' ? t('inspections.form.title') : t('inspections.form.edit_title')}
+      centered
+    >
       <Stack>
         {isCarsLoading && <Text c="dimmed">{t('common.loading')}</Text>}
         {isCarsError && <Text c="red">{t('inspections.form.failed_to_load_cars')}</Text>}
@@ -87,7 +119,7 @@ export function InspectionFormModal({ opened, onClose, onCreate, isSubmitting }:
 
         <DateInput
           label={t('inspections.form.inspected_at')}
-          placeholder={t('inspections.form.inspected_at')}
+          placeholder={t('inspections.form.inspected_at_placeholder')}
           value={form.inspected_at}
           onChange={(value) => {
             if (value) {
@@ -110,7 +142,7 @@ export function InspectionFormModal({ opened, onClose, onCreate, isSubmitting }:
             {t('common.cancel')}
           </Button>
           <Button onClick={() => void submit()} loading={isSubmitting}>
-            {t('common.create')}
+            {mode === 'create' ? t('common.create') : t('common.save')}
           </Button>
         </Group>
       </Stack>

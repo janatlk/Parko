@@ -19,6 +19,8 @@ export type FuelCreatePayload = {
   monthly_mileage: number
 }
 
+export type FuelUpdatePayload = Partial<FuelCreatePayload>
+
 export async function listFuel(params: ListFuelParams = {}): Promise<PaginatedResponse<Fuel>> {
   const { data } = await http.get<PaginatedResponse<Fuel>>('fuel/', {
     params: {
@@ -34,5 +36,10 @@ export async function listFuel(params: ListFuelParams = {}): Promise<PaginatedRe
 
 export async function createFuel(payload: FuelCreatePayload): Promise<Fuel> {
   const { data } = await http.post<Fuel>('fuel/', payload)
+  return data
+}
+
+export async function updateFuel(fuelId: number, payload: FuelUpdatePayload): Promise<Fuel> {
+  const { data } = await http.patch<Fuel>(`fuel/${fuelId}/`, payload)
   return data
 }

@@ -1,11 +1,13 @@
 import { useMemo, useState } from 'react'
 
-import { Button, Container, Group, Pagination, Select, Table, Text, Title } from '@mantine/core'
+import { ActionIcon, Button, Container, Group, Pagination, Select, Table, Text, Title } from '@mantine/core'
+import { IconEdit } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
 
 import { useCarsQuery } from '@features/cars/hooks/useCars'
-import { useCreateInsuranceMutation, useInsurancesQuery } from '@features/insurance/hooks/useInsurance'
+import { useCreateInsuranceMutation, useInsurancesQuery, useUpdateInsuranceMutation } from '@features/insurance/hooks/useInsurance'
 import { InsuranceFormModal } from '@features/insurance/ui/InsuranceFormModal'
+import type { Insurance } from '@entities/fleet/types'
 
 export function InsurancesPage() {
   const { t } = useTranslation()
@@ -17,7 +19,7 @@ export function InsurancesPage() {
     () =>
       (carsData?.results ?? []).map((c) => ({
         value: String(c.id),
-        label: `${c.numplate} (${c.brand})`,
+        label: `${c.numplate} - ${c.brand} ${c.title}`,
       })),
     [carsData],
   )
@@ -27,7 +29,18 @@ export function InsurancesPage() {
   const { data, isLoading, isError } = useInsurancesQuery({ page, car: carId })
 
   const createMutation = useCreateInsuranceMutation()
+  const updateMutation = useUpdateInsuranceMutation()
+
   const [modalOpened, setModalOpened] = useState(false)
+  const [modalMode, setModalMode] = useState<'create' | 'edit'>('create')
+  const [selectedRecord, setSelectedRecord] = useState<Insurance | undefined>(undefined)
+
+  const openEdit = (record: Insurance, e: React.MouseEvent) => {
+    e.stopPropagation()
+    setSelectedRecord(record)
+    setModalMode('edit')
+    setModalOpened(true)
+  }
 
   const records = data?.results ?? []
   const totalPages = data ? Math.max(1, Math.ceil(data.count / 20)) : 1
@@ -41,8 +54,8 @@ export function InsurancesPage() {
 
       <Group align="flex-end" mb="md">
         <Select
-          label="Car"
-          placeholder="All"
+          label={t('insurances.form.car')}
+          placeholder={t('common.all') || 'All'}
           data={carOptions}
           value={carFilter}
           onChange={setCarFilter}
@@ -66,6 +79,7 @@ export function InsurancesPage() {
                 <Table.Th>{t('insurances.table.start')}</Table.Th>
                 <Table.Th>{t('insurances.table.end')}</Table.Th>
                 <Table.Th>{t('insurances.table.cost')}</Table.Th>
+                <Table.Th></Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
@@ -77,6 +91,17 @@ export function InsurancesPage() {
                   <Table.Td>{r.start_date}</Table.Td>
                   <Table.Td>{r.end_date}</Table.Td>
                   <Table.Td>{r.cost}</Table.Td>
+                  <Table.Td onClick={(e) => e.stopPropagation()}>
+                    <ActionIcon
+                      variant="light"
+                      color="blue"
+                      size="sm"
+                      onClick={(e) => openEdit(r, e)}
+                      title={t('common.edit')}
+                    >
+                      <IconEdit size={16} />
+                    </ActionIcon>
+                  </Table.Td>
                 </Table.Tr>
               ))}
             </Table.Tbody>
@@ -94,9 +119,14 @@ export function InsurancesPage() {
       <InsuranceFormModal
         opened={modalOpened}
         onClose={() => setModalOpened(false)}
-        isSubmitting={createMutation.isPending}
+        mode={modalMode}
+        record={selectedRecord}
+        isSubmitting={createMutation.isPending || updateMutation.isPending}
         onCreate={async (payload) => {
           await createMutation.mutateAsync(payload)
+        }}
+        onUpdate={async (insuranceId, payload) => {
+          await updateMutation.mutateAsync({ insuranceId, payload })
         }}
       />
     </Container>

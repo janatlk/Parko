@@ -14,37 +14,58 @@ class DashboardStatsView(APIView):
 
     def get(self, request):
         company = request.user.company
-        
+
         # Car statistics
         total_cars = Car.objects.filter(company=company).count()
         active_cars = Car.objects.filter(company=company, status='ACTIVE').count()
         maintenance_cars = Car.objects.filter(company=company, status='MAINTENANCE').count()
         inactive_cars = Car.objects.filter(company=company, status='INACTIVE').count()
-        
-        # Fuel statistics for current month
+
+        # Fuel statistics - get the most recent month with data
         now = timezone.now()
         current_month = now.month
         current_year = now.year
-        
+
+        # First try current month, if no data, get the last month with data
         fuel_this_month = Fuel.objects.filter(
             car__company=company,
             month=current_month,
             year=current_year
         )
-        total_fuel_cost_month = fuel_this_month.aggregate(total=Sum('total_cost'))['total'] or 0
         
-        # Calculate average fuel consumption
-        avg_consumption_data = fuel_this_month.aggregate(
-            avg_liters=Avg('liters'),
-            avg_mileage=Avg('monthly_mileage')
+        # If no data for current month, find the most recent month with data
+        if not fuel_this_month.exists():
+            latest_fuel = Fuel.objects.filter(
+                car__company=company
+            ).order_by('-year', '-month').first()
+            
+            if latest_fuel:
+                fuel_this_month = Fuel.objects.filter(
+                    car__company=company,
+                    month=latest_fuel.month,
+                    year=latest_fuel.year
+                )
+
+        total_fuel_cost_month = fuel_this_month.aggregate(total=Sum('total_cost'))['total'] or 0
+
+        # Calculate average fuel consumption from all fuel records with valid data
+        all_fuel_with_data = Fuel.objects.filter(
+            car__company=company,
+            liters__gt=0,
+            monthly_mileage__gt=0
         )
         avg_fuel_consumption = 0
-        if avg_consumption_data['avg_liters'] and avg_consumption_data['avg_mileage']:
-            if avg_consumption_data['avg_mileage'] > 0:
-                avg_fuel_consumption = round(
-                    (avg_consumption_data['avg_liters'] / avg_consumption_data['avg_mileage']) * 100, 
-                    2
-                )
+        if all_fuel_with_data.exists():
+            avg_consumption_data = all_fuel_with_data.aggregate(
+                total_liters=Sum('liters'),
+                total_mileage=Sum('monthly_mileage')
+            )
+            if avg_consumption_data['total_liters'] and avg_consumption_data['total_mileage']:
+                if avg_consumption_data['total_mileage'] > 0:
+                    avg_fuel_consumption = round(
+                        (avg_consumption_data['total_liters'] / avg_consumption_data['total_mileage']) * 100,
+                        2
+                    )
         
         # Maintenance cost for current month (from spares)
         maintenance_cost_month = Spare.objects.filter(
@@ -179,20 +200,21 @@ class DashboardFuelByMonthView(APIView):
     def get(self, request):
         company = request.user.company
         months = int(request.query_params.get('months', 6))
-        
+
         now = timezone.now()
-        # Calculate the start date for the last N months
-        start_date = now - timedelta(days=30 * months)
         
+        # Get the last N months with data, ordered by year and month
         fuel_data = Fuel.objects.filter(
-            car__company=company,
-            created_at__gte=start_date
-        ).values('month', 'month_name').annotate(
+            car__company=company
+        ).values('year', 'month', 'month_name').annotate(
             total_liters=Sum('liters'),
             total_cost=Sum('total_cost'),
             avg_consumption=Avg('liters')
-        ).order_by('month')
-        
+        ).order_by('-year', '-month')[:months]
+
+        # Sort by month number (ascending) for the chart
+        fuel_data = sorted(fuel_data, key=lambda x: (x['year'], x['month']))
+
         data = []
         for item in fuel_data:
             data.append({
@@ -202,5 +224,5 @@ class DashboardFuelByMonthView(APIView):
                 'total_cost': float(item['total_cost'] or 0),
                 'avg_consumption': float(item['avg_consumption'] or 0),
             })
-        
+
         return Response(data)

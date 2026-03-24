@@ -23,6 +23,8 @@ export type InsuranceCreatePayload = {
   cost: number
 }
 
+export type InsuranceUpdatePayload = Partial<InsuranceCreatePayload>
+
 export async function listInsurances(
   params: ListInsurancesParams = {},
 ): Promise<PaginatedResponse<Insurance>> {
@@ -34,5 +36,13 @@ export async function listInsurances(
 
 export async function createInsurance(payload: InsuranceCreatePayload): Promise<Insurance> {
   const { data } = await http.post<Insurance>('insurances/', payload)
+  return data
+}
+
+export async function updateInsurance(
+  insuranceId: number,
+  payload: InsuranceUpdatePayload,
+): Promise<Insurance> {
+  const { data } = await http.patch<Insurance>(`insurances/${insuranceId}/`, payload)
   return data
 }

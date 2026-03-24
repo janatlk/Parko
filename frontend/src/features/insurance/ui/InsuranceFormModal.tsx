@@ -6,28 +6,44 @@ import { useTranslation } from 'react-i18next'
 
 import { useCarsQuery } from '@features/cars/hooks/useCars'
 
-import type { InsuranceCreatePayload } from '../api/insuranceApi'
+import type { InsuranceCreatePayload, InsuranceUpdatePayload } from '../api/insuranceApi'
+import type { Insurance } from '@entities/fleet/types'
+
+type Mode = 'create' | 'edit'
 
 type Props = {
   opened: boolean
   onClose: () => void
+  mode: Mode
+  record?: Insurance
   onCreate: (payload: InsuranceCreatePayload) => Promise<void>
+  onUpdate: (insuranceId: number, payload: InsuranceUpdatePayload) => Promise<void>
   isSubmitting?: boolean
 }
 
-export function InsuranceFormModal({ opened, onClose, onCreate, isSubmitting }: Props) {
+export function InsuranceFormModal({
+  opened,
+  onClose,
+  mode,
+  record,
+  onCreate,
+  onUpdate,
+  isSubmitting,
+}: Props) {
   const { t } = useTranslation()
   const today = useMemo(() => new Date(), [])
   const initial = useMemo(
     () => ({
-      car: null as string | null,
-      insurance_type: 'OSAGO',
-      number: '',
-      start_date: today as Date | string,
-      end_date: today as Date | string,
-      cost: 0,
+      car: record ? String(record.car) : null as string | null,
+      insurance_type: record?.insurance_type ?? 'OSAGO',
+      number: record?.number ?? '',
+      start_date: record?.start_date
+        ? new Date(record.start_date)
+        : (today as Date | string),
+      end_date: record?.end_date ? new Date(record.end_date) : (today as Date | string),
+      cost: record?.cost ?? 0,
     }),
-    [today],
+    [record, today],
   )
 
   const [form, setForm] = useState<typeof initial>(initial)
@@ -41,7 +57,7 @@ export function InsuranceFormModal({ opened, onClose, onCreate, isSubmitting }: 
     () =>
       (carsData?.results ?? []).map((c) => ({
         value: String(c.id),
-        label: `${c.numplate} (${c.brand})`,
+        label: `${c.numplate} - ${c.brand} ${c.title}`,
       })),
     [carsData],
   )
@@ -53,6 +69,19 @@ export function InsuranceFormModal({ opened, onClose, onCreate, isSubmitting }: 
 
     const startDateObj = form.start_date instanceof Date ? form.start_date : new Date(form.start_date)
     const endDateObj = form.end_date instanceof Date ? form.end_date : new Date(form.end_date)
+
+    if (mode === 'edit' && record) {
+      await onUpdate(record.id, {
+        car: carId,
+        insurance_type: form.insurance_type,
+        number: form.number.trim(),
+        start_date: startDateObj.toISOString().slice(0, 10),
+        end_date: endDateObj.toISOString().slice(0, 10),
+        cost: form.cost,
+      })
+      onClose()
+      return
+    }
 
     const payload: InsuranceCreatePayload = {
       car: carId,
@@ -68,7 +97,12 @@ export function InsuranceFormModal({ opened, onClose, onCreate, isSubmitting }: 
   }
 
   return (
-    <Modal opened={opened} onClose={onClose} title={t('insurances.form.title')} centered>
+    <Modal
+      opened={opened}
+      onClose={onClose}
+      title={mode === 'create' ? t('insurances.form.title') : t('insurances.form.edit_title')}
+      centered
+    >
       <Stack>
         {isCarsLoading && <Text c="dimmed">{t('common.loading')}</Text>}
         {isCarsError && <Text c="red">{t('insurances.form.failed_to_load_cars')}</Text>}
@@ -103,7 +137,7 @@ export function InsuranceFormModal({ opened, onClose, onCreate, isSubmitting }: 
 
         <DateInput
           label={t('insurances.form.start_date')}
-          placeholder={t('insurances.form.start_date')}
+          placeholder={t('insurances.form.start_date_placeholder')}
           value={form.start_date}
           onChange={(value) => {
             if (value) {
@@ -115,7 +149,7 @@ export function InsuranceFormModal({ opened, onClose, onCreate, isSubmitting }: 
 
         <DateInput
           label={t('insurances.form.end_date')}
-          placeholder={t('insurances.form.end_date')}
+          placeholder={t('insurances.form.end_date_placeholder')}
           value={form.end_date}
           onChange={(value) => {
             if (value) {
@@ -138,7 +172,7 @@ export function InsuranceFormModal({ opened, onClose, onCreate, isSubmitting }: 
             {t('common.cancel')}
           </Button>
           <Button onClick={() => void submit()} loading={isSubmitting}>
-            {t('common.create')}
+            {mode === 'create' ? t('common.create') : t('common.save')}
           </Button>
         </Group>
       </Stack>

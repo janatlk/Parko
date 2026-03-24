@@ -3,8 +3,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { PaginatedResponse } from '@shared/api/types'
 import type { Inspection } from '@entities/fleet/types'
 
-import { createInspection, listInspections } from '../api/inspectionsApi'
-import type { InspectionCreatePayload, ListInspectionsParams } from '../api/inspectionsApi'
+import { createInspection, listInspections, updateInspection } from '../api/inspectionsApi'
+import type { InspectionCreatePayload, InspectionUpdatePayload, ListInspectionsParams } from '../api/inspectionsApi'
 
 type InspectionsQueryArgs = {
   page: number
@@ -33,7 +33,18 @@ export function useCreateInspectionMutation() {
   return useMutation({
     mutationFn: (payload: InspectionCreatePayload) => createInspection(payload),
     onSuccess: async () => {
-      await qc.invalidateQueries({ queryKey: inspectionsKeys.all })
+      await qc.invalidateQueries({ queryKey: ['inspections'] })
+    },
+  })
+}
+
+export function useUpdateInspectionMutation() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ inspectionId, payload }: { inspectionId: number; payload: InspectionUpdatePayload }) =>
+      updateInspection(inspectionId, payload),
+    onSuccess: async () => {
+      await qc.invalidateQueries({ queryKey: ['inspections'] })
     },
   })
 }

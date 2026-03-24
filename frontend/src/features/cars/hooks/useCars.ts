@@ -3,8 +3,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { PaginatedResponse } from '@shared/api/types'
 import type { Car } from '@entities/car/types'
 
-import { createCar, getCar, listCars } from '../api/carsApi'
-import type { CarCreatePayload, CarListItem, ListCarsParams } from '../api/carsApi'
+import { createCar, getCar, listCars, updateCar } from '../api/carsApi'
+import type { CarCreatePayload, CarListItem, ListCarsParams, CarUpdatePayload } from '../api/carsApi'
 
 type CarsQueryArgs = {
   page: number
@@ -36,7 +36,20 @@ export function useCreateCarMutation() {
   return useMutation({
     mutationFn: (payload: CarCreatePayload) => createCar(payload),
     onSuccess: async () => {
-      await qc.invalidateQueries({ queryKey: carsKeys.all })
+      // Invalidate all car-related queries
+      await qc.invalidateQueries({ queryKey: ['cars'] })
+    },
+  })
+}
+
+export function useUpdateCarMutation() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ carId, payload }: { carId: number; payload: CarUpdatePayload }) =>
+      updateCar(carId, payload),
+    onSuccess: async () => {
+      // Invalidate all car-related queries
+      await qc.invalidateQueries({ queryKey: ['cars'] })
     },
   })
 }

@@ -1,11 +1,13 @@
 import { useMemo, useState } from 'react'
 
-import { Button, Container, Group, Pagination, Select, Table, Text, Title } from '@mantine/core'
+import { ActionIcon, Button, Container, Group, Pagination, Select, Table, Text, Title } from '@mantine/core'
+import { IconEdit } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
 
 import { useCarsQuery } from '@features/cars/hooks/useCars'
-import { useCreateInspectionMutation, useInspectionsQuery } from '@features/inspections/hooks/useInspections'
+import { useCreateInspectionMutation, useInspectionsQuery, useUpdateInspectionMutation } from '@features/inspections/hooks/useInspections'
 import { InspectionFormModal } from '@features/inspections/ui/InspectionFormModal'
+import type { Inspection } from '@entities/fleet/types'
 
 export function InspectionsPage() {
   const { t } = useTranslation()
@@ -17,7 +19,7 @@ export function InspectionsPage() {
     () =>
       (carsData?.results ?? []).map((c) => ({
         value: String(c.id),
-        label: `${c.numplate} (${c.brand})`,
+        label: `${c.numplate} - ${c.brand} ${c.title}`,
       })),
     [carsData],
   )
@@ -27,7 +29,18 @@ export function InspectionsPage() {
   const { data, isLoading, isError } = useInspectionsQuery({ page, car: carId })
 
   const createMutation = useCreateInspectionMutation()
+  const updateMutation = useUpdateInspectionMutation()
+
   const [modalOpened, setModalOpened] = useState(false)
+  const [modalMode, setModalMode] = useState<'create' | 'edit'>('create')
+  const [selectedRecord, setSelectedRecord] = useState<Inspection | undefined>(undefined)
+
+  const openEdit = (record: Inspection, e: React.MouseEvent) => {
+    e.stopPropagation()
+    setSelectedRecord(record)
+    setModalMode('edit')
+    setModalOpened(true)
+  }
 
   const records = data?.results ?? []
   const totalPages = data ? Math.max(1, Math.ceil(data.count / 20)) : 1
@@ -41,8 +54,8 @@ export function InspectionsPage() {
 
       <Group align="flex-end" mb="md">
         <Select
-          label="Car"
-          placeholder="All"
+          label={t('inspections.form.car')}
+          placeholder={t('common.all') || 'All'}
           data={carOptions}
           value={carFilter}
           onChange={setCarFilter}
@@ -64,6 +77,7 @@ export function InspectionsPage() {
                 <Table.Th>{t('inspections.table.number')}</Table.Th>
                 <Table.Th>{t('inspections.table.date')}</Table.Th>
                 <Table.Th>{t('inspections.table.cost')}</Table.Th>
+                <Table.Th></Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
@@ -73,6 +87,17 @@ export function InspectionsPage() {
                   <Table.Td>{r.number}</Table.Td>
                   <Table.Td>{r.inspected_at}</Table.Td>
                   <Table.Td>{r.cost}</Table.Td>
+                  <Table.Td onClick={(e) => e.stopPropagation()}>
+                    <ActionIcon
+                      variant="light"
+                      color="blue"
+                      size="sm"
+                      onClick={(e) => openEdit(r, e)}
+                      title={t('common.edit')}
+                    >
+                      <IconEdit size={16} />
+                    </ActionIcon>
+                  </Table.Td>
                 </Table.Tr>
               ))}
             </Table.Tbody>
@@ -90,9 +115,14 @@ export function InspectionsPage() {
       <InspectionFormModal
         opened={modalOpened}
         onClose={() => setModalOpened(false)}
-        isSubmitting={createMutation.isPending}
+        mode={modalMode}
+        record={selectedRecord}
+        isSubmitting={createMutation.isPending || updateMutation.isPending}
         onCreate={async (payload) => {
           await createMutation.mutateAsync(payload)
+        }}
+        onUpdate={async (inspectionId, payload) => {
+          await updateMutation.mutateAsync({ inspectionId, payload })
         }}
       />
     </Container>

@@ -29,6 +29,8 @@ export type CarCreatePayload = {
   commissioned_at?: string | null
 }
 
+export type CarUpdatePayload = Partial<CarCreatePayload>
+
 export async function listCars(params: ListCarsParams = {}): Promise<PaginatedResponse<CarListItem>> {
   const { data } = await http.get<PaginatedResponse<CarListItem>>('cars/', {
     params: {
@@ -50,5 +52,10 @@ export async function createCar(payload: CarCreatePayload): Promise<Car> {
 
 export async function getCar(carId: number): Promise<Car> {
   const { data } = await http.get<Car>(`cars/${carId}/`)
+  return data
+}
+
+export async function updateCar(carId: number, payload: CarUpdatePayload): Promise<Car> {
+  const { data } = await http.patch<Car>(`cars/${carId}/`, payload)
   return data
 }

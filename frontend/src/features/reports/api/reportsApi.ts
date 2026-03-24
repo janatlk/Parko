@@ -310,6 +310,53 @@ export async function deleteReportTemplate(id: number): Promise<void> {
   await http.delete(`templates/${id}/`)
 }
 
+/**
+ * Share report via email
+ */
+export interface ShareReportEmailPayload {
+  report_type: ReportType
+  from_date: string
+  to_date: string
+  recipient_email: string
+  format?: 'csv' | 'xlsx' | 'pdf'
+}
+
+export async function shareReportViaEmail(payload: ShareReportEmailPayload): Promise<{ success: boolean; message: string }> {
+  const { data } = await http.post<{ success: boolean; message: string }>('share-email/', payload)
+  return data
+}
+
+/**
+ * Update user email settings (API key)
+ */
+export interface EmailSettingsPayload {
+  email_api_key: string
+  email_service?: string
+}
+
+export async function updateEmailSettings(payload: EmailSettingsPayload): Promise<{ success: boolean; message: string }> {
+  const { data } = await http.post<{ success: boolean; message: string }>('email-settings/', payload)
+  return data
+}
+
+/**
+ * Get user email settings
+ */
+export interface EmailSettings {
+  email_api_key: string | null
+  email_service: string
+  user_email: string
+}
+
+export async function getEmailSettings(): Promise<EmailSettings | null> {
+  try {
+    const { data } = await http.get<EmailSettings>('email-settings/')
+    return data
+  } catch {
+    return null
+  }
+}
+
 // Legacy function for backward compatibility
 export type MaintenanceCostsParams = {
   from?: string

@@ -1,13 +1,14 @@
 import { useMemo, useState } from 'react'
 
-import { Button, Container, Group, Pagination, Select, Table, Text, TextInput, Title } from '@mantine/core'
+import { ActionIcon, Button, Container, Group, Pagination, Select, Table, Text, TextInput, Title } from '@mantine/core'
+import { IconEdit, IconEye } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
 import { useAuth } from '@features/auth/hooks/useAuth'
-import { useCarsQuery, useCreateCarMutation } from '@features/cars/hooks/useCars'
+import { useCarsQuery, useCreateCarMutation, useUpdateCarMutation } from '@features/cars/hooks/useCars'
 import { CarFormModal } from '@features/cars/ui/CarFormModal'
-import type { CarStatus } from '@entities/car/types'
+import type { Car, CarStatus } from '@entities/car/types'
 import { CAR_STATUSES } from '@entities/car/types'
 import { canEditCars } from '@shared/lib/permissions'
 import { PermissionGuard } from '@shared/ui/PermissionGuard'
@@ -23,7 +24,24 @@ export function CarsPage() {
   const [search, setSearch] = useState('')
 
   const createMutation = useCreateCarMutation()
+  const updateMutation = useUpdateCarMutation()
+
   const [modalOpened, setModalOpened] = useState(false)
+  const [modalMode, setModalMode] = useState<'create' | 'edit'>('create')
+  const [selectedCar, setSelectedCar] = useState<Car | undefined>(undefined)
+
+  const openCreate = () => {
+    setSelectedCar(undefined)
+    setModalMode('create')
+    setModalOpened(true)
+  }
+
+  const openEdit = (car: Car, e: React.MouseEvent) => {
+    e.stopPropagation()
+    setSelectedCar(car as Car)
+    setModalMode('edit')
+    setModalOpened(true)
+  }
 
   const { data, isLoading, isError } = useCarsQuery({
     page,
@@ -45,21 +63,21 @@ export function CarsPage() {
         <Title order={2}>{t('cars.title')}</Title>
 
         <PermissionGuard canAccess={canEdit} mode="disable">
-          <Button onClick={() => setModalOpened(true)}>{t('cars.add')}</Button>
+          <Button onClick={openCreate}>{t('cars.add')}</Button>
         </PermissionGuard>
       </Group>
 
       <Group align="flex-end" mb="md">
         <TextInput
           label={t('cars.search')}
-          placeholder="Numplate, VIN, driver..."
+          placeholder={t('cars.search_placeholder') || 'Numplate, VIN, driver...'}
           value={search}
           onChange={(e) => setSearch(e.currentTarget.value)}
           w={320}
         />
         <Select
           label={t('cars.status')}
-          placeholder="All"
+          placeholder={t('common.all') || 'All'}
           data={statusOptions}
           value={statusFilter}
           onChange={setStatusFilter}
@@ -73,6 +91,9 @@ export function CarsPage() {
 
       {!isLoading && !isError && (
         <>
+          <Text size="sm" c="dimmed" mb="xs">
+            💡 {t('cars.click_hint') || 'Click on a row to view car details'}
+          </Text>
           <Table withTableBorder withColumnBorders striped highlightOnHover>
             <Table.Thead>
               <Table.Tr>
@@ -82,21 +103,49 @@ export function CarsPage() {
                 <Table.Th>{t('cars.table.title')}</Table.Th>
                 <Table.Th>{t('cars.table.driver')}</Table.Th>
                 <Table.Th>{t('cars.table.status')}</Table.Th>
+                <Table.Th></Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
               {cars.map((c) => (
                 <Table.Tr
                   key={c.id}
-                  style={{ cursor: 'pointer' }}
                   onClick={() => navigate(`/cars/${c.id}`)}
+                  style={{
+                    cursor: 'pointer',
+                    transition: 'background-color 0.2s',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--mantine-color-blue-light)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent'
+                  }}
                 >
-                  <Table.Td>{c.id}</Table.Td>
+                  <Table.Td>
+                    <Group gap="xs">
+                      <IconEye size={16} color="var(--mantine-color-blue-6)" />
+                      {c.id}
+                    </Group>
+                  </Table.Td>
                   <Table.Td>{c.numplate}</Table.Td>
                   <Table.Td>{c.brand}</Table.Td>
                   <Table.Td>{c.title}</Table.Td>
                   <Table.Td>{c.driver}</Table.Td>
                   <Table.Td>{c.status}</Table.Td>
+                  <Table.Td onClick={(e) => e.stopPropagation()}>
+                    <PermissionGuard canAccess={canEdit} mode="disable">
+                      <ActionIcon
+                        variant="light"
+                        color="blue"
+                        size="sm"
+                        onClick={(e) => openEdit(c as Car, e)}
+                        title={t('cars.edit')}
+                      >
+                        <IconEdit size={16} />
+                      </ActionIcon>
+                    </PermissionGuard>
+                  </Table.Td>
                 </Table.Tr>
               ))}
             </Table.Tbody>
@@ -114,9 +163,14 @@ export function CarsPage() {
       <CarFormModal
         opened={modalOpened}
         onClose={() => setModalOpened(false)}
-        isSubmitting={createMutation.isPending}
+        mode={modalMode}
+        car={selectedCar}
+        isSubmitting={createMutation.isPending || updateMutation.isPending}
         onCreate={async (payload) => {
           await createMutation.mutateAsync(payload)
+        }}
+        onUpdate={async (carId, payload) => {
+          await updateMutation.mutateAsync({ carId, payload })
         }}
       />
     </Container>

@@ -10,6 +10,7 @@ import {
   Switch,
   TextInput,
 } from '@mantine/core'
+import { useTranslation } from 'react-i18next'
 
 import type { User } from '@entities/user/types'
 import { USER_ROLES } from '@shared/constants/roles'
@@ -38,6 +39,7 @@ export function UserFormModal({
   onUpdate,
   isSubmitting,
 }: Props) {
+  const { t } = useTranslation()
   const getInputValue = (valueOrEvent: unknown): string => {
     if (typeof valueOrEvent === 'string') return valueOrEvent
     if (valueOrEvent && typeof valueOrEvent === 'object') {
@@ -127,12 +129,12 @@ export function UserFormModal({
     <Modal
       opened={opened}
       onClose={onClose}
-      title={mode === 'create' ? 'Create user' : 'Edit user'}
+      title={mode === 'create' ? t('users.create') : t('users.edit')}
       centered
     >
       <Stack>
         <TextInput
-          label="Username"
+          label={t('auth.username')}
           value={form.username}
           onChange={(valueOrEvent) =>
             setForm((s) => ({ ...s, username: getInputValue(valueOrEvent) }))
@@ -141,7 +143,7 @@ export function UserFormModal({
         />
 
         <PasswordInput
-          label={mode === 'create' ? 'Password' : 'New password (optional)'}
+          label={mode === 'create' ? t('auth.password') : t('users.new_password')}
           value={form.password}
           onChange={(valueOrEvent) =>
             setForm((s) => ({ ...s, password: getInputValue(valueOrEvent) }))
@@ -150,7 +152,7 @@ export function UserFormModal({
         />
 
         <TextInput
-          label="First name"
+          label={t('users.first_name')}
           value={form.first_name}
           onChange={(valueOrEvent) =>
             setForm((s) => ({ ...s, first_name: getInputValue(valueOrEvent) }))
@@ -158,7 +160,7 @@ export function UserFormModal({
         />
 
         <TextInput
-          label="Last name"
+          label={t('users.last_name')}
           value={form.last_name}
           onChange={(valueOrEvent) =>
             setForm((s) => ({ ...s, last_name: getInputValue(valueOrEvent) }))
@@ -166,13 +168,13 @@ export function UserFormModal({
         />
 
         <TextInput
-          label="Email"
+          label={t('users.email')}
           value={form.email}
           onChange={(valueOrEvent) => setForm((s) => ({ ...s, email: getInputValue(valueOrEvent) }))}
         />
 
         <Select
-          label="Role"
+          label={t('users.role')}
           data={USER_ROLES.map((r) => ({ value: r, label: r }))}
           value={form.role}
           onChange={(value) => value && setForm((s) => ({ ...s, role: value as User['role'] }))}
@@ -180,7 +182,7 @@ export function UserFormModal({
         />
 
         <Select
-          label="Language"
+          label={t('users.language')}
           data={LANGUAGES.map((l) => ({ value: l, label: l.toUpperCase() }))}
           value={form.language}
           onChange={(value) =>
@@ -190,13 +192,13 @@ export function UserFormModal({
         />
 
         <TextInput
-          label="Region"
+          label={t('users.region')}
           value={form.region}
           onChange={(valueOrEvent) => setForm((s) => ({ ...s, region: getInputValue(valueOrEvent) }))}
         />
 
         <Switch
-          label="Active"
+          label={t('users.active')}
           checked={form.is_active}
           onChange={(valueOrEvent) =>
             setForm((s) => ({ ...s, is_active: getCheckedValue(valueOrEvent) }))
@@ -205,10 +207,10 @@ export function UserFormModal({
 
         <Group justify="flex-end">
           <Button variant="default" onClick={onClose} disabled={isSubmitting}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button onClick={() => void submit()} loading={isSubmitting}>
-            {mode === 'create' ? 'Create' : 'Save'}
+            {mode === 'create' ? t('common.create') : t('common.save')}
           </Button>
         </Group>
       </Stack>

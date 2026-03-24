@@ -3,8 +3,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { PaginatedResponse } from '@shared/api/types'
 import type { Insurance } from '@entities/fleet/types'
 
-import { createInsurance, listInsurances } from '../api/insuranceApi'
-import type { InsuranceCreatePayload, ListInsurancesParams } from '../api/insuranceApi'
+import { createInsurance, listInsurances, updateInsurance } from '../api/insuranceApi'
+import type { InsuranceCreatePayload, InsuranceUpdatePayload, ListInsurancesParams } from '../api/insuranceApi'
 
 type InsurancesQueryArgs = {
   page: number
@@ -33,7 +33,18 @@ export function useCreateInsuranceMutation() {
   return useMutation({
     mutationFn: (payload: InsuranceCreatePayload) => createInsurance(payload),
     onSuccess: async () => {
-      await qc.invalidateQueries({ queryKey: insuranceKeys.all })
+      await qc.invalidateQueries({ queryKey: ['insurances'] })
+    },
+  })
+}
+
+export function useUpdateInsuranceMutation() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ insuranceId, payload }: { insuranceId: number; payload: InsuranceUpdatePayload }) =>
+      updateInsurance(insuranceId, payload),
+    onSuccess: async () => {
+      await qc.invalidateQueries({ queryKey: ['insurances'] })
     },
   })
 }
