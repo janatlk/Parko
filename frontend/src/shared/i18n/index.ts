@@ -331,6 +331,7 @@ const resources = {
         email_service_help_sendgrid: 'SendGrid: Настройки → API Keys → Create API Key',
         email_service_help_mailgun: 'Mailgun: Панель управления → API Keys',
         email_service_help_smtp: 'SMTP: Используйте пароль приложения (не обычный пароль)',
+        change_api_key: 'Изменить API ключ',
       },
       landing: {
         hero_title: 'Управление автопарком стало проще',
@@ -710,6 +711,7 @@ const resources = {
         email_service_help_sendgrid: 'SendGrid: Settings → API Keys → Create API Key',
         email_service_help_mailgun: 'Mailgun: Dashboard → API Keys',
         email_service_help_smtp: 'SMTP: Use app-specific password (not regular password)',
+        change_api_key: 'Change API Key',
       },
       landing: {
         hero_title: 'Fleet Management Made Simple',
@@ -1080,6 +1082,7 @@ const resources = {
         email_service_help_sendgrid: 'SendGrid: Настройки → API Keys → Create API Key',
         email_service_help_mailgun: 'Mailgun: Панель управления → API Keys',
         email_service_help_smtp: 'SMTP: Колдонмо сырсөзүн колдонуңуз (кадимки сырсөз эмес)',
+        change_api_key: 'API ачкычты өзгөртүү',
       },
       landing: {
         hero_title: 'Автопарк башкаруу жеңилдеди',

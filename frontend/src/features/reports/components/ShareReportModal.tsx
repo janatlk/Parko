@@ -42,6 +42,7 @@ export function ShareReportModal({ opened, onClose, report }: Props) {
   const [showApiKeyInput, setShowApiKeyInput] = useState(false)
   const [apiKey, setApiKey] = useState('')
   const [emailService, setEmailService] = useState('sendgrid')
+  const [showChangeKey, setShowChangeKey] = useState(false)
 
   // Check for existing API key when modal opens
   useEffect(() => {
@@ -232,6 +233,21 @@ export function ShareReportModal({ opened, onClose, report }: Props) {
           </Stack>
         ) : (
           <>
+            <Group justify="space-between" align="flex-start" mb="xs">
+              <Text size="sm" fw={500}>
+                {t('reports.email_service') || 'Email Service'}: <Text component="span" fw={700}>{emailService}</Text>
+              </Text>
+              <Button
+                variant="subtle"
+                size="xs"
+                color="blue"
+                onClick={() => setShowChangeKey(true)}
+                leftSection={<IconKey size={14} />}
+              >
+                {t('reports.change_api_key') || 'Change API Key'}
+              </Button>
+            </Group>
+
             <TextInput
               label={t('reports.share_email') || 'Recipient Email'}
               placeholder={t('reports.share_email_placeholder') || 'Enter recipient email'}
@@ -267,6 +283,47 @@ export function ShareReportModal({ opened, onClose, report }: Props) {
               </Button>
             </Group>
           </>
+        )}
+
+        {/* Change API Key Modal */}
+        {showChangeKey && (
+          <Stack gap="sm" mt="md" p="md" bg="gray.0" style={{ borderRadius: 'var(--mantine-radius-md)' }}>
+            <Text size="sm" fw={500}>
+              {t('reports.email_service') || 'Email Service'}
+            </Text>
+            <Select
+              value={emailService}
+              onChange={(value) => value && setEmailService(value)}
+              data={[
+                { value: 'sendgrid', label: 'SendGrid' },
+                { value: 'mailgun', label: 'Mailgun' },
+                { value: 'smtp', label: 'SMTP' },
+              ]}
+            />
+
+            <Text size="sm" fw={500} mt="sm">
+              {t('reports.email_api_key') || 'Email Service API Key'}
+            </Text>
+            <PasswordInput
+              placeholder={t('reports.email_api_key_placeholder') || 'Enter new API key'}
+              value={apiKey}
+              onChange={(e) => setApiKey(e.currentTarget.value)}
+              autoFocus
+            />
+            <Text size="xs" c="dimmed">
+              {emailService === 'sendgrid' && 'Get your API key from SendGrid dashboard (Settings → API Keys)'}
+              {emailService === 'mailgun' && 'Get your API key from Mailgun dashboard'}
+              {emailService === 'smtp' && 'For Gmail: Use App Password (not regular password). Enable 2FA first, then go to Google Account → Security → App Passwords'}
+            </Text>
+            <Group justify="flex-end" gap="sm">
+              <Button variant="default" onClick={() => { setShowChangeKey(false); setApiKey(''); }}>
+                {t('common.cancel') || 'Cancel'}
+              </Button>
+              <Button onClick={handleSaveApiKey} disabled={!apiKey}>
+                {t('common.save') || 'Save'}
+              </Button>
+            </Group>
+          </Stack>
         )}
       </Stack>
     </Modal>

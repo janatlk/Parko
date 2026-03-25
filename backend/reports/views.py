@@ -547,14 +547,28 @@ class ShareReportEmailView(APIView):
             "format": "xlsx"
         }
         """
+        logger = __import__('logging').getLogger(__name__)
+        logger.info("=" * 60)
+        logger.info("SHARE REPORT EMAIL VIEW - REQUEST RECEIVED")
+        logger.info("=" * 60)
+        logger.info(f"User: {request.user.username} (ID: {request.user.id})")
+        logger.info(f"User email: {request.user.email}")
+        logger.info(f"User company: {request.user.company}")
+        logger.info(f"Request data: {request.data}")
+        
         user = request.user
         
         # Validate user has email API key
         if not user.email_api_key:
+            logger.error("ERROR: User has no email_api_key configured")
+            logger.error(f"User email_service: {user.email_service}")
             return Response(
                 {'error': 'Email API key not configured. Please save your API key first.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
+        
+        logger.info(f"User has API key: {len(user.email_api_key) > 0}")
+        logger.info(f"Email service: {user.email_service}")
         
         # Validate required fields
         report_type = request.data.get('report_type')
@@ -563,7 +577,13 @@ class ShareReportEmailView(APIView):
         recipient_email = request.data.get('recipient_email')
         export_format = request.data.get('format', 'xlsx')
         
+        logger.info(f"Report type: {report_type}")
+        logger.info(f"Date range: {from_date_str} to {to_date_str}")
+        logger.info(f"Recipient: {recipient_email}")
+        logger.info(f"Export format: {export_format}")
+        
         if not all([report_type, from_date_str, to_date_str, recipient_email]):
+            logger.error("ERROR: Missing required fields")
             return Response(
                 {'error': 'Missing required fields: report_type, from_date, to_date, recipient_email'},
                 status=status.HTTP_400_BAD_REQUEST
@@ -574,7 +594,9 @@ class ShareReportEmailView(APIView):
             from datetime import date
             from_date = date.fromisoformat(from_date_str)
             to_date = date.fromisoformat(to_date_str)
-        except ValueError:
+            logger.info(f"Parsed dates: from={from_date}, to={to_date}")
+        except ValueError as e:
+            logger.error(f"ERROR: Invalid date format: {e}")
             return Response(
                 {'error': 'Invalid date format. Use YYYY-MM-DD'},
                 status=status.HTTP_400_BAD_REQUEST
@@ -582,6 +604,7 @@ class ShareReportEmailView(APIView):
         
         # Generate report
         try:
+            logger.info("Generating report...")
             report_data = ReportGenerator.generate(
                 report_type=report_type,
                 from_date=from_date,
@@ -591,9 +614,10 @@ class ShareReportEmailView(APIView):
                 filters={},
                 include_charts=False  # Don't include charts for email attachment
             )
+            logger.info(f"Report generated successfully. Data keys: {list(report_data.keys())}")
         except Exception as e:
-            logger = __import__('logging').getLogger(__name__)
-            logger.error(f"Error generating report for email: {e}")
+            logger.error(f"ERROR generating report: {e}")
+            logger.exception("Full traceback:")
             return Response(
                 {'error': f'Report generation failed: {str(e)}'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -602,8 +626,11 @@ class ShareReportEmailView(APIView):
         # Prepare data for export
         preparator = get_export_preparator(report_type)
         if preparator:
+            logger.info(f"Using preparator: {preparator.__name__}")
             export_data = preparator(report_data)
+            logger.info(f"Export data rows: {len(export_data)}")
         else:
+            logger.warning(f"No preparator found for {report_type}, using raw data")
             export_data = report_data.get('data', [])
         
         # Export to file
@@ -614,16 +641,21 @@ class ShareReportEmailView(APIView):
         filename = f"report_{report_type}_{from_date_str}_to_{to_date_str}"
         
         try:
+            logger.info(f"Exporting to {export_format.upper()}...")
             if export_format == 'xlsx':
                 response = export_to_xlsx(export_data, f"{filename}.xlsx")
                 content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                logger.info("Exported to XLSX")
             elif export_format == 'csv':
                 response = export_to_csv(export_data, f"{filename}.csv")
                 content_type = 'text/csv'
+                logger.info("Exported to CSV")
             elif export_format == 'pdf':
                 response = export_to_pdf(export_data, f"{filename}.pdf")
                 content_type = 'application/pdf'
+                logger.info("Exported to PDF")
             else:
+                logger.error(f"Unsupported format: {export_format}")
                 return Response(
                     {'error': f'Unsupported format: {export_format}'},
                     status=status.HTTP_400_BAD_REQUEST
@@ -632,16 +664,18 @@ class ShareReportEmailView(APIView):
             # Get file content
             buffer.write(response.content)
             buffer.seek(0)
+            logger.info(f"File size: {len(buffer.getvalue())} bytes")
             
         except Exception as e:
-            logger = __import__('logging').getLogger(__name__)
-            logger.error(f"Error exporting report for email: {e}")
+            logger.error(f"ERROR exporting report: {e}")
+            logger.exception("Full traceback:")
             return Response(
                 {'error': f'Export failed: {str(e)}'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
         # Send email
+        logger.info("Calling send_report_email...")
         success = send_report_email(
             recipient_email=recipient_email,
             report_file=buffer,
@@ -651,7 +685,12 @@ class ShareReportEmailView(APIView):
             service=user.email_service,
             subject=f'Report: {report_type.replace("_", " ").title()}',
         )
-
+        
+        logger.info(f"Email send result: {'SUCCESS' if success else 'FAILED'}")
+        logger.info("=" * 60)
+        logger.info("SHARE REPORT EMAIL VIEW - COMPLETED")
+        logger.info("=" * 60)
+        
         if success:
             return Response({
                 'success': True,

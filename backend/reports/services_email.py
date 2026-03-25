@@ -34,9 +34,20 @@ def send_report_email(
     Returns:
         True if sent successfully, False otherwise
     """
+    logger.info("=" * 60)
+    logger.info("EMAIL SEND ATTEMPT STARTED")
+    logger.info("=" * 60)
+    logger.info(f"Service: {service}")
+    logger.info(f"Recipient: {recipient_email}")
+    logger.info(f"Sender: {sender_email}")
+    logger.info(f"Report file: {report_name}")
+    logger.info(f"Subject: {subject or 'Report from Parko'}")
+    logger.info("-" * 60)
+    
     try:
         if service == 'sendgrid':
-            return _send_via_sendgrid(
+            logger.info("Attempting to send via SendGrid...")
+            result = _send_via_sendgrid(
                 recipient_email,
                 report_file,
                 report_name,
@@ -45,8 +56,11 @@ def send_report_email(
                 subject,
                 body
             )
+            logger.info(f"SendGrid result: {'SUCCESS' if result else 'FAILED'}")
+            return result
         elif service == 'mailgun':
-            return _send_via_mailgun(
+            logger.info("Attempting to send via Mailgun...")
+            result = _send_via_mailgun(
                 recipient_email,
                 report_file,
                 report_name,
@@ -55,8 +69,11 @@ def send_report_email(
                 subject,
                 body
             )
+            logger.info(f"Mailgun result: {'SUCCESS' if result else 'FAILED'}")
+            return result
         elif service == 'smtp':
-            return _send_via_smtp(
+            logger.info("Attempting to send via SMTP...")
+            result = _send_via_smtp(
                 recipient_email,
                 report_file,
                 report_name,
@@ -65,13 +82,23 @@ def send_report_email(
                 subject,
                 body
             )
+            logger.info(f"SMTP result: {'SUCCESS' if result else 'FAILED'}")
+            return result
         else:
             logger.error(f"Unknown email service: {service}")
             return False
             
     except Exception as e:
-        logger.error(f"Failed to send email: {e}")
+        logger.error(f"Unexpected error in send_report_email: {e}")
+        logger.exception("Full traceback:")
+        logger.info("=" * 60)
+        logger.info("EMAIL SEND ATTEMPT FAILED")
+        logger.info("=" * 60)
         return False
+    finally:
+        logger.info("=" * 60)
+        logger.info("EMAIL SEND ATTEMPT COMPLETED")
+        logger.info("=" * 60)
 
 
 def _send_via_sendgrid(

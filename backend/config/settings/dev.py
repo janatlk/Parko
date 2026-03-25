@@ -43,9 +43,16 @@ CORS_ALLOW_ALL_ORIGINS = True  # Only for development!
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+    },
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
         },
     },
     'root': {
@@ -59,6 +66,11 @@ LOGGING = {
             'propagate': False,
         },
         'reports': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'reports.services_email': {
             'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': False,
