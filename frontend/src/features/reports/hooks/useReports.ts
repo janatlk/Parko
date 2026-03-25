@@ -148,7 +148,7 @@ export function useDeleteSavedReport() {
  * Hook for exporting a saved report
  */
 export function useExportSavedReport() {
-  return useMutation<Blob | ReportResponse, Error, { id: number; format: 'json' | 'csv' | 'xlsx' | 'pdf' }>({
+  return useMutation<Blob, Error, { id: number; format: 'json' | 'csv' | 'xlsx' | 'pdf' }>({
     mutationFn: ({ id, format }) => exportSavedReport(id, format),
   })
 }

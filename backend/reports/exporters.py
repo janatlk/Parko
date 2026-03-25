@@ -286,91 +286,122 @@ def export_to_pdf(
 def prepare_maintenance_costs_for_export(report_data: Dict[str, Any]) -> List[Dict[str, Any]]:
     """
     Подготовка данных отчета по затратам на ТО для экспорта.
-    
+
     Args:
-        report_data: Данные отчета из get_maintenance_costs_report
-    
+        report_data: Данные отчета из ReportGenerator (maintenance_costs)
+
     Returns:
         Список словарей для экспорта
     """
     rows = []
+
+    # New format from ReportGenerator
+    data = report_data.get('data', [])
     
-    # Добавляем строки по машинам
-    for car_data in report_data.get('by_car', []):
+    for car_data in data:
+        if car_data.get('car_numplate', '') == 'TOTAL':
+            continue  # Skip total row, we'll add it at the end
         rows.append({
-            'Машина (номер)': car_data.get('car__numplate', ''),
-            'Стоимость запчастей (сом)': car_data.get('part_total', 0),
-            'Стоимость работ (сом)': car_data.get('job_total', 0),
-            'Итого (сом)': car_data.get('total', 0),
+            'car_numplate': car_data.get('car_numplate', ''),
+            'parts_cost': car_data.get('parts_cost', 0),
+            'labor_cost': car_data.get('labor_cost', 0),
+            'total_cost': car_data.get('total_cost', 0),
         })
-    
-    # Добавляем итоговую строку
-    totals = report_data.get('totals', {})
-    rows.append({
-        'Машина (номер)': 'ИТОГО',
-        'Стоимость запчастей (сом)': totals.get('part_total', 0),
-        'Стоимость работ (сом)': totals.get('job_total', 0),
-        'Итого (сом)': totals.get('total', 0),
-    })
-    
+
+    # Add totals from summary
+    summary = report_data.get('summary', {})
+    if summary:
+        rows.append({
+            'car_numplate': 'TOTAL',
+            'parts_cost': summary.get('total_parts_cost', 0),
+            'labor_cost': summary.get('total_labor_cost', 0),
+            'total_cost': summary.get('total_cost', 0),
+        })
+
     return rows
 
 
 def prepare_fuel_consumption_for_export(report_data: Dict[str, Any]) -> List[Dict[str, Any]]:
     """
     Подготовка данных отчета по топливу для экспорта.
+    
+    Args:
+        report_data: Данные отчета из ReportGenerator (fuel_consumption)
     """
     rows = []
-    
-    for car_data in report_data.get('by_car', []):
+    data = report_data.get('data', [])
+
+    # Group by car
+    car_totals = {}
+    for record in data:
+        car_id = record.get('car_id')
+        if car_id not in car_totals:
+            car_totals[car_id] = {
+                'car_numplate': record.get('car_numplate', ''),
+                'total_liters': 0,
+                'total_cost': 0,
+                'mileage': 0,
+                'consumption_records': 0,
+            }
+        car_totals[car_id]['total_liters'] += record.get('total_liters', 0)
+        car_totals[car_id]['total_cost'] += record.get('total_cost', 0)
+        car_totals[car_id]['mileage'] += record.get('mileage', 0)
+        car_totals[car_id]['consumption_records'] += 1
+
+    for car_id, totals in car_totals.items():
+        avg_consumption = totals['total_liters'] / totals['mileage'] * 100 if totals['mileage'] > 0 else 0
         rows.append({
-            'Машина (номер)': car_data.get('car__numplate', ''),
-            'Марка': car_data.get('car__brand', ''),
-            'Литры': car_data.get('total_liters', 0),
-            'Стоимость (сом)': car_data.get('total_cost', 0),
-            'Пробег (км)': car_data.get('total_mileage', 0),
-            'Средний расход (л/100км)': car_data.get('avg_consumption', 0),
+            'car_numplate': totals['car_numplate'],
+            'total_liters': round(totals['total_liters'], 2),
+            'total_cost': round(totals['total_cost'], 2),
+            'total_mileage': round(totals['mileage'], 2),
+            'avg_consumption': round(avg_consumption, 2),
         })
-    
-    totals = report_data.get('totals', {})
-    rows.append({
-        'Машина (номер)': 'ИТОГО',
-        'Марка': '',
-        'Литры': totals.get('total_liters', 0),
-        'Стоимость (сом)': totals.get('total_cost', 0),
-        'Пробег (км)': totals.get('total_mileage', 0),
-        'Средний расход (л/100км)': totals.get('avg_consumption', 0),
-    })
-    
+
+    # Add summary totals
+    summary = report_data.get('summary', {})
+    if summary:
+        rows.append({
+            'car_numplate': 'TOTAL',
+            'total_liters': round(summary.get('total_liters', 0), 2),
+            'total_cost': round(summary.get('total_cost', 0), 2),
+            'total_mileage': 0,
+            'avg_consumption': round(summary.get('avg_consumption', 0), 2),
+        })
+
     return rows
 
 
 def prepare_insurance_inspection_for_export(report_data: Dict[str, Any]) -> List[Dict[str, Any]]:
     """
     Подготовка данных отчета по страховкам/техосмотрам для экспорта.
+    
+    Args:
+        report_data: Данные отчета из ReportGenerator (insurance_inspection)
     """
     rows = []
-    
+    data = report_data.get('data', [])
+
     status_map = {
-        'active': 'Активна',
-        'expiring_soon': 'Скоро истекает',
-        'expired': 'Просрочена',
+        'active': 'Active',
+        'expiring_soon': 'Expiring Soon',
+        'expired': 'Expired',
     }
-    
+
     type_map = {
-        'insurance': 'Страховка',
-        'inspection': 'Техосмотр',
+        'insurance': 'Insurance',
+        'inspection': 'Inspection',
     }
-    
-    for item in report_data.get('items', []):
+
+    for item in data:
         rows.append({
-            'Тип': type_map.get(item.get('type', ''), item.get('type', '')),
-            'Машина (номер)': item.get('car__numplate', ''),
-            'Номер': item.get('number', ''),
-            'Дата начала': item.get('start_date', ''),
-            'Дата окончания': item.get('end_date', ''),
-            'Стоимость (сом)': item.get('cost', 0),
-            'Статус': status_map.get(item.get('status', ''), item.get('status', '')),
+            'type': type_map.get(item.get('type', ''), item.get('type', '')),
+            'car_numplate': item.get('car__numplate', ''),
+            'number': item.get('number', ''),
+            'start_date': item.get('start_date', ''),
+            'end_date': item.get('end_date', ''),
+            'cost': item.get('cost', 0),
+            'status': status_map.get(item.get('status', ''), item.get('status', '')),
         })
 
     return rows
@@ -379,15 +410,18 @@ def prepare_insurance_inspection_for_export(report_data: Dict[str, Any]) -> List
 def prepare_vehicle_utilization_for_export(report_data: Dict[str, Any]) -> List[Dict[str, Any]]:
     """
     Подготовка данных отчета по утилизации транспорта для экспорта.
+    
+    Args:
+        report_data: Данные отчета из ReportGenerator (vehicle_utilization)
     """
     rows = []
 
     for car_data in report_data.get('data', []):
         rows.append({
-            'Машина (номер)': car_data.get('car_numplate', ''),
-            'Общий пробег (км)': car_data.get('total_mileage', 0),
-            'Месяцев учёта': car_data.get('months', 0),
-            'Средний пробег в месяц (км)': car_data.get('avg_monthly_mileage', 0),
+            'car_numplate': car_data.get('car_numplate', ''),
+            'total_mileage': car_data.get('total_mileage', 0),
+            'months': car_data.get('months', 0),
+            'avg_monthly_mileage': car_data.get('avg_monthly_mileage', 0),
         })
 
     return rows
@@ -396,28 +430,31 @@ def prepare_vehicle_utilization_for_export(report_data: Dict[str, Any]) -> List[
 def prepare_cost_analysis_for_export(report_data: Dict[str, Any]) -> List[Dict[str, Any]]:
     """
     Подготовка данных отчета по анализу затрат для экспорта.
+    
+    Args:
+        report_data: Данные отчета из ReportGenerator (cost_analysis)
     """
     rows = []
 
     for car_data in report_data.get('data', []):
         rows.append({
-            'Машина (номер)': car_data.get('car_numplate', ''),
-            'Топливо (сом)': car_data.get('fuel_cost', 0),
-            'ТО и ремонты (сом)': car_data.get('maintenance_cost', 0),
-            'Страховка (сом)': car_data.get('insurance_cost', 0),
-            'Техосмотр (сом)': car_data.get('inspection_cost', 0),
-            'Итого (сом)': car_data.get('total_cost', 0),
+            'car_numplate': car_data.get('car_numplate', ''),
+            'fuel_cost': car_data.get('fuel_cost', 0),
+            'maintenance_cost': car_data.get('maintenance_cost', 0),
+            'insurance_cost': car_data.get('insurance_cost', 0),
+            'inspection_cost': car_data.get('inspection_cost', 0),
+            'total_cost': car_data.get('total_cost', 0),
         })
 
-    # Добавляем итоговую строку
+    # Add totals row
     summary = report_data.get('summary', {})
     rows.append({
-        'Машина (номер)': 'ИТОГО',
-        'Топливо (сом)': summary.get('total_fuel_cost', 0),
-        'ТО и ремонты (сом)': summary.get('total_maintenance_cost', 0),
-        'Страховка (сом)': summary.get('total_insurance_cost', 0),
-        'Техосмотр (сом)': summary.get('total_inspection_cost', 0),
-        'Итого (сом)': summary.get('grand_total', 0),
+        'car_numplate': 'TOTAL',
+        'fuel_cost': summary.get('total_fuel_cost', 0),
+        'maintenance_cost': summary.get('total_maintenance_cost', 0),
+        'insurance_cost': summary.get('total_insurance_cost', 0),
+        'inspection_cost': summary.get('total_inspection_cost', 0),
+        'total_cost': summary.get('grand_total', 0),
     })
 
     return rows

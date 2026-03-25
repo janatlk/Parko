@@ -128,7 +128,7 @@ export async function generateReport(params: GenerateReportParams): Promise<Repo
  */
 export async function downloadReport(
   params: GenerateReportParams,
-  format: 'csv' | 'xlsx' | 'pdf',
+  format: 'csv' | 'xlsx' | 'pdf' | 'json',
 ): Promise<Blob> {
   const response = await http.post(`generate/`, {
     ...params,
@@ -216,12 +216,7 @@ export async function deleteSavedReport(id: number): Promise<void> {
 export async function exportSavedReport(
   id: number,
   format: 'json' | 'csv' | 'xlsx' | 'pdf',
-): Promise<Blob | ReportResponse> {
-  if (format === 'json') {
-    const { data } = await http.get<ReportResponse>(`saved/${id}/export/`)
-    return data
-  }
-
+): Promise<Blob> {
   const response = await http.get(`saved/${id}/export/`, {
     responseType: 'blob',
     params: { format },
@@ -329,19 +324,6 @@ export async function shareReportViaEmail(payload: ShareReportEmailPayload): Pro
 /**
  * Update user email settings (API key)
  */
-export interface EmailSettingsPayload {
-  email_api_key: string
-  email_service?: string
-}
-
-export async function updateEmailSettings(payload: EmailSettingsPayload): Promise<{ success: boolean; message: string }> {
-  const { data } = await http.post<{ success: boolean; message: string }>('email-settings/', payload)
-  return data
-}
-
-/**
- * Get user email settings
- */
 export interface EmailSettings {
   email_api_key: string | null
   email_service: string
@@ -355,6 +337,11 @@ export async function getEmailSettings(): Promise<EmailSettings | null> {
   } catch {
     return null
   }
+}
+
+export async function updateEmailSettings(payload: { email_api_key: string; email_service?: string }): Promise<{ success: boolean; message: string }> {
+  const { data } = await http.post<{ success: boolean; message: string }>('email-settings/', payload)
+  return data
 }
 
 // Legacy function for backward compatibility

@@ -1,5 +1,6 @@
 import { MantineProvider } from '@mantine/core'
 import { Notifications } from '@mantine/notifications'
+import { ModalsProvider } from '@mantine/modals'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 
 import '@mantine/notifications/styles.css'
@@ -28,43 +29,45 @@ export function App() {
         primaryColor: 'blue',
       }}
     >
-      <Notifications
-        position="top-right"
-        autoClose={3000}
-        styles={{
-          notification: {
-            opacity: 0.9,
-            pointerEvents: 'auto',
-          },
-          root: {
-            pointerEvents: 'none',
-          },
-        }}
-      />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route
-            element={
-              <ProtectedRoute>
-                <AppLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/cars" element={<CarsPage />} />
-            <Route path="/cars/:id" element={<CarDetailPage />} />
-            <Route path="/fuel" element={<FuelPage />} />
-            <Route path="/insurances" element={<InsurancesPage />} />
-            <Route path="/inspections" element={<InspectionsPage />} />
-            <Route path="/users" element={<UsersPage />} />
-            <Route path="/reports" element={<ReportsPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-          </Route>
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
-      </BrowserRouter>
+      <ModalsProvider>
+        <Notifications
+          position="top-right"
+          autoClose={3000}
+          styles={{
+            notification: {
+              opacity: 0.9,
+              pointerEvents: 'auto',
+            },
+            root: {
+              pointerEvents: 'none',
+            },
+          }}
+        />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route
+              element={
+                <ProtectedRoute>
+                  <AppLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/cars" element={<CarsPage />} />
+              <Route path="/cars/:id" element={<CarDetailPage />} />
+              <Route path="/fuel" element={<FuelPage />} />
+              <Route path="/insurances" element={<InsurancesPage />} />
+              <Route path="/inspections" element={<InspectionsPage />} />
+              <Route path="/users" element={<UsersPage />} />
+              <Route path="/reports" element={<ReportsPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+            </Route>
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </BrowserRouter>
+      </ModalsProvider>
     </MantineProvider>
   )
 }

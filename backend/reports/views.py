@@ -3,12 +3,21 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
+from rest_framework import serializers
 from datetime import datetime
 
 from core.permissions import IsCompanyStaff
 
 from .services import get_maintenance_costs_report
 from .services_additional import get_fuel_consumption_report, get_insurance_inspection_report
+from .services_email import send_report_email
+from .exporters import (
+    export_to_csv,
+    export_to_xlsx,
+    export_to_pdf,
+    get_export_preparator,
+)
+from .report_generator import ReportGenerator
 
 
 class ReportTypesView(APIView):
@@ -478,3 +487,185 @@ class ExportLogViewSet(ModelViewSet):
         return ExportLog.objects.filter(
             company=self.request.user.company
         ).select_related('user', 'company').order_by('-created_at')
+
+
+class EmailSettingsView(APIView):
+    """Get and update user's email settings"""
+    permission_classes = [IsCompanyStaff]
+    
+    def get(self, request):
+        """Get user's email settings"""
+        user = request.user
+        return Response({
+            'email_api_key': user.email_api_key,  # Masked in production
+            'email_service': user.email_service,
+            'user_email': user.email,
+        })
+    
+    def post(self, request):
+        """Save user's email API key and service"""
+        user = request.user
+        email_api_key = request.data.get('email_api_key')
+        email_service = request.data.get('email_service', 'sendgrid')
+        
+        if not email_api_key:
+            return Response(
+                {'error': 'email_api_key is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        if email_service not in ['sendgrid', 'mailgun', 'smtp']:
+            return Response(
+                {'error': 'Invalid email_service. Choose from: sendgrid, mailgun, smtp'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        user.email_api_key = email_api_key
+        user.email_service = email_service
+        user.save()
+        
+        return Response({
+            'success': True,
+            'message': 'Email settings saved successfully'
+        })
+
+
+class ShareReportEmailView(APIView):
+    """Share report via email"""
+    permission_classes = [IsCompanyStaff]
+    
+    def post(self, request):
+        """
+        Share report via email
+        
+        Request body:
+        {
+            "report_type": "fuel_consumption",
+            "from_date": "2026-01-01",
+            "to_date": "2026-01-31",
+            "recipient_email": "user@example.com",
+            "format": "xlsx"
+        }
+        """
+        user = request.user
+        
+        # Validate user has email API key
+        if not user.email_api_key:
+            return Response(
+                {'error': 'Email API key not configured. Please save your API key first.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Validate required fields
+        report_type = request.data.get('report_type')
+        from_date_str = request.data.get('from_date')
+        to_date_str = request.data.get('to_date')
+        recipient_email = request.data.get('recipient_email')
+        export_format = request.data.get('format', 'xlsx')
+        
+        if not all([report_type, from_date_str, to_date_str, recipient_email]):
+            return Response(
+                {'error': 'Missing required fields: report_type, from_date, to_date, recipient_email'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Parse dates
+        try:
+            from datetime import date
+            from_date = date.fromisoformat(from_date_str)
+            to_date = date.fromisoformat(to_date_str)
+        except ValueError:
+            return Response(
+                {'error': 'Invalid date format. Use YYYY-MM-DD'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Generate report
+        try:
+            report_data = ReportGenerator.generate(
+                report_type=report_type,
+                from_date=from_date,
+                to_date=to_date,
+                company=user.company,
+                car_ids=None,
+                filters={},
+                include_charts=False  # Don't include charts for email attachment
+            )
+        except Exception as e:
+            logger = __import__('logging').getLogger(__name__)
+            logger.error(f"Error generating report for email: {e}")
+            return Response(
+                {'error': f'Report generation failed: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        
+        # Prepare data for export
+        preparator = get_export_preparator(report_type)
+        if preparator:
+            export_data = preparator(report_data)
+        else:
+            export_data = report_data.get('data', [])
+        
+        # Export to file
+        from io import BytesIO
+        from .exporters import export_to_xlsx, export_to_csv, export_to_pdf
+        
+        buffer = BytesIO()
+        filename = f"report_{report_type}_{from_date_str}_to_{to_date_str}"
+        
+        try:
+            if export_format == 'xlsx':
+                response = export_to_xlsx(export_data, f"{filename}.xlsx")
+                content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            elif export_format == 'csv':
+                response = export_to_csv(export_data, f"{filename}.csv")
+                content_type = 'text/csv'
+            elif export_format == 'pdf':
+                response = export_to_pdf(export_data, f"{filename}.pdf")
+                content_type = 'application/pdf'
+            else:
+                return Response(
+                    {'error': f'Unsupported format: {export_format}'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Get file content
+            buffer.write(response.content)
+            buffer.seek(0)
+            
+        except Exception as e:
+            logger = __import__('logging').getLogger(__name__)
+            logger.error(f"Error exporting report for email: {e}")
+            return Response(
+                {'error': f'Export failed: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        
+        # Send email
+        success = send_report_email(
+            recipient_email=recipient_email,
+            report_file=buffer,
+            report_name=f"{filename}.{export_format}",
+            sender_email=user.email,
+            api_key=user.email_api_key,
+            service=user.email_service,
+            subject=f'Report: {report_type.replace("_", " ").title()}',
+        )
+
+        if success:
+            return Response({
+                'success': True,
+                'message': f'Report sent to {recipient_email}'
+            })
+        else:
+            error_message = 'Failed to send email. '
+            if user.email_service == 'smtp':
+                error_message += 'For SMTP: Check your email password (use app-specific password for Gmail) and ensure SMTP is enabled.'
+            elif user.email_service == 'sendgrid':
+                error_message += 'For SendGrid: Check your API key is valid.'
+            elif user.email_service == 'mailgun':
+                error_message += 'For Mailgun: Check your API key and domain configuration.'
+            return Response(
+                {'error': error_message},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

@@ -25,16 +25,18 @@ import {
   Text,
   Title,
 } from '@mantine/core'
-import { IconDownload, IconFileExport, IconFileDescription, IconTable, IconFileCode, IconShare } from '@tabler/icons-react'
+import { IconDownload, IconFileExport, IconFileDescription, IconTable, IconFileCode, IconShare, IconDeviceFloppy } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
 
 import type { ChartData, ReportResponse } from '../api/reportsApi'
 import { ShareReportModal } from './ShareReportModal'
+import { SaveReportModal } from './SaveReportModal'
 
 interface ReportResultsProps {
   report: ReportResponse
   onExport: (format: 'json' | 'csv' | 'xlsx' | 'pdf') => void
+  onSave?: (name: string) => void
 }
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316']
@@ -200,10 +202,20 @@ function SummaryCard({ label, value, t }: { label: string; value: string | numbe
   )
 }
 
-export function ReportResults({ report, onExport }: ReportResultsProps) {
+export function ReportResults({ report, onExport, onSave }: ReportResultsProps) {
   const { t } = useTranslation()
   const { data, summary, charts } = report
   const [shareModalOpened, setShareModalOpened] = useState(false)
+  const [saveModalOpened, setSaveModalOpened] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+
+  const handleSave = (name: string) => {
+    if (!onSave) return
+    setIsSaving(true)
+    onSave(name)
+    // Reset saving state after notification is shown (parent handles this)
+    setTimeout(() => setIsSaving(false), 1000)
+  }
 
   const hasData = data && data.length > 0
   const hasCharts = charts && charts.length > 0
@@ -226,6 +238,16 @@ export function ReportResults({ report, onExport }: ReportResultsProps) {
         <Text size="sm" c="dimmed" mr="sm">
           {t('reports.export') || 'Export:'}
         </Text>
+        {onSave && (
+          <Button
+            variant="outline"
+            size="sm"
+            leftSection={<IconDeviceFloppy size={16} />}
+            onClick={() => setSaveModalOpened(true)}
+          >
+            {t('reports.save_report') || 'Save Report'}
+          </Button>
+        )}
         <Button
           variant="outline"
           size="sm"
@@ -274,6 +296,15 @@ export function ReportResults({ report, onExport }: ReportResultsProps) {
         opened={shareModalOpened}
         onClose={() => setShareModalOpened(false)}
         report={report}
+      />
+
+      {/* Save Report Modal */}
+      <SaveReportModal
+        opened={saveModalOpened}
+        onClose={() => setSaveModalOpened(false)}
+        report={report}
+        onSave={handleSave}
+        isSaving={isSaving}
       />
 
       {/* Summary Cards */}

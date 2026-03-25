@@ -79,6 +79,7 @@ export function ReportsPage() {
         onSuccess: (data) => {
           console.log('Report generated successfully:', data)
           setGeneratedReport(data)
+          setActiveTab('results')
 
           // Save report if requested
           if (params.save_report && params.report_name) {
@@ -141,25 +142,18 @@ export function ReportsPage() {
     if (!generatedReport) return
 
     try {
-      // For newly generated reports, we need to regenerate with export format
-      if (format === 'json') {
-        // For JSON, we already have the data, just download it
-        const jsonBlob = new Blob([JSON.stringify(generatedReport, null, 2)], { type: 'application/json' })
-        downloadBlob(jsonBlob, `report_${generatedReport.report_type}_${Date.now()}.json`)
-      } else {
-        // For CSV, XLSX, PDF - regenerate the report with export format
-        const blob = await downloadReport(
-          {
-            report_type: generatedReport.report_type,
-            from_date: generatedReport.from_date,
-            to_date: generatedReport.to_date,
-            car_ids: null, // Will be ignored for now - would need to store this in state
-            export_format: format,
-          },
-          format
-        )
-        downloadBlob(blob, `report_${generatedReport.report_type}_${Date.now()}.${format}`)
-      }
+      // Regenerate report with export format
+      const blob = await downloadReport(
+        {
+          report_type: generatedReport.report_type,
+          from_date: generatedReport.from_date,
+          to_date: generatedReport.to_date,
+          car_ids: null,
+          export_format: format,
+        },
+        format
+      )
+      downloadBlob(blob, `report_${generatedReport.report_type}_${Date.now()}.${format}`)
 
       notifications.show({
         title: t('reports.export_success') || 'Export Successful',
@@ -178,6 +172,44 @@ export function ReportsPage() {
   }
 
   /**
+   * Handle save report from results page
+   */
+  const handleSaveReport = (reportName: string) => {
+    if (!generatedReport) return
+
+    createSavedMutation.mutate(
+      {
+        name: reportName,
+        report_type: generatedReport.report_type,
+        from_date: generatedReport.from_date,
+        to_date: generatedReport.to_date,
+        car_ids: null,
+        filters: {},
+        summary: generatedReport.summary,
+      },
+      {
+        onSuccess: () => {
+          notifications.show({
+            title: t('reports.report_saved') || 'Report Saved',
+            message: t('reports.report_saved_message') || 'Your report has been saved successfully',
+            icon: <IconCheck />,
+            color: 'green',
+          })
+        },
+        onError: (error) => {
+          console.error('Save error:', error)
+          notifications.show({
+            title: t('reports.save_failed') || 'Save Failed',
+            message: t('reports.save_failed_message') || 'Failed to save the report',
+            icon: <IconExclamationCircle />,
+            color: 'red',
+          })
+        },
+      },
+    )
+  }
+
+  /**
    * Handle viewing a saved report
    */
   const handleViewSaved = (report: SavedReportList) => {
@@ -191,13 +223,7 @@ export function ReportsPage() {
   const handleExportSaved = async (report: SavedReportList, format: 'json' | 'csv' | 'xlsx' | 'pdf') => {
     try {
       const blob = await exportMutation.mutateAsync({ id: report.id, format })
-
-      if (format === 'json' && typeof blob === 'object') {
-        const jsonBlob = new Blob([JSON.stringify(blob, null, 2)], { type: 'application/json' })
-        downloadBlob(jsonBlob, `report_${report.name}_${Date.now()}.json`)
-      } else {
-        downloadBlob(blob as Blob, `report_${report.name}_${Date.now()}.${format}`)
-      }
+      downloadBlob(blob, `report_${report.name}_${Date.now()}.${format}`)
 
       notifications.show({
         title: t('reports.export_success') || 'Export Successful',
@@ -274,7 +300,7 @@ export function ReportsPage() {
 
           <Tabs.Panel value="results" pt="md">
             {generatedReport && (
-              <ReportResults report={generatedReport} onExport={handleExport} />
+              <ReportResults report={generatedReport} onExport={handleExport} onSave={handleSaveReport} />
             )}
             {selectedSavedReport && savedReportData && (
               <ReportResults report={savedReportData} onExport={(format) => handleExportSaved(selectedSavedReport, format)} />

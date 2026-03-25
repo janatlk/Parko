@@ -8,3 +8,4 @@ django-filter>=23.5
 Pillow>=10.0
 openpyxl>=3.1.0
 reportlab>=4.0.0
+sendgrid>=6.10.0

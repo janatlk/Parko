@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -10,13 +10,16 @@ import {
   Select,
   Text,
   Alert,
+  PasswordInput,
+  Tooltip,
 } from '@mantine/core'
-import { IconAt, IconSend, IconAlertCircle, IconKey } from '@tabler/icons-react'
+import { IconAt, IconSend, IconAlertCircle, IconKey, IconHelp } from '@tabler/icons-react'
 import { notifications } from '@mantine/notifications'
 
 import {
   shareReportViaEmail,
   updateEmailSettings,
+  getEmailSettings,
   type ReportType,
 } from '../api/reportsApi'
 
@@ -32,15 +35,52 @@ type Props = {
 
 export function ShareReportModal({ opened, onClose, report }: Props) {
   const { t } = useTranslation()
-  
+
   const [recipientEmail, setRecipientEmail] = useState('')
   const [format, setFormat] = useState<'csv' | 'xlsx' | 'pdf'>('xlsx')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showApiKeyInput, setShowApiKeyInput] = useState(false)
   const [apiKey, setApiKey] = useState('')
+  const [emailService, setEmailService] = useState('sendgrid')
+
+  // Check for existing API key when modal opens
+  useEffect(() => {
+    if (opened) {
+      checkEmailSettings()
+    }
+  }, [opened])
+
+  const checkEmailSettings = async () => {
+    try {
+      const settings = await getEmailSettings()
+      if (settings) {
+        setEmailService(settings.email_service || 'sendgrid')
+        if (!settings.email_api_key) {
+          setShowApiKeyInput(true)
+        }
+      } else {
+        setShowApiKeyInput(true)
+      }
+    } catch (error) {
+      console.error('Error fetching email settings:', error)
+      setShowApiKeyInput(true)
+    }
+  }
 
   const handleShare = async () => {
     if (!report || !recipientEmail) return
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(recipientEmail)) {
+      notifications.show({
+        title: t('reports.invalid_email') || 'Invalid Email',
+        message: 'Please enter a valid email address',
+        icon: <IconAlertCircle />,
+        color: 'orange',
+      })
+      return
+    }
 
     setIsSubmitting(true)
     try {
@@ -63,11 +103,6 @@ export function ShareReportModal({ opened, onClose, report }: Props) {
       onClose()
     } catch (error: any) {
       const message = error?.response?.data?.message || error?.message || t('reports.share_email_failed') || 'Failed to send report'
-      
-      // If error is about missing API key, show API key input
-      if (message.toLowerCase().includes('api key') || message.toLowerCase().includes('email')) {
-        setShowApiKeyInput(true)
-      }
 
       notifications.show({
         title: t('reports.share_email_failed') || 'Failed to Send',
@@ -84,8 +119,8 @@ export function ShareReportModal({ opened, onClose, report }: Props) {
     if (!apiKey) return
 
     try {
-      await updateEmailSettings({ email_api_key: apiKey })
-      
+      await updateEmailSettings({ email_api_key: apiKey, email_service: emailService })
+
       notifications.show({
         title: t('reports.email_saved') || 'Settings Saved',
         message: 'Your email API key has been saved',
@@ -135,24 +170,62 @@ export function ShareReportModal({ opened, onClose, report }: Props) {
 
         {showApiKeyInput ? (
           <Stack gap="sm">
-            <Text size="sm" fw={500}>
+            <Alert variant="light" color="blue" icon={<IconKey size={16} />}>
+              <Text size="sm">
+                To send reports via email, you need to configure an email service API key.
+              </Text>
+            </Alert>
+            
+            <Group gap="xs">
+              <Text size="sm" fw={500}>
+                {t('reports.email_service') || 'Email Service'}
+              </Text>
+              <Tooltip
+                label={
+                  <Stack gap="xs" style={{ maxWidth: 300 }}>
+                    <Text fw={700} size="sm">{t('reports.email_service_help') || 'How to get API key?'}</Text>
+                    <Text size="xs">{t('reports.email_service_help_sendgrid')}</Text>
+                    <Text size="xs">{t('reports.email_service_help_mailgun')}</Text>
+                    <Text size="xs">{t('reports.email_service_help_smtp')}</Text>
+                  </Stack>
+                }
+                position="right"
+                withArrow
+                multiline
+                w={320}
+              >
+                <IconHelp size={16} style={{ cursor: 'pointer' }} color="#666" />
+              </Tooltip>
+            </Group>
+            <Select
+              value={emailService}
+              onChange={(value) => value && setEmailService(value)}
+              data={[
+                { value: 'sendgrid', label: 'SendGrid (Recommended)' },
+                { value: 'mailgun', label: 'Mailgun' },
+                { value: 'smtp', label: 'SMTP (Gmail, etc.)' },
+              ]}
+            />
+
+            <Text size="sm" fw={500} mt="sm">
               {t('reports.email_api_key') || 'Email Service API Key'}
             </Text>
-            <TextInput
+            <PasswordInput
               placeholder={t('reports.email_api_key_placeholder') || 'Enter your API key'}
               value={apiKey}
               onChange={(e) => setApiKey(e.currentTarget.value)}
-              type="password"
               autoFocus
             />
             <Text size="xs" c="dimmed">
-              Enter your email service API key (e.g., SendGrid, Mailgun)
+              {emailService === 'sendgrid' && 'Get your API key from SendGrid dashboard (Settings → API Keys)'}
+              {emailService === 'mailgun' && 'Get your API key from Mailgun dashboard'}
+              {emailService === 'smtp' && 'For Gmail: Use App Password (not regular password). Enable 2FA first, then go to Google Account → Security → App Passwords'}
             </Text>
             <Group justify="flex-end" gap="sm">
               <Button variant="default" onClick={() => setShowApiKeyInput(false)}>
                 {t('common.cancel') || 'Cancel'}
               </Button>
-              <Button onClick={handleSaveApiKey}>
+              <Button onClick={handleSaveApiKey} disabled={!apiKey}>
                 {t('common.save') || 'Save'}
               </Button>
             </Group>

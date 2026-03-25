@@ -12,6 +12,7 @@ import {
 import { useDisclosure } from '@mantine/hooks'
 import { IconDownload, IconTrash, IconX } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
+import { modals } from '@mantine/modals'
 
 import { useExportHistoryQuery, useDeleteExportLog } from '../hooks/useReports'
 import type { ExportLog } from '../api/reportsApi'
@@ -26,10 +27,27 @@ export function ExportHistory() {
   const { data: history, refetch } = useExportHistoryQuery()
   const deleteLog = useDeleteExportLog()
 
-  const handleDelete = (id: number) => {
-    deleteLog.mutate(id, {
-      onSuccess: () => {
-        refetch()
+  const handleDelete = (id: number, logInfo: string) => {
+    modals.openConfirmModal({
+      title: 'Delete Export Log',
+      children: (
+        <Text size="sm">
+          Are you sure you want to delete this export log?
+          <br />
+          <Text component="span" c="dimmed" size="xs">
+            {logInfo}
+          </Text>
+        </Text>
+      ),
+      labels: { confirm: 'Delete', cancel: 'Cancel' },
+      confirmProps: { color: 'red' },
+      onCancel: () => {},
+      onConfirm: () => {
+        deleteLog.mutate(id, {
+          onSuccess: () => {
+            refetch()
+          },
+        })
       },
     })
   }
@@ -157,7 +175,7 @@ export function ExportHistory() {
                         variant="subtle"
                         size="sm"
                         color="red"
-                        onClick={() => handleDelete(log.id)}
+                        onClick={() => handleDelete(log.id, `${formatReportType(log.report_type)} - ${formatExportFormat(log.export_format)} - ${formatDate(log.created_at)}`)}
                         title={t('reports.delete') || 'Delete'}
                       >
                         <IconTrash size={16} />

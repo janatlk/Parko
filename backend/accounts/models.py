@@ -52,6 +52,22 @@ class User(AbstractUser):
         choices=LanguageChoices.choices,
         default=LanguageChoices.RU,
     )
+    email_api_key = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text='Email service API key (SendGrid, Mailgun, etc.)'
+    )
+    email_service = models.CharField(
+        max_length=50,
+        choices=[
+            ('sendgrid', 'SendGrid'),
+            ('mailgun', 'Mailgun'),
+            ('smtp', 'SMTP'),
+        ],
+        default='sendgrid',
+        help_text='Email service provider'
+    )
 
     objects = UserManager()
 

@@ -6,6 +6,8 @@ from .views import (
     InsuranceInspectionReportView,
     MaintenanceCostsReportView,
     ReportTypesView,
+    EmailSettingsView,
+    ShareReportEmailView,
 )
 from .views_unified import GenerateReportView
 from .views import SavedReportViewSet, ReportTemplateViewSet, ExportLogViewSet
@@ -21,5 +23,7 @@ urlpatterns = [
     path('fuel-consumption/', FuelConsumptionReportView.as_view(), name='fuel-consumption'),
     path('insurance-inspection/', InsuranceInspectionReportView.as_view(), name='insurance-inspection'),
     path('generate/', GenerateReportView.as_view(), name='generate-report'),
+    path('share-email/', ShareReportEmailView.as_view(), name='share-report-email'),
+    path('email-settings/', EmailSettingsView.as_view(), name='email-settings'),
     path('', include(router.urls)),
 ]

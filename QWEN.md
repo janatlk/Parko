@@ -235,7 +235,7 @@ Base URL: `/api/v1/`
 ---
 
 ## Testing
-
+Always run both backend and frontend after completing the task to ensure it runs
 ### Backend
 ```bash
 # Run Django tests
