@@ -5,16 +5,17 @@ export type DashboardStats = {
   active_cars: number
   maintenance_cars: number
   inactive_cars: number
-  total_fuel_records: number
-  total_insurances: number
-  active_insurances: number
-  expiring_insurances: number
-  total_inspections: number
-  active_inspections: number
-  expiring_inspections: number
   total_fuel_cost_month: number
+  total_fuel_cost_prev_month: number
   total_maintenance_cost_month: number
+  total_maintenance_cost_prev_month: number
+  total_operational_cost: number
+  prev_operational_cost: number
+  active_insurances: number
+  active_inspections: number
+  expiring_items_count: number
   avg_fuel_consumption: number
+  prev_avg_fuel_consumption: number
 }
 
 export type ExpiringItem = {
@@ -25,6 +26,48 @@ export type ExpiringItem = {
   end_date: string
   days_until_expiry: number
   cost?: number
+}
+
+export type ExpiringItemsResponse = {
+  items: ExpiringItem[]
+  total_renewal_cost: number
+}
+
+export type ActivityFeedItem = {
+  id: number
+  type: 'fuel' | 'maintenance' | 'car_added' | 'car_edited'
+  car_id: number
+  car_numplate: string
+  title: string
+  description: string
+  date: string
+  cost: number
+}
+
+export type CostByMonth = {
+  year: number
+  month: number
+  month_name: string
+  fuel_cost: number
+  spare_cost: number
+  insurance_cost: number
+  inspection_cost: number
+  tires_cost: number
+  accumulator_cost: number
+  total_cost: number
+  fuel_liters: number
+}
+
+export type VehicleConsumption = {
+  id: number
+  numplate: string
+  brand: string
+  title: string
+  total_fuel_liters: number
+  total_cost: number
+  avg_consumption: number
+  records_count: number
+  last_updated: string | null
 }
 
 export type RecentFuelEntry = {
@@ -54,8 +97,23 @@ export async function getDashboardStats(): Promise<DashboardStats> {
   return data
 }
 
-export async function getExpiringItems(): Promise<ExpiringItem[]> {
-  const { data } = await http.get<ExpiringItem[]>('dashboard/expiring/')
+export async function getExpiringItems(): Promise<ExpiringItemsResponse> {
+  const { data } = await http.get<ExpiringItemsResponse>('dashboard/expiring/')
+  return data
+}
+
+export async function getActivityFeed(limit = 10): Promise<ActivityFeedItem[]> {
+  const { data } = await http.get<ActivityFeedItem[]>('dashboard/activity-feed/', { params: { limit } })
+  return data
+}
+
+export async function getCostByMonth(months = 6): Promise<CostByMonth[]> {
+  const { data } = await http.get<CostByMonth[]>('dashboard/cost-by-month/', { params: { months } })
+  return data
+}
+
+export async function getVehicleConsumption(limit = 10): Promise<VehicleConsumption[]> {
+  const { data } = await http.get<VehicleConsumption[]>('dashboard/vehicle-consumption/', { params: { limit } })
   return data
 }
 

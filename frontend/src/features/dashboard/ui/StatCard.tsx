@@ -3,56 +3,70 @@ import type { ReactNode } from 'react'
 import { Box, Group, RingProgress, SimpleGrid, Stack, Text, ThemeIcon } from '@mantine/core'
 import type { MantineColor } from '@mantine/core'
 
+import { TrendIndicator } from './TrendIndicator'
+
 type StatCardProps = {
   icon: ReactNode
   label: string
   value: string | number
   color?: MantineColor
-  trend?: {
-    value: number
-    label: string
-  }
+  currentValue?: number
+  previousValue?: number
+  inverseTrend?: boolean
   ringValue?: number
+  compact?: boolean
 }
 
-export function StatCard({ icon, label, value, color = 'blue', trend, ringValue }: StatCardProps) {
+export function StatCard({
+  icon,
+  label,
+  value,
+  color = 'blue',
+  currentValue,
+  previousValue,
+  inverseTrend = false,
+  ringValue,
+  compact = false,
+}: StatCardProps) {
   return (
     <Box
       style={{
         backgroundColor: 'var(--mantine-color-body)',
         borderRadius: 'var(--mantine-radius-md)',
-        padding: 'var(--mantine-spacing-md)',
+        padding: compact ? 'var(--mantine-spacing-sm)' : 'var(--mantine-spacing-md)',
         border: '1px solid var(--mantine-color-default-border)',
       }}
     >
       <Group justify="space-between" align="flex-start" gap="xl">
-        <Stack gap="xs">
-          <Text size="xs" c="dimmed" fw={500}>
+        <Stack gap={compact ? 2 : 'xs'}>
+          <Text size={compact ? 'xs' : undefined} c="dimmed" fw={500}>
             {label}
           </Text>
-          <Text size="xl" fw={700}>
+          <Text size={compact ? 'lg' : 'xl'} fw={700}>
             {value}
           </Text>
-          {trend && (
-            <Text size="xs" c={trend.value >= 0 ? 'teal' : 'red'}>
-              {trend.value >= 0 ? '↑' : '↓'} {Math.abs(trend.value)}% {trend.label}
-            </Text>
+          {currentValue !== undefined && previousValue !== undefined && (
+            <TrendIndicator
+              currentValue={currentValue}
+              previousValue={previousValue}
+              inverseGood={inverseTrend}
+            />
           )}
         </Stack>
         {ringValue !== undefined ? (
           <RingProgress
-            size={60}
+            size={compact ? 50 : 60}
             thickness={6}
             roundCaps
             sections={[{ value: ringValue, color }]}
             label={
-              <ThemeIcon size={34} variant="light" color={color}>
+              <ThemeIcon size={compact ? 28 : 34} variant="light" color={color}>
                 {icon}
               </ThemeIcon>
             }
           />
         ) : (
-          <ThemeIcon size={44} variant="light" color={color}>
+          <ThemeIcon size={compact ? 36 : 44} variant="light" color={color}>
             {icon}
           </ThemeIcon>
         )}
@@ -67,19 +81,22 @@ type StatsGridProps = {
     label: string
     value: string | number
     color?: MantineColor
-    trend?: { value: number; label: string }
+    currentValue?: number
+    previousValue?: number
+    inverseTrend?: boolean
     ringValue?: number
   }>
+  compact?: boolean
 }
 
-export function StatsGrid({ stats }: StatsGridProps) {
+export function StatsGrid({ stats, compact = false }: StatsGridProps) {
   return (
     <SimpleGrid
       cols={{ base: 1, sm: 2, lg: 4 }}
-      spacing="md"
+      spacing={compact ? 'sm' : 'md'}
     >
       {stats.map((stat, index) => (
-        <StatCard key={index} {...stat} />
+        <StatCard key={index} {...stat} compact={compact} />
       ))}
     </SimpleGrid>
   )

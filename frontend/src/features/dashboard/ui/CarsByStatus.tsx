@@ -9,9 +9,10 @@ type CarsByStatusProps = {
   maintenance?: number
   inactive?: number
   isLoading?: boolean
+  compact?: boolean
 }
 
-export function CarsByStatus({ total = 0, active = 0, maintenance = 0, inactive = 0, isLoading }: CarsByStatusProps) {
+export function CarsByStatus({ total = 0, active = 0, maintenance = 0, inactive = 0, isLoading, compact = false }: CarsByStatusProps) {
   const { t } = useTranslation()
 
   const data = [
@@ -56,7 +57,7 @@ export function CarsByStatus({ total = 0, active = 0, maintenance = 0, inactive 
 
   if (isLoading) {
     return (
-      <Box p="xl" ta="center">
+      <Box p={compact ? 'sm' : 'xl'} ta="center">
         <Loader />
       </Box>
     )
@@ -64,7 +65,7 @@ export function CarsByStatus({ total = 0, active = 0, maintenance = 0, inactive 
 
   if (total === 0) {
     return (
-      <Box p="xl" ta="center">
+      <Box p={compact ? 'sm' : 'xl'} ta="center">
         <Text c="dimmed">{t('dashboard.no_cars_data')}</Text>
       </Box>
     )
@@ -73,32 +74,34 @@ export function CarsByStatus({ total = 0, active = 0, maintenance = 0, inactive 
   return (
     <Box>
       <Group justify="space-between" mb="md">
-        <Title order={4}>{t('dashboard.fleet_overview')}</Title>
+        <Title order={compact ? 5 : 4}>{t('dashboard.fleet_overview')}</Title>
         <Group gap="xs">
-          <IconCar size={20} stroke={1.5} />
-          <Text size="sm" c="dimmed">{total} {t('dashboard.cars_total')}</Text>
+          <IconCar size={compact ? 16 : 20} stroke={1.5} />
+          <Text size={compact ? 'xs' : 'sm'} c="dimmed">{total} {t('dashboard.cars_total')}</Text>
         </Group>
       </Group>
-      <ResponsiveContainer width="100%" height={300}>
-        <PieChart>
-          <Pie
-            data={data}
-            cx="50%"
-            cy="50%"
-            labelLine={false}
-            label={CustomLabel}
-            outerRadius={80}
-            fill="#8884d8"
-            dataKey="value"
-            nameKey="name"
-          >
-            {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={entry.color} />
-            ))}
-          </Pie>
-          <Legend />
-        </PieChart>
-      </ResponsiveContainer>
+      <Box style={{ height: compact ? 200 : 260, minHeight: compact ? 200 : 260 }}>
+        <ResponsiveContainer width="100%" height="100%" minHeight={compact ? 200 : 260}>
+          <PieChart>
+            <Pie
+              data={data}
+              cx="50%"
+              cy="50%"
+              labelLine={false}
+              label={CustomLabel}
+              outerRadius={80}
+              fill="#8884d8"
+              dataKey="value"
+              nameKey="name"
+            >
+              {data.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.color} />
+              ))}
+            </Pie>
+            <Legend />
+          </PieChart>
+        </ResponsiveContainer>
+      </Box>
     </Box>
   )
 }

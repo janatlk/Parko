@@ -213,6 +213,7 @@ export function ReportsPage() {
    * Handle viewing a saved report
    */
   const handleViewSaved = (report: SavedReportList) => {
+    setGeneratedReport(null)
     setSelectedSavedReport(report)
     setActiveTab('results')
   }
@@ -299,13 +300,11 @@ export function ReportsPage() {
           </Tabs.Panel>
 
           <Tabs.Panel value="results" pt="md">
-            {generatedReport && (
-              <ReportResults report={generatedReport} onExport={handleExport} onSave={handleSaveReport} />
-            )}
-            {selectedSavedReport && savedReportData && (
+            {selectedSavedReport && savedReportData ? (
               <ReportResults report={savedReportData} onExport={(format) => handleExportSaved(selectedSavedReport, format)} />
-            )}
-            {!generatedReport && !savedReportData && (
+            ) : generatedReport ? (
+              <ReportResults report={generatedReport} onExport={handleExport} onSave={handleSaveReport} />
+            ) : (
               <Notification icon={<IconExclamationCircle />} color="gray">
                 {t('reports.no_report_selected') || 'No report selected'}
               </Notification>
