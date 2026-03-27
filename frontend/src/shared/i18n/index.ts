@@ -14,6 +14,7 @@ const resources = {
         actions: 'Действия',
         all: 'Все',
         total: 'Всего',
+        see_all: 'Посмотреть все',
       },
       auth: {
         title: 'Вход',
@@ -69,6 +70,7 @@ const resources = {
         this_month: 'в этом месяце',
         // New dashboard translations
         total_operational_cost: 'Общие расходы',
+        spare_parts_cost: 'Затраты на запчасти',
         cost_breakdown: 'Структура расходов',
         fleet_status: 'Состояние автопарка',
         customize: 'Настройки',
@@ -138,6 +140,16 @@ const resources = {
         status: 'Статус',
         loading_error: 'Не удалось загрузить машины',
         click_hint: 'Нажмите на строку для просмотра деталей',
+        delete_confirm: {
+          title: 'Удалить автомобиль?',
+          message: 'Вы уверены, что хотите удалить "{{numplate}} - {{brand}}"?',
+        },
+        notifications: {
+          deleted: {
+            title: 'Удалено',
+            message: 'Автомобиль успешно удалён',
+          },
+        },
         form: {
           region: 'Регион',
           brand: 'Марка',
@@ -182,9 +194,69 @@ const resources = {
         region: 'Регион',
         commissioned: 'Введен в эксплуатацию',
       },
+      spares: {
+        title: 'Запчасти',
+        add: 'Добавить запчасть',
+        no_data: 'Нет данных о запчастях',
+        delete_confirm: {
+          title: 'Удалить запчасть?',
+          message: 'Вы уверены, что хотите удалить "{{title}}"?',
+        },
+        notifications: {
+          created: {
+            title: 'Создано',
+            message: 'Запчасть успешно добавлена',
+          },
+          updated: {
+            title: 'Обновлено',
+            message: 'Запчасть успешно обновлена',
+          },
+          deleted: {
+            title: 'Удалено',
+            message: 'Запчасть успешно удалена',
+          },
+        },
+        form: {
+          title: 'Добавить запчасть',
+          edit_title: 'Редактировать запчасть',
+          car: 'Машина',
+          name: 'Название',
+          description: 'Описание',
+          part_price: 'Стоимость запчасти',
+          job_description: 'Описание работы',
+          job_price: 'Стоимость работы',
+          total_cost: 'Общая стоимость:',
+          installed_at: 'Дата установки',
+          year: 'Год',
+          month: 'Месяц',
+          search: 'Поиск',
+          search_placeholder: 'Поиск по названию...',
+          failed_to_load_cars: 'Не удалось загрузить машины',
+        },
+        table: {
+          car: 'Машина',
+          title: 'Название',
+          description: 'Описание',
+          part_price: 'Запчасть',
+          job: 'Работа',
+          job_price: 'Работа',
+          total: 'Итого',
+          date: 'Дата',
+        },
+      },
       fuel: {
         title: 'Топливо',
         add: 'Добавить топливо',
+        delete_confirm: {
+          title: 'Удалить запись о топливе?',
+          message: 'Вы уверены, что хотите удалить запись за {{period}}?',
+        },
+        notifications: {
+          deleted: {
+            title: 'Удалено',
+            message: 'Запись о топливе успешно удалена',
+          },
+        },
         form: {
           title: 'Добавить запись о топливе',
           edit_title: 'Редактировать запись',
@@ -211,6 +283,16 @@ const resources = {
         title: 'Страховки',
         add: 'Добавить страховку',
         edit: 'Редактировать',
+        delete_confirm: {
+          title: 'Удалить страховку?',
+          message: 'Вы уверены, что хотите удалить страховку №{{number}}?',
+        },
+        notifications: {
+          deleted: {
+            title: 'Удалено',
+            message: 'Страховка успешно удалена',
+          },
+        },
         form: {
           title: 'Добавить страховку',
           edit_title: 'Редактировать страховку',
@@ -237,6 +319,16 @@ const resources = {
         title: 'Техосмотры',
         add: 'Добавить техосмотр',
         edit: 'Редактировать',
+        delete_confirm: {
+          title: 'Удалить техосмотр?',
+          message: 'Вы уверены, что хотите удалить техосмотр №{{number}}?',
+        },
+        notifications: {
+          deleted: {
+            title: 'Удалено',
+            message: 'Техосмотр успешно удалён',
+          },
+        },
         form: {
           title: 'Добавить техосмотр',
           edit_title: 'Редактировать техосмотр',
@@ -404,6 +496,7 @@ const resources = {
         all: 'All',
         total: 'Total',
         error_loading: 'Failed to load',
+        see_all: 'See all',
       },
       auth: {
         title: 'Login',
@@ -459,6 +552,7 @@ const resources = {
         this_month: 'this month',
         // New dashboard translations
         total_operational_cost: 'Total Operational Cost',
+        spare_parts_cost: 'Spare Parts Cost',
         cost_breakdown: 'Cost Breakdown',
         fleet_status: 'Fleet Status',
         customize: 'Customize',
@@ -528,6 +622,16 @@ const resources = {
         status: 'Status',
         loading_error: 'Failed to load cars',
         click_hint: 'Click on a row to view car details',
+        delete_confirm: {
+          title: 'Delete vehicle?',
+          message: 'Are you sure you want to delete "{{numplate}} - {{brand}}"?',
+        },
+        notifications: {
+          deleted: {
+            title: 'Deleted',
+            message: 'Vehicle deleted successfully',
+          },
+        },
         form: {
           region: 'Region',
           brand: 'Brand',
@@ -573,14 +677,53 @@ const resources = {
         commissioned: 'Commissioned',
       },
       spares: {
-        table: {
-          title: 'Part',
+        title: 'Spares',
+        add: 'Add spare part',
+        no_data: 'No spare parts data',
+        delete_confirm: {
+          title: 'Delete spare part?',
+          message: 'Are you sure you want to delete "{{title}}"?',
+        },
+        notifications: {
+          created: {
+            title: 'Created',
+            message: 'Spare part added successfully',
+          },
+          updated: {
+            title: 'Updated',
+            message: 'Spare part updated successfully',
+          },
+          deleted: {
+            title: 'Deleted',
+            message: 'Spare part deleted successfully',
+          },
+        },
+        form: {
+          title: 'Add spare part',
+          edit_title: 'Edit spare part',
+          car: 'Car',
+          name: 'Title',
           description: 'Description',
-          part_price: 'Part Price',
+          part_price: 'Part price',
+          job_description: 'Job description',
+          job_price: 'Job price',
+          total_cost: 'Total cost:',
+          installed_at: 'Installation date',
+          year: 'Year',
+          month: 'Month',
+          search: 'Search',
+          search_placeholder: 'Search by title...',
+          failed_to_load_cars: 'Failed to load cars',
+        },
+        table: {
+          car: 'Car',
+          title: 'Title',
+          description: 'Description',
+          part_price: 'Part',
           job: 'Job',
-          job_price: 'Job Price',
+          job_price: 'Job',
           total: 'Total',
-          date: 'Installed',
+          date: 'Date',
         },
       },
       tires: {
@@ -605,6 +748,16 @@ const resources = {
       fuel: {
         title: 'Fuel',
         add: 'Add fuel',
+        delete_confirm: {
+          title: 'Delete fuel record?',
+          message: 'Are you sure you want to delete record for {{period}}?',
+        },
+        notifications: {
+          deleted: {
+            title: 'Deleted',
+            message: 'Fuel record deleted successfully',
+          },
+        },
         form: {
           title: 'Add fuel record',
           edit_title: 'Edit fuel record',
@@ -631,6 +784,16 @@ const resources = {
         title: 'Insurances',
         add: 'Add insurance',
         edit: 'Edit',
+        delete_confirm: {
+          title: 'Delete insurance?',
+          message: 'Are you sure you want to delete insurance #{{number}}?',
+        },
+        notifications: {
+          deleted: {
+            title: 'Deleted',
+            message: 'Insurance deleted successfully',
+          },
+        },
         form: {
           title: 'Add insurance',
           edit_title: 'Edit insurance',
@@ -657,6 +820,16 @@ const resources = {
         title: 'Inspections',
         add: 'Add inspection',
         edit: 'Edit',
+        delete_confirm: {
+          title: 'Delete inspection?',
+          message: 'Are you sure you want to delete inspection #{{number}}?',
+        },
+        notifications: {
+          deleted: {
+            title: 'Deleted',
+            message: 'Inspection deleted successfully',
+          },
+        },
         form: {
           title: 'Add inspection',
           edit_title: 'Edit inspection',
@@ -824,6 +997,7 @@ const resources = {
         all: 'Баары',
         total: 'Жалпы',
         error_loading: 'Жүктөө мүмкүн эмес',
+        see_all: 'Баарын көрүү',
       },
       auth: {
         title: 'Кирүү',
@@ -879,6 +1053,7 @@ const resources = {
         this_month: 'бул айда',
         // New dashboard translations
         total_operational_cost: 'Жалпы чыгымдар',
+        spare_parts_cost: 'Запастык бөлүктөрге чыгымдар',
         cost_breakdown: 'Чыгымдардын структурасы',
         fleet_status: 'Автопарктын абалы',
         customize: 'Жөндөөлөр',
@@ -947,6 +1122,16 @@ const resources = {
         search_placeholder: 'Номер, VIN, айдоочу...',
         status: 'Статус',
         click_hint: 'Маалыматты көрүү үчүн сапка басыңыз',
+        delete_confirm: {
+          title: 'Унааны өчүрүү?',
+          message: 'Сиз "{{numplate}} - {{brand}}" өчүргүңүз келеби?',
+        },
+        notifications: {
+          deleted: {
+            title: 'Өчүрүлдү',
+            message: 'Унаа ийгиликтүү өчүрүлдү',
+          },
+        },
         form: {
           region: 'Регион',
           brand: 'Марка',
@@ -984,14 +1169,53 @@ const resources = {
         commissioned: 'Ишке киргизилген',
       },
       spares: {
-        table: {
-          title: 'Бөлүк',
+        title: 'Запастык бөлүктөр',
+        add: 'Запастык бөлүк кошуу',
+        no_data: 'Запастык бөлүктөр жок',
+        delete_confirm: {
+          title: 'Запастык бөлүктү өчүрүү?',
+          message: 'Сиз "{{title}}" өчүргүңүз келеби?',
+        },
+        notifications: {
+          created: {
+            title: 'Түзүлдү',
+            message: 'Запастык бөлүк ийгиликтүү кошулду',
+          },
+          updated: {
+            title: 'Жаңыртылды',
+            message: 'Запастык бөлүк ийгиликтүү жаңыртылды',
+          },
+          deleted: {
+            title: 'Өчүрүлдү',
+            message: 'Запастык бөлүк ийгиликтүү өчүрүлдү',
+          },
+        },
+        form: {
+          title: 'Запастык бөлүк кошуу',
+          edit_title: 'Запастык бөлүктү оңдоо',
+          car: 'Унаа',
+          name: 'Аталышы',
           description: 'Сүрөттөмө',
-          part_price: 'Бөлүк баасы',
+          part_price: 'Бөлүктүн баасы',
+          job_description: 'Жумуштун сүрөттөмөсү',
+          job_price: 'Жумуштун баасы',
+          total_cost: 'Жалпы баасы:',
+          installed_at: 'Орнотулган күнү',
+          year: 'Жыл',
+          month: 'Ай',
+          search: 'Издөө',
+          search_placeholder: 'Аталышы боюнча издөө...',
+          failed_to_load_cars: 'Унааларды жүктөө ийгиликсиз',
+        },
+        table: {
+          car: 'Унаа',
+          title: 'Аталышы',
+          description: 'Сүрөттөмө',
+          part_price: 'Бөлүк',
           job: 'Жумуш',
-          job_price: 'Жумуш баасы',
+          job_price: 'Жумуш',
           total: 'Жалпы',
-          date: 'Орнотулган',
+          date: 'Күнү',
         },
       },
       tires: {
@@ -1016,6 +1240,16 @@ const resources = {
       fuel: {
         title: 'Отун',
         add: 'Отун кошуу',
+        delete_confirm: {
+          title: 'Отун жазуусун өчүрүү?',
+          message: 'Сиз {{period}} үчүн жазууну өчүргүңүз келеби?',
+        },
+        notifications: {
+          deleted: {
+            title: 'Өчүрүлдү',
+            message: 'Отун жазуусу ийгиликтүү өчүрүлдү',
+          },
+        },
         form: {
           title: 'Отун жазуусун кошуу',
           edit_title: 'Отун жазуусун оңдоо',
@@ -1042,6 +1276,16 @@ const resources = {
         title: 'Камсыздандыруулар',
         add: 'Камсыздандыруу кошуу',
         edit: 'Оңдоо',
+        delete_confirm: {
+          title: 'Камсыздандырууну өчүрүү?',
+          message: 'Сиз №{{number}} камсыздандырууну өчүргүңүз келеби?',
+        },
+        notifications: {
+          deleted: {
+            title: 'Өчүрүлдү',
+            message: 'Камсыздандыруу ийгиликтүү өчүрүлдү',
+          },
+        },
         form: {
           title: 'Камсыздандыруу кошуу',
           edit_title: 'Камсыздандырууну оңдоо',
@@ -1068,6 +1312,16 @@ const resources = {
         title: 'Техкароолор',
         add: 'Техкароо кошуу',
         edit: 'Оңдоо',
+        delete_confirm: {
+          title: 'Техкароону өчүрүү?',
+          message: 'Сиз №{{number}} техкароону өчүргүңүз келеби?',
+        },
+        notifications: {
+          deleted: {
+            title: 'Өчүрүлдү',
+            message: 'Техкароо ийгиликтүү өчүрүлдү',
+          },
+        },
         form: {
           title: 'Техкароо кошуу',
           edit_title: 'Техкароону оңдоо',

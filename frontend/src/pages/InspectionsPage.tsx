@@ -1,16 +1,19 @@
 import { useMemo, useState } from 'react'
 
 import { ActionIcon, Button, Container, Group, Pagination, Select, Table, Text, Title } from '@mantine/core'
-import { IconEdit } from '@tabler/icons-react'
+import { IconEdit, IconTrash } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
+import { useModals } from '@mantine/modals'
+import { showNotification } from '@mantine/notifications'
 
 import { useCarsQuery } from '@features/cars/hooks/useCars'
-import { useCreateInspectionMutation, useInspectionsQuery, useUpdateInspectionMutation } from '@features/inspections/hooks/useInspections'
+import { useCreateInspectionMutation, useInspectionsQuery, useUpdateInspectionMutation, useDeleteInspectionMutation } from '@features/inspections/hooks/useInspections'
 import { InspectionFormModal } from '@features/inspections/ui/InspectionFormModal'
 import type { Inspection } from '@entities/fleet/types'
 
 export function InspectionsPage() {
   const { t } = useTranslation()
+  const modals = useModals()
   const [page, setPage] = useState(1)
   const [carFilter, setCarFilter] = useState<string | null>(null)
 
@@ -30,6 +33,7 @@ export function InspectionsPage() {
 
   const createMutation = useCreateInspectionMutation()
   const updateMutation = useUpdateInspectionMutation()
+  const deleteMutation = useDeleteInspectionMutation()
 
   const [modalOpened, setModalOpened] = useState(false)
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create')
@@ -40,6 +44,31 @@ export function InspectionsPage() {
     setSelectedRecord(record)
     setModalMode('edit')
     setModalOpened(true)
+  }
+
+  const confirmDelete = (record: Inspection, e: React.MouseEvent) => {
+    e.stopPropagation()
+    modals.openConfirmModal({
+      title: t('inspections.delete_confirm.title'),
+      children: (
+        <Text size="sm">
+          {t('inspections.delete_confirm.message', { number: record.number })}
+        </Text>
+      ),
+      labels: {
+        confirm: t('common.delete'),
+        cancel: t('common.cancel'),
+      },
+      confirmProps: { color: 'red' },
+      onConfirm: async () => {
+        await deleteMutation.mutateAsync(record.id)
+        showNotification({
+          title: t('inspections.notifications.deleted.title'),
+          message: t('inspections.notifications.deleted.message'),
+          color: 'green',
+        })
+      },
+    })
   }
 
   const records = data?.results ?? []
@@ -88,15 +117,26 @@ export function InspectionsPage() {
                   <Table.Td>{r.inspected_at}</Table.Td>
                   <Table.Td>{r.cost}</Table.Td>
                   <Table.Td onClick={(e) => e.stopPropagation()}>
-                    <ActionIcon
-                      variant="light"
-                      color="blue"
-                      size="sm"
-                      onClick={(e) => openEdit(r, e)}
-                      title={t('common.edit')}
-                    >
-                      <IconEdit size={16} />
-                    </ActionIcon>
+                    <Group gap="xs">
+                      <ActionIcon
+                        variant="light"
+                        color="blue"
+                        size="sm"
+                        onClick={(e) => openEdit(r, e)}
+                        title={t('common.edit')}
+                      >
+                        <IconEdit size={16} />
+                      </ActionIcon>
+                      <ActionIcon
+                        variant="light"
+                        color="red"
+                        size="sm"
+                        onClick={(e) => confirmDelete(r, e)}
+                        title={t('common.delete')}
+                      >
+                        <IconTrash size={16} />
+                      </ActionIcon>
+                    </Group>
                   </Table.Td>
                 </Table.Tr>
               ))}

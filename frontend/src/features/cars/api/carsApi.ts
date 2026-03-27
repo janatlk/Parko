@@ -59,3 +59,7 @@ export async function updateCar(carId: number, payload: CarUpdatePayload): Promi
   const { data } = await http.patch<Car>(`cars/${carId}/`, payload)
   return data
 }
+
+export async function deleteCar(carId: number): Promise<void> {
+  await http.delete(`cars/${carId}/`)
+}

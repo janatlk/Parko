@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { PaginatedResponse } from '@shared/api/types'
 import type { Fuel } from '@entities/fleet/types'
 
-import { createFuel, listFuel, updateFuel } from '../api/fuelApi'
+import { createFuel, listFuel, updateFuel, deleteFuel } from '../api/fuelApi'
 import type { FuelCreatePayload, FuelUpdatePayload, ListFuelParams } from '../api/fuelApi'
 
 type FuelQueryArgs = {
@@ -47,6 +47,16 @@ export function useUpdateFuelMutation() {
   return useMutation({
     mutationFn: ({ fuelId, payload }: { fuelId: number; payload: FuelUpdatePayload }) =>
       updateFuel(fuelId, payload),
+    onSuccess: async () => {
+      await qc.invalidateQueries({ queryKey: ['fuel'] })
+    },
+  })
+}
+
+export function useDeleteFuelMutation() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (fuelId: number) => deleteFuel(fuelId),
     onSuccess: async () => {
       await qc.invalidateQueries({ queryKey: ['fuel'] })
     },

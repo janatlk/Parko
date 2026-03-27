@@ -147,6 +147,17 @@ export function AppLayout() {
           />
           <NavLink
             component={RouterNavLink}
+            to="/spares"
+            label={t('spares.title')}
+            leftSection={<IconCar size={18} stroke={1.5} />}
+            active={activePath.startsWith('/spares')}
+            onClick={() => toggle()}
+            styles={(theme) => ({
+              root: { borderRadius: theme.radius.md },
+            })}
+          />
+          <NavLink
+            component={RouterNavLink}
             to="/insurances"
             label={t('insurances.title')}
             leftSection={<IconShield size={18} stroke={1.5} />}

@@ -46,3 +46,7 @@ export async function updateInsurance(
   const { data } = await http.patch<Insurance>(`insurances/${insuranceId}/`, payload)
   return data
 }
+
+export async function deleteInsurance(insuranceId: number): Promise<void> {
+  await http.delete(`insurances/${insuranceId}/`)
+}

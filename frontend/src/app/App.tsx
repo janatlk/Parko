@@ -19,6 +19,7 @@ import { LoginPage } from '@pages/LoginPage'
 import { NotFoundPage } from '@pages/NotFoundPage'
 import { ProfilePage } from '@pages/ProfilePage'
 import { ReportsPage } from '@pages/ReportsPage'
+import { SparesPage } from '@pages/SparesPage'
 import { UsersPage } from '@pages/UsersPage'
 
 export function App() {
@@ -58,6 +59,7 @@ export function App() {
               <Route path="/cars" element={<CarsPage />} />
               <Route path="/cars/:id" element={<CarDetailPage />} />
               <Route path="/fuel" element={<FuelPage />} />
+              <Route path="/spares" element={<SparesPage />} />
               <Route path="/insurances" element={<InsurancesPage />} />
               <Route path="/inspections" element={<InspectionsPage />} />
               <Route path="/users" element={<UsersPage />} />

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
 
 import {
   Badge,
@@ -15,8 +16,9 @@ import {
   Image,
   Modal,
   Box,
+  Button,
 } from '@mantine/core'
-import { IconTrash, IconDownload } from '@tabler/icons-react'
+import { IconTrash, IconDownload, IconExternalLink } from '@tabler/icons-react'
 import { useParams } from 'react-router-dom'
 
 import { useCarQuery } from '@features/cars/hooks/useCars'
@@ -168,7 +170,19 @@ export function CarDetailPage() {
 
         {/* Fuel Tab */}
         <Tabs.Panel value="fuel" pt="md">
-          <Paper withBorder shadow="sm" radius="md">
+          <Paper withBorder shadow="sm" radius="md" p="md">
+            <Group justify="space-between" mb="md">
+              <Title order={4}>{t('carDetail.fuel') || 'Fuel'}</Title>
+              <Button
+                component={Link}
+                to="/fuel"
+                variant="outline"
+                size="xs"
+                rightSection={<IconExternalLink size={14} />}
+              >
+                {t('common.see_all') || 'See all'}
+              </Button>
+            </Group>
             <Table striped highlightOnHover>
               <Table.Thead>
                 <Table.Tr>
@@ -201,7 +215,19 @@ export function CarDetailPage() {
 
         {/* Insurances Tab */}
         <Tabs.Panel value="insurances" pt="md">
-          <Paper withBorder shadow="sm" radius="md">
+          <Paper withBorder shadow="sm" radius="md" p="md">
+            <Group justify="space-between" mb="md">
+              <Title order={4}>{t('carDetail.insurances') || 'Insurances'}</Title>
+              <Button
+                component={Link}
+                to="/insurances"
+                variant="outline"
+                size="xs"
+                rightSection={<IconExternalLink size={14} />}
+              >
+                {t('common.see_all') || 'See all'}
+              </Button>
+            </Group>
             <Table striped highlightOnHover>
               <Table.Thead>
                 <Table.Tr>
@@ -232,7 +258,19 @@ export function CarDetailPage() {
 
         {/* Inspections Tab */}
         <Tabs.Panel value="inspections" pt="md">
-          <Paper withBorder shadow="sm" radius="md">
+          <Paper withBorder shadow="sm" radius="md" p="md">
+            <Group justify="space-between" mb="md">
+              <Title order={4}>{t('carDetail.inspections') || 'Inspections'}</Title>
+              <Button
+                component={Link}
+                to="/inspections"
+                variant="outline"
+                size="xs"
+                rightSection={<IconExternalLink size={14} />}
+              >
+                {t('common.see_all') || 'See all'}
+              </Button>
+            </Group>
             <Table striped highlightOnHover>
               <Table.Thead>
                 <Table.Tr>
@@ -259,7 +297,19 @@ export function CarDetailPage() {
 
         {/* Spares Tab */}
         <Tabs.Panel value="spares" pt="md">
-          <Paper withBorder shadow="sm" radius="md">
+          <Paper withBorder shadow="sm" radius="md" p="md">
+            <Group justify="space-between" mb="md">
+              <Title order={4}>{t('carDetail.spares') || 'Spares'}</Title>
+              <Button
+                component={Link}
+                to="/spares"
+                variant="outline"
+                size="xs"
+                rightSection={<IconExternalLink size={14} />}
+              >
+                {t('common.see_all') || 'See all'}
+              </Button>
+            </Group>
             <Table striped highlightOnHover>
               <Table.Thead>
                 <Table.Tr>

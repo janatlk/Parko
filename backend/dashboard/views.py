@@ -120,8 +120,8 @@ class DashboardStatsView(APIView):
             if prev_data['total_liters'] and prev_data['total_mileage'] and prev_data['total_mileage'] > 0:
                 prev_avg_consumption = (prev_data['total_liters'] / prev_data['total_mileage']) * 100
 
-        # Maintenance cost for current month
-        maintenance_cost_month = Spare.objects.filter(
+        # Spare parts cost for current month
+        spare_parts_cost_month = Spare.objects.filter(
             car__company=company,
             installed_at__year=current_year,
             installed_at__month=current_month
@@ -129,8 +129,8 @@ class DashboardStatsView(APIView):
             total=Sum('part_price') + Sum('job_price')
         )['total'] or 0
 
-        # Previous month maintenance for trend
-        prev_maintenance = Spare.objects.filter(
+        # Previous month spare parts for trend
+        prev_spare_parts = Spare.objects.filter(
             car__company=company,
             installed_at__year=prev_year,
             installed_at__month=prev_month
@@ -138,9 +138,9 @@ class DashboardStatsView(APIView):
             total=Sum('part_price') + Sum('job_price')
         )['total'] or 0
 
-        # Total operational cost (fuel + maintenance)
-        total_operational_cost = total_fuel_cost_month + maintenance_cost_month
-        prev_operational_cost = total_fuel_cost_prev_month + prev_maintenance
+        # Total operational cost (fuel + spare parts)
+        total_operational_cost = total_fuel_cost_month + spare_parts_cost_month
+        prev_operational_cost = total_fuel_cost_prev_month + prev_spare_parts
 
         # Insurance statistics
         active_insurances = Insurance.objects.filter(
@@ -177,8 +177,8 @@ class DashboardStatsView(APIView):
             'inactive_cars': inactive_cars,
             'total_fuel_cost_month': round(float(total_fuel_cost_month), 2),
             'total_fuel_cost_prev_month': round(float(total_fuel_cost_prev_month), 2),
-            'total_maintenance_cost_month': round(float(maintenance_cost_month), 2),
-            'total_maintenance_cost_prev_month': round(float(prev_maintenance), 2),
+            'total_spare_parts_cost_month': round(float(spare_parts_cost_month), 2),
+            'total_spare_parts_cost_prev_month': round(float(prev_spare_parts), 2),
             'total_operational_cost': round(float(total_operational_cost), 2),
             'prev_operational_cost': round(float(prev_operational_cost), 2),
             'active_insurances': active_insurances,

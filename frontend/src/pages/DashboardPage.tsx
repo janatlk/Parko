@@ -89,10 +89,19 @@ export function DashboardPage() {
     preferences.showAvgConsumption ? {
       icon: <IconFlame size={24} />,
       label: t('dashboard.avg_consumption'),
-      value: `${(stats?.avg_fuel_consumption ?? 0).toFixed(1)} л/100км`,
+      value: `${(stats?.avg_fuel_consumption ?? 0).toFixed(1)}л/100км`,
       color: 'green',
       currentValue: stats?.avg_fuel_consumption,
       previousValue: stats?.prev_avg_fuel_consumption,
+      inverseTrend: true,
+    } : null,
+    preferences.showSparePartsCost ? {
+      icon: <IconTools size={24} />,
+      label: t('dashboard.spare_parts_cost'),
+      value: `${(stats?.total_spare_parts_cost_month ?? 0).toLocaleString('ru-RU')} с.`,
+      color: 'cyan',
+      currentValue: stats?.total_spare_parts_cost_month,
+      previousValue: stats?.total_spare_parts_cost_prev_month,
       inverseTrend: true,
     } : null,
     preferences.showMaintenanceCars ? {

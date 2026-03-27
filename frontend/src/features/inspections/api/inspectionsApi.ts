@@ -41,3 +41,7 @@ export async function updateInspection(
   const { data } = await http.patch<Inspection>(`inspections/${inspectionId}/`, payload)
   return data
 }
+
+export async function deleteInspection(inspectionId: number): Promise<void> {
+  await http.delete(`inspections/${inspectionId}/`)
+}

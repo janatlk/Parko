@@ -43,3 +43,7 @@ export async function updateFuel(fuelId: number, payload: FuelUpdatePayload): Pr
   const { data } = await http.patch<Fuel>(`fuel/${fuelId}/`, payload)
   return data
 }
+
+export async function deleteFuel(fuelId: number): Promise<void> {
+  await http.delete(`fuel/${fuelId}/`)
+}

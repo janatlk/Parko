@@ -7,8 +7,8 @@ export type DashboardStats = {
   inactive_cars: number
   total_fuel_cost_month: number
   total_fuel_cost_prev_month: number
-  total_maintenance_cost_month: number
-  total_maintenance_cost_prev_month: number
+  total_spare_parts_cost_month: number
+  total_spare_parts_cost_prev_month: number
   total_operational_cost: number
   prev_operational_cost: number
   active_insurances: number

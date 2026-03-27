@@ -1,16 +1,19 @@
 import { useMemo, useState } from 'react'
 
 import { ActionIcon, Button, Container, Group, Pagination, Select, Table, Text, Title } from '@mantine/core'
-import { IconEdit } from '@tabler/icons-react'
+import { IconEdit, IconTrash } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
+import { useModals } from '@mantine/modals'
+import { showNotification } from '@mantine/notifications'
 
 import { useCarsQuery } from '@features/cars/hooks/useCars'
-import { useCreateFuelMutation, useFuelQuery, useUpdateFuelMutation } from '@features/fuel/hooks/useFuel'
+import { useCreateFuelMutation, useFuelQuery, useUpdateFuelMutation, useDeleteFuelMutation } from '@features/fuel/hooks/useFuel'
 import { FuelFormModal } from '@features/fuel/ui/FuelFormModal'
 import type { Fuel } from '@entities/fleet/types'
 
 export function FuelPage() {
   const { t } = useTranslation()
+  const modals = useModals()
   const [page, setPage] = useState(1)
   const [carFilter, setCarFilter] = useState<string | null>(null)
 
@@ -33,6 +36,7 @@ export function FuelPage() {
 
   const createMutation = useCreateFuelMutation()
   const updateMutation = useUpdateFuelMutation()
+  const deleteMutation = useDeleteFuelMutation()
 
   const [modalOpened, setModalOpened] = useState(false)
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create')
@@ -49,6 +53,31 @@ export function FuelPage() {
     setSelectedRecord(record)
     setModalMode('edit')
     setModalOpened(true)
+  }
+
+  const confirmDelete = (record: Fuel, e: React.MouseEvent) => {
+    e.stopPropagation()
+    modals.openConfirmModal({
+      title: t('fuel.delete_confirm.title'),
+      children: (
+        <Text size="sm">
+          {t('fuel.delete_confirm.message', { period: `${record.year}-${String(record.month).padStart(2, '0')}` })}
+        </Text>
+      ),
+      labels: {
+        confirm: t('common.delete'),
+        cancel: t('common.cancel'),
+      },
+      confirmProps: { color: 'red' },
+      onConfirm: async () => {
+        await deleteMutation.mutateAsync(record.id)
+        showNotification({
+          title: t('fuel.notifications.deleted.title'),
+          message: t('fuel.notifications.deleted.message'),
+          color: 'green',
+        })
+      },
+    })
   }
 
   const records = data?.results ?? []
@@ -103,15 +132,26 @@ export function FuelPage() {
                   <Table.Td>{r.consumption}</Table.Td>
                   <Table.Td>{r.total_cost}</Table.Td>
                   <Table.Td onClick={(e) => e.stopPropagation()}>
-                    <ActionIcon
-                      variant="light"
-                      color="blue"
-                      size="sm"
-                      onClick={(e) => openEdit(r, e)}
-                      title={t('common.edit')}
-                    >
-                      <IconEdit size={16} />
-                    </ActionIcon>
+                    <Group gap="xs">
+                      <ActionIcon
+                        variant="light"
+                        color="blue"
+                        size="sm"
+                        onClick={(e) => openEdit(r, e)}
+                        title={t('common.edit')}
+                      >
+                        <IconEdit size={16} />
+                      </ActionIcon>
+                      <ActionIcon
+                        variant="light"
+                        color="red"
+                        size="sm"
+                        onClick={(e) => confirmDelete(r, e)}
+                        title={t('common.delete')}
+                      >
+                        <IconTrash size={16} />
+                      </ActionIcon>
+                    </Group>
                   </Table.Td>
                 </Table.Tr>
               ))}

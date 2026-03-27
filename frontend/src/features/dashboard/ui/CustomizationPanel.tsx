@@ -22,6 +22,7 @@ type DashboardPreferences = {
   showOperationalCost: boolean
   showActiveCars: boolean
   showAvgConsumption: boolean
+  showSparePartsCost: boolean
   showMaintenanceCars: boolean
   // Display options
   compactMode: boolean
@@ -36,6 +37,7 @@ const defaultPreferences: DashboardPreferences = {
   showOperationalCost: true,
   showActiveCars: true,
   showAvgConsumption: true,
+  showSparePartsCost: true,
   showMaintenanceCars: true,
   compactMode: false,
 }
@@ -153,6 +155,11 @@ export function CustomizationPanel({
               label={t('dashboard.avg_consumption')}
               checked={preferences.showAvgConsumption}
               onChange={() => handleToggle('showAvgConsumption')}
+            />
+            <Checkbox
+              label={t('dashboard.spare_parts_cost')}
+              checked={preferences.showSparePartsCost}
+              onChange={() => handleToggle('showSparePartsCost')}
             />
             <Checkbox
               label={t('dashboard.maintenance_cars')}

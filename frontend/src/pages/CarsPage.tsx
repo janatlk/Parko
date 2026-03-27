@@ -1,12 +1,14 @@
 import { useMemo, useState } from 'react'
 
 import { ActionIcon, Button, Container, Group, Pagination, Select, Table, Text, TextInput, Title } from '@mantine/core'
-import { IconEdit, IconEye } from '@tabler/icons-react'
+import { IconEdit, IconEye, IconTrash } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
+import { useModals } from '@mantine/modals'
+import { showNotification } from '@mantine/notifications'
 
 import { useAuth } from '@features/auth/hooks/useAuth'
-import { useCarsQuery, useCreateCarMutation, useUpdateCarMutation } from '@features/cars/hooks/useCars'
+import { useCarsQuery, useCreateCarMutation, useUpdateCarMutation, useDeleteCarMutation } from '@features/cars/hooks/useCars'
 import { CarFormModal } from '@features/cars/ui/CarFormModal'
 import type { Car, CarStatus } from '@entities/car/types'
 import { CAR_STATUSES } from '@entities/car/types'
@@ -16,6 +18,7 @@ import { PermissionGuard } from '@shared/ui/PermissionGuard'
 export function CarsPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const modals = useModals()
   const { user: currentUser } = useAuth()
   const canEdit = canEditCars(currentUser)
 
@@ -25,6 +28,7 @@ export function CarsPage() {
 
   const createMutation = useCreateCarMutation()
   const updateMutation = useUpdateCarMutation()
+  const deleteMutation = useDeleteCarMutation()
 
   const [modalOpened, setModalOpened] = useState(false)
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create')
@@ -41,6 +45,31 @@ export function CarsPage() {
     setSelectedCar(car as Car)
     setModalMode('edit')
     setModalOpened(true)
+  }
+
+  const confirmDelete = (car: Car, e: React.MouseEvent) => {
+    e.stopPropagation()
+    modals.openConfirmModal({
+      title: t('cars.delete_confirm.title'),
+      children: (
+        <Text size="sm">
+          {t('cars.delete_confirm.message', { numplate: car.numplate, brand: car.brand })}
+        </Text>
+      ),
+      labels: {
+        confirm: t('common.delete'),
+        cancel: t('common.cancel'),
+      },
+      confirmProps: { color: 'red' },
+      onConfirm: async () => {
+        await deleteMutation.mutateAsync(car.id)
+        showNotification({
+          title: t('cars.notifications.deleted.title'),
+          message: t('cars.notifications.deleted.message'),
+          color: 'green',
+        })
+      },
+    })
   }
 
   const { data, isLoading, isError } = useCarsQuery({
@@ -134,17 +163,30 @@ export function CarsPage() {
                   <Table.Td>{c.driver}</Table.Td>
                   <Table.Td>{c.status}</Table.Td>
                   <Table.Td onClick={(e) => e.stopPropagation()}>
-                    <PermissionGuard canAccess={canEdit} mode="disable">
-                      <ActionIcon
-                        variant="light"
-                        color="blue"
-                        size="sm"
-                        onClick={(e) => openEdit(c as Car, e)}
-                        title={t('cars.edit')}
-                      >
-                        <IconEdit size={16} />
-                      </ActionIcon>
-                    </PermissionGuard>
+                    <Group gap="xs">
+                      <PermissionGuard canAccess={canEdit} mode="disable">
+                        <ActionIcon
+                          variant="light"
+                          color="blue"
+                          size="sm"
+                          onClick={(e) => openEdit(c as Car, e)}
+                          title={t('cars.edit')}
+                        >
+                          <IconEdit size={16} />
+                        </ActionIcon>
+                      </PermissionGuard>
+                      <PermissionGuard canAccess={canEdit} mode="disable">
+                        <ActionIcon
+                          variant="light"
+                          color="red"
+                          size="sm"
+                          onClick={(e) => confirmDelete(c as Car, e)}
+                          title={t('common.delete')}
+                        >
+                          <IconTrash size={16} />
+                        </ActionIcon>
+                      </PermissionGuard>
+                    </Group>
                   </Table.Td>
                 </Table.Tr>
               ))}
