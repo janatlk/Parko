@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 import type { PaginatedResponse } from '@shared/api/types'
 import type { Fuel, Insurance, Inspection, Spare, Tire, Accumulator, CarPhoto } from '@entities/fleet/types'
+import type { CarRelatedStats } from '@features/cars/api/carDetailApi'
 
 import {
   listFuelByCar,
@@ -12,6 +13,7 @@ import {
   listAccumulatorsByCar,
   listPhotosByCar,
   deletePhoto,
+  getCarRelatedStats,
 } from '../api/carDetailApi'
 
 const detailKeys = {
@@ -88,5 +90,13 @@ export function useDeletePhotoMutation(carId: number) {
     onSuccess: async () => {
       await qc.invalidateQueries({ queryKey: detailKeys.photos(carId) })
     },
+  })
+}
+
+export function useCarRelatedStats(carId: number) {
+  return useQuery<CarRelatedStats>({
+    queryKey: [...detailKeys.all, 'stats', carId] as const,
+    queryFn: () => getCarRelatedStats(carId),
+    enabled: carId > 0,
   })
 }

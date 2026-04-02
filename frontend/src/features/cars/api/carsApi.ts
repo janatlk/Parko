@@ -6,6 +6,7 @@ export type CarListItem = Pick<Car, 'id' | 'brand' | 'title' | 'numplate' | 'sta
 
 export type ListCarsParams = {
   page?: number
+  page_size?: number
   search?: string
   status?: CarStatus
   brand?: string
@@ -35,6 +36,7 @@ export async function listCars(params: ListCarsParams = {}): Promise<PaginatedRe
   const { data } = await http.get<PaginatedResponse<CarListItem>>('cars/', {
     params: {
       page: params.page,
+      page_size: params.page_size,
       search: params.search,
       status: params.status,
       brand: params.brand,

@@ -10,6 +10,7 @@ from core.permissions import IsCompanyStaff
 
 from .services import get_maintenance_costs_report
 from .services_additional import get_fuel_consumption_report, get_insurance_inspection_report
+from .services_cost_per_km import get_cost_per_km_report
 from .services_email import send_report_email
 from .exporters import (
     export_to_csv,
@@ -708,3 +709,84 @@ class ShareReportEmailView(APIView):
                 {'error': error_message},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+
+class CostPerKmReportView(APIView):
+    """Cost Per Kilometer Report"""
+    permission_classes = [IsCompanyStaff]
+
+    def get(self, request):
+        start_date = request.query_params.get('start_date')
+        end_date = request.query_params.get('end_date')
+        vehicle_ids_str = request.query_params.get('vehicle_ids')
+        vehicle_type = request.query_params.get('vehicle_type')
+        region = request.query_params.get('region')
+        export_format = request.query_params.get('export')  # csv, xlsx, json
+
+        # Parse vehicle_ids
+        vehicle_ids = None
+        if vehicle_ids_str:
+            try:
+                vehicle_ids = [int(x.strip()) for x in vehicle_ids_str.split(',')]
+            except ValueError:
+                return Response(
+                    {'error': 'Invalid vehicle_ids format. Use comma-separated integers'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+        # Generate report
+        data = get_cost_per_km_report(
+            company_id=request.user.company_id,
+            start_date=start_date,
+            end_date=end_date,
+            vehicle_ids=vehicle_ids,
+            vehicle_type=vehicle_type,
+            region=region,
+        )
+
+        # Export
+        if export_format in ['csv', 'xlsx', 'json']:
+            from io import BytesIO
+            from .exporters import export_to_xlsx, export_to_csv
+
+            # Prepare data for export
+            export_rows = []
+            for vehicle in data['by_vehicle']:
+                export_rows.append({
+                    'Vehicle': f"{vehicle['brand']} {vehicle['model']} ({vehicle['numplate']})",
+                    'Fuel Cost': vehicle['fuel_cost'],
+                    'Maintenance Cost': vehicle['maintenance_cost'],
+                    'Insurance Cost': vehicle['insurance_cost'],
+                    'Inspection Cost': vehicle['inspection_cost'],
+                    'Total Cost': vehicle['total_cost'],
+                    'Total Distance (km)': vehicle['total_distance'],
+                    'Cost per km': vehicle['cost_per_km'],
+                    'Fuel Cost per km': vehicle['fuel_cost_per_km'],
+                    'Maintenance Cost per km': vehicle['maintenance_cost_per_km'],
+                })
+
+            filename_base = f"cost_per_km_{request.user.company.slug}"
+            if start_date:
+                filename_base += f"_{start_date}"
+            if end_date:
+                filename_base += f"_{end_date}"
+
+            if export_format == 'xlsx':
+                response = export_to_xlsx(export_rows, f"{filename_base}.xlsx")
+                content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            elif export_format == 'csv':
+                response = export_to_csv(export_rows, f"{filename_base}.csv")
+                content_type = 'text/csv'
+            else:  # json
+                from rest_framework.response import Response as DRFResponse
+                return DRFResponse(data)
+
+            return Response(
+                response.content,
+                content_type=content_type,
+                headers={
+                    'Content-Disposition': f'attachment; filename="{filename_base}.{export_format}"'
+                }
+            )
+
+        return Response(data)

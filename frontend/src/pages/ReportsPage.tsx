@@ -16,6 +16,9 @@ import {
 import { downloadReport } from '@features/reports/api/reportsApi'
 import { ReportBuilder } from '@features/reports/components/ReportBuilder'
 import { ReportResults } from '@features/reports/components/ReportResults'
+import { CostPerKmReport } from '@features/reports/components/CostPerKmReport'
+import type { CostPerKmReportResponse, CostPerKmParams } from '@features/reports/api/reportsApi'
+import { getCostPerKmReport } from '@features/reports/api/reportsApi'
 import { SavedReportsList } from '@features/reports/components/SavedReportsList'
 import { ExportHistory } from '@features/reports/components/ExportHistory'
 import type { ReportResponse, SavedReportList, ReportType } from '@features/reports/api/reportsApi'
@@ -24,6 +27,7 @@ export function ReportsPage() {
   const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState<string | null>('new')
   const [generatedReport, setGeneratedReport] = useState<ReportResponse | null>(null)
+  const [costPerKmReport, setCostPerKmReport] = useState<CostPerKmReportResponse | null>(null)
   const [selectedSavedReport, setSelectedSavedReport] = useState<SavedReportList | null>(null)
 
   // Queries
@@ -66,7 +70,38 @@ export function ReportsPage() {
     report_name?: string
   }) => {
     console.log('Generating report with params:', params)
-    
+
+    // Special handling for cost_per_km report
+    if (params.report_type === 'cost_per_km') {
+      const costParams: CostPerKmParams = {
+        start_date: params.from_date,
+        end_date: params.to_date,
+        vehicle_ids: params.car_ids ? params.car_ids.join(',') : undefined,
+      }
+      
+      try {
+        const data = await getCostPerKmReport(costParams)
+        setCostPerKmReport(data)
+        setActiveTab('results')
+        
+        notifications.show({
+          title: t('reports.report_generated') || 'Report Generated',
+          message: t('reports.report_generated_message') || 'Your report is ready to view',
+          icon: <IconCheck />,
+          color: 'green',
+        })
+      } catch (error) {
+        console.error('Cost per km report error:', error)
+        notifications.show({
+          title: t('reports.report_error') || 'Report Error',
+          message: t('reports.report_error_message') || 'Failed to generate report',
+          icon: <IconExclamationCircle />,
+          color: 'red',
+        })
+      }
+      return
+    }
+
     generateMutation.mutate(
       {
         report_type: params.report_type as ReportType,
@@ -302,6 +337,28 @@ export function ReportsPage() {
           <Tabs.Panel value="results" pt="md">
             {selectedSavedReport && savedReportData ? (
               <ReportResults report={savedReportData} onExport={(format) => handleExportSaved(selectedSavedReport, format)} />
+            ) : costPerKmReport ? (
+              <CostPerKmReport 
+                data={costPerKmReport} 
+                onExport={(format) => {
+                  // Handle export for cost per km report
+                  const params: CostPerKmParams = {
+                    start_date: costPerKmReport.filters.start_date || undefined,
+                    end_date: costPerKmReport.filters.end_date || undefined,
+                    vehicle_ids: costPerKmReport.filters.vehicle_ids?.join(','),
+                    export: format,
+                  }
+                  getCostPerKmReport(params).then((blob) => {
+                    const blobData = new Blob([JSON.stringify(blob)], { type: 'application/json' })
+                    const url = window.URL.createObjectURL(blobData)
+                    const link = document.createElement('a')
+                    link.href = url
+                    link.download = `cost_per_km_${format}.${format}`
+                    link.click()
+                    window.URL.revokeObjectURL(url)
+                  })
+                }}
+              />
             ) : generatedReport ? (
               <ReportResults report={generatedReport} onExport={handleExport} onSave={handleSaveReport} />
             ) : (

@@ -8,6 +8,7 @@ import type { CarCreatePayload, CarListItem, ListCarsParams, CarUpdatePayload } 
 
 type CarsQueryArgs = {
   page: number
+  page_size?: number
   search?: string
   status?: Car['status']
 }
@@ -21,6 +22,7 @@ const carsKeys = {
 export function useCarsQuery(args: CarsQueryArgs) {
   const params: ListCarsParams = {
     page: args.page,
+    page_size: args.page_size,
     search: args.search,
     status: args.status,
   }

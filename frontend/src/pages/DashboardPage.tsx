@@ -30,9 +30,13 @@ import { CostBreakdownChart } from '@features/dashboard/ui/CostBreakdownChart'
 import { CarsByStatus } from '@features/dashboard/ui/CarsByStatus'
 import { CustomizationPanel } from '@features/dashboard/ui/CustomizationPanel'
 import { VehicleConsumptionList } from '@features/dashboard/ui/VehicleConsumptionList'
+import { formatPrice } from '@shared/utils/formatPrice'
+import { useAuth } from '@features/auth/hooks/useAuth'
 
 export function DashboardPage() {
   const { t } = useTranslation()
+  const { user } = useAuth()
+  const currency = user?.currency || 'KGS'
 
   const [preferencesOpen, setPreferencesOpen] = useState(false)
   const [preferences, setPreferences] = useState(() => loadDashboardPreferences())
@@ -65,31 +69,28 @@ export function DashboardPage() {
   }
 
   const totalCars = stats?.total_cars ?? 0
-  const activeCars = stats?.active_cars ?? 0
 
   // Build stat cards array based on preferences
   const statCards = [
     preferences.showOperationalCost ? {
       icon: <IconCar size={24} />,
       label: t('dashboard.total_operational_cost'),
-      value: `${(stats?.total_operational_cost ?? 0).toLocaleString('ru-RU')} с.`,
+      value: formatPrice(stats?.total_operational_cost ?? 0, currency),
       color: 'blue',
       currentValue: stats?.total_operational_cost,
       previousValue: stats?.prev_operational_cost,
       inverseTrend: true,
-      ringValue: totalCars > 0 ? Math.round((activeCars / totalCars) * 100) : 0,
     } : null,
     preferences.showActiveCars ? {
       icon: <IconCar size={24} />,
       label: t('dashboard.active_cars'),
       value: `${stats?.active_cars ?? 0} / ${totalCars}`,
       color: 'teal',
-      ringValue: totalCars > 0 ? Math.round((activeCars / totalCars) * 100) : 0,
     } : null,
     preferences.showAvgConsumption ? {
       icon: <IconFlame size={24} />,
       label: t('dashboard.avg_consumption'),
-      value: `${(stats?.avg_fuel_consumption ?? 0).toFixed(1)}л/100км`,
+      value: `${(stats?.avg_fuel_consumption ?? 0).toFixed(1)} ${t('dashboard.avg_consumption_unit')}`,
       color: 'green',
       currentValue: stats?.avg_fuel_consumption,
       previousValue: stats?.prev_avg_fuel_consumption,
@@ -98,7 +99,7 @@ export function DashboardPage() {
     preferences.showSparePartsCost ? {
       icon: <IconTools size={24} />,
       label: t('dashboard.spare_parts_cost'),
-      value: `${(stats?.total_spare_parts_cost_month ?? 0).toLocaleString('ru-RU')} с.`,
+      value: formatPrice(stats?.total_spare_parts_cost_month ?? 0, currency),
       color: 'cyan',
       currentValue: stats?.total_spare_parts_cost_month,
       previousValue: stats?.total_spare_parts_cost_prev_month,
@@ -109,7 +110,6 @@ export function DashboardPage() {
       label: t('dashboard.maintenance_cars'),
       value: stats?.maintenance_cars ?? 0,
       color: 'orange',
-      ringValue: totalCars > 0 ? Math.round((stats?.maintenance_cars ?? 0) / totalCars * 100) : 0,
     } : null,
   ].filter((card): card is NonNullable<typeof card> => card !== null)
 

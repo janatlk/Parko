@@ -8,6 +8,7 @@ import type { InspectionCreatePayload, InspectionUpdatePayload, ListInspectionsP
 
 type InspectionsQueryArgs = {
   page: number
+  page_size?: number
   car?: number
 }
 
@@ -19,6 +20,7 @@ const inspectionsKeys = {
 export function useInspectionsQuery(args: InspectionsQueryArgs) {
   const params: ListInspectionsParams = {
     page: args.page,
+    page_size: args.page_size,
     car: args.car,
   }
 

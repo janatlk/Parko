@@ -4,6 +4,7 @@ import type { Fuel } from '@entities/fleet/types'
 
 export type ListFuelParams = {
   page?: number
+  page_size?: number
   car?: number
   year?: number
   month?: number
@@ -25,6 +26,7 @@ export async function listFuel(params: ListFuelParams = {}): Promise<PaginatedRe
   const { data } = await http.get<PaginatedResponse<Fuel>>('fuel/', {
     params: {
       page: params.page,
+      page_size: params.page_size,
       car: params.car,
       year: params.year,
       month: params.month,

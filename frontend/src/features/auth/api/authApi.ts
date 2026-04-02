@@ -21,7 +21,7 @@ export async function meApi(): Promise<User> {
   return data
 }
 
-export type MeUpdatePayload = Partial<Pick<User, 'first_name' | 'last_name' | 'email' | 'region' | 'language'>>
+export type MeUpdatePayload = Partial<Pick<User, 'first_name' | 'last_name' | 'email' | 'region' | 'language' | 'currency' | 'theme'>>
 
 export async function patchMeApi(payload: MeUpdatePayload): Promise<User> {
   const { data } = await http.patch<User>('auth/me/', payload)

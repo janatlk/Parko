@@ -19,6 +19,7 @@ import { useAuth } from '@features/auth/hooks/useAuth'
 import { patchMeApi } from '@features/auth/api/authApi'
 import { LANGUAGES } from '@shared/constants/languages'
 import { showSuccess } from '@shared/utils/toast'
+import { ThemeToggle } from '@features/theme/ui/ThemeToggle'
 
 export function AppLayout() {
   const { t, i18n } = useTranslation()
@@ -44,8 +45,12 @@ export function AppLayout() {
         collapsed: { mobile: !opened },
       }}
       padding="md"
+      classNames={{
+        navbar: 'app-shell-navbar',
+        header: 'app-shell-header',
+      }}
     >
-      <AppShell.Header bg="blue.6">
+      <AppShell.Header bg="#000000" style={{ borderBottom: '1px solid #222222' }}>
         <Group h="100%" px="md" justify="space-between">
           <Group gap="sm">
             <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" color="white" />
@@ -56,6 +61,7 @@ export function AppLayout() {
           </Group>
 
           <Group gap="sm">
+            <ThemeToggle />
             <Select
               leftSection={<IconLanguage size={14} />}
               data={LANGUAGES.map((l) => ({ value: l, label: l.toUpperCase() }))}
@@ -79,7 +85,8 @@ export function AppLayout() {
               variant="filled"
             />
             <Button
-              variant="white"
+              variant="outline"
+              color="white"
               size="xs"
               leftSection={<IconLogout size={14} />}
               onClick={() => void logout()}
@@ -91,10 +98,10 @@ export function AppLayout() {
         </Group>
       </AppShell.Header>
 
-      <AppShell.Navbar bg="gray.0" p="xs">
+      <AppShell.Navbar bg="gray.0" p="xs" className="app-shell-navbar">
         {/* User Info Card */}
-        <Group gap="sm" mb="md" p="sm" bg="white" style={{ borderRadius: '8px' }}>
-          <Avatar size={40} radius="xl" color="blue" variant="filled">
+        <Group gap="sm" mb="md" p="sm" bg="white" className="navbar-user-card" style={{ borderRadius: '8px' }}>
+          <Avatar size={40} radius="xl" color="gray" variant="filled">
             {getInitials()}
           </Avatar>
           <Stack gap={0} style={{ flex: 1 }}>
@@ -105,7 +112,7 @@ export function AppLayout() {
               {user?.company_name || user?.role}
             </Text>
           </Stack>
-          <Badge size="sm" variant="light" color="blue">
+          <Badge size="sm" variant="light" color="gray">
             {user?.role}
           </Badge>
         </Group>

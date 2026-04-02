@@ -8,6 +8,7 @@ import type { FuelCreatePayload, FuelUpdatePayload, ListFuelParams } from '../ap
 
 type FuelQueryArgs = {
   page: number
+  page_size?: number
   car?: number
   year?: number
   month?: number
@@ -21,6 +22,7 @@ const fuelKeys = {
 export function useFuelQuery(args: FuelQueryArgs) {
   const params: ListFuelParams = {
     page: args.page,
+    page_size: args.page_size,
     car: args.car,
     year: args.year,
     month: args.month,

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 
-import { ActionIcon, Button, Container, Group, Pagination, Select, Table, Text, Title } from '@mantine/core'
+import { ActionIcon, Button, Container, Group, Select, Text, Title } from '@mantine/core'
 import { IconEdit, IconTrash } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
 import { useModals } from '@mantine/modals'
@@ -10,12 +10,19 @@ import { useCarsQuery } from '@features/cars/hooks/useCars'
 import { useCreateInspectionMutation, useInspectionsQuery, useUpdateInspectionMutation, useDeleteInspectionMutation } from '@features/inspections/hooks/useInspections'
 import { InspectionFormModal } from '@features/inspections/ui/InspectionFormModal'
 import type { Inspection } from '@entities/fleet/types'
+import { ModernTable, ModernTableRow, TableCell } from '@shared/ui/ModernTable'
+import { formatPrice } from '@shared/utils/formatPrice'
+import { useAuth } from '@features/auth/hooks/useAuth'
 
 export function InspectionsPage() {
   const { t } = useTranslation()
   const modals = useModals()
   const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
   const [carFilter, setCarFilter] = useState<string | null>(null)
+
+  const { user } = useAuth()
+  const currency = user?.currency || 'KGS'
 
   const { data: carsData } = useCarsQuery({ page: 1 })
   const carOptions = useMemo(
@@ -29,7 +36,7 @@ export function InspectionsPage() {
 
   const carId = carFilter ? Number(carFilter) : undefined
 
-  const { data, isLoading, isError } = useInspectionsQuery({ page, car: carId })
+  const { data, isLoading, isError } = useInspectionsQuery({ page, page_size: pageSize, car: carId })
 
   const createMutation = useCreateInspectionMutation()
   const updateMutation = useUpdateInspectionMutation()
@@ -72,7 +79,18 @@ export function InspectionsPage() {
   }
 
   const records = data?.results ?? []
-  const totalPages = data ? Math.max(1, Math.ceil(data.count / 20)) : 1
+  const totalPages = data ? Math.max(1, Math.ceil(data.count / pageSize)) : 1
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setPage(newPage)
+    }
+  }
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize)
+    setPage(1)
+  }
 
   return (
     <Container>
@@ -99,56 +117,55 @@ export function InspectionsPage() {
 
       {!isLoading && !isError && (
         <>
-          <Table withTableBorder withColumnBorders striped highlightOnHover>
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>{t('inspections.table.car')}</Table.Th>
-                <Table.Th>{t('inspections.table.number')}</Table.Th>
-                <Table.Th>{t('inspections.table.date')}</Table.Th>
-                <Table.Th>{t('inspections.table.cost')}</Table.Th>
-                <Table.Th></Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>
-              {records.map((r) => (
-                <Table.Tr key={r.id}>
-                  <Table.Td>{r.car_numplate ?? r.car}</Table.Td>
-                  <Table.Td>{r.number}</Table.Td>
-                  <Table.Td>{r.inspected_at}</Table.Td>
-                  <Table.Td>{r.cost}</Table.Td>
-                  <Table.Td onClick={(e) => e.stopPropagation()}>
-                    <Group gap="xs">
+          <ModernTable
+            columns={[
+              { key: 'car', title: t('inspections.table.car'), width: 160 },
+              { key: 'number', title: t('inspections.table.number'), width: 140 },
+              { key: 'date', title: t('inspections.table.date'), width: 130 },
+              { key: 'cost', title: t('inspections.table.cost'), width: 110 },
+              { key: 'actions', title: '', width: 90 },
+            ]}
+            data={records}
+            renderRow={(r) => (
+              <ModernTableRow
+                key={r.id}
+                cells={[
+                  <TableCell key="car" fw={500}>{r.car_numplate ?? r.car}</TableCell>,
+                  <TableCell key="number" fw={500}>{r.number}</TableCell>,
+                  <TableCell key="date">{r.inspected_at}</TableCell>,
+                  <TableCell key="cost" fw={500}>{formatPrice(r.cost, currency)}</TableCell>,
+                  <TableCell key="actions" align="right">
+                    <Group gap="xs" justify="flex-end">
                       <ActionIcon
-                        variant="light"
+                        variant="subtle"
                         color="blue"
                         size="sm"
                         onClick={(e) => openEdit(r, e)}
                         title={t('common.edit')}
                       >
-                        <IconEdit size={16} />
+                        <IconEdit size={18} />
                       </ActionIcon>
                       <ActionIcon
-                        variant="light"
+                        variant="subtle"
                         color="red"
                         size="sm"
                         onClick={(e) => confirmDelete(r, e)}
                         title={t('common.delete')}
                       >
-                        <IconTrash size={16} />
+                        <IconTrash size={18} />
                       </ActionIcon>
                     </Group>
-                  </Table.Td>
-                </Table.Tr>
-              ))}
-            </Table.Tbody>
-          </Table>
-
-          <Group justify="space-between" align="center" mt="md">
-            <Text size="sm" c="dimmed">
-              Total: {data?.count ?? 0}
-            </Text>
-            <Pagination total={totalPages} value={page} onChange={setPage} />
-          </Group>
+                  </TableCell>,
+                ]}
+              />
+            )}
+            emptyMessage={t('inspections.no_data') || 'No inspection records'}
+            total={data?.count}
+            page={page}
+            onPageChange={handlePageChange}
+            pageSize={pageSize}
+            onPageSizeChange={handlePageSizeChange}
+          />
         </>
       )}
 

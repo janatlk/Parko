@@ -50,6 +50,18 @@ class CarCreateUpdateSerializer(CarDetailSerializer):
     pass
 
 
+class CarRelatedStatsSerializer(serializers.Serializer):
+    """Serializer для подсчета связанных записей автомобиля"""
+    fuel_records = serializers.IntegerField()
+    spares = serializers.IntegerField()
+    insurances = serializers.IntegerField()
+    inspections = serializers.IntegerField()
+    tires = serializers.IntegerField()
+    accumulators = serializers.IntegerField()
+    photos = serializers.IntegerField()
+    total = serializers.IntegerField()
+
+
 class CarPhotoSerializer(serializers.ModelSerializer):
     class Meta:
         model = CarPhoto

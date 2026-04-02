@@ -1,62 +1,80 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 
 import {
   Badge,
+  Box,
+  Button,
   Container,
   Group,
+  Paper,
+  SimpleGrid,
+  Stack,
   Tabs,
   Text,
   Title,
-  Table,
-  ActionIcon,
-  Paper,
-  SimpleGrid,
-  Image,
-  Modal,
-  Box,
-  Button,
+  rem,
 } from '@mantine/core'
-import { IconTrash, IconDownload, IconExternalLink } from '@tabler/icons-react'
-import { useParams } from 'react-router-dom'
+import {
+  IconCar,
+  IconGasStation,
+  IconFileDescription,
+  IconClipboardCheck,
+  IconTools,
+  IconPhoto,
+  IconEdit,
+  IconExternalLink,
+} from '@tabler/icons-react'
 
-import { useCarQuery } from '@features/cars/hooks/useCars'
+import { useAuth } from '@features/auth/hooks/useAuth'
+import { useCarQuery, useUpdateCarMutation } from '@features/cars/hooks/useCars'
 import {
   useCarFuelQuery,
   useCarInsurancesQuery,
   useCarInspectionsQuery,
   useCarSparesQuery,
-  useCarTiresQuery,
-  useCarAccumulatorsQuery,
   useCarPhotosQuery,
   useDeletePhotoMutation,
 } from '@features/cars/hooks/useCarDetail'
+import { CarFormModal } from '@features/cars/ui/CarFormModal'
+import type { Car } from '@entities/car/types'
+import { canEditCars } from '@shared/lib/permissions'
+import { PermissionGuard } from '@shared/ui/PermissionGuard'
+import { ModernTable, ModernTableRow, TableCell, TableCellBadge } from '@shared/ui/ModernTable'
+import { formatPrice } from '@shared/utils/formatPrice'
 
 export function CarDetailPage() {
   const { t } = useTranslation()
   const params = useParams()
   const carId = Number(params.id)
+  const { user } = useAuth()
+  const currency = user?.currency || 'KGS'
+  const canEdit = canEditCars(user)
 
   const { data: car, isLoading: carLoading, isError: carError } = useCarQuery(carId)
   const { data: fuelData } = useCarFuelQuery(carId, 1)
   const { data: insuranceData } = useCarInsurancesQuery(carId, 1)
   const { data: inspectionData } = useCarInspectionsQuery(carId, 1)
   const { data: sparesData } = useCarSparesQuery(carId, 1)
-  const { data: tiresData } = useCarTiresQuery(carId, 1)
-  const { data: accumulatorsData } = useCarAccumulatorsQuery(carId, 1)
   const { data: photosData } = useCarPhotosQuery(carId)
   const deletePhoto = useDeletePhotoMutation(carId)
+  const updateCarMutation = useUpdateCarMutation()
 
-  const [activeTab, setActiveTab] = useState<string | null>('info')
-  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState<string>('info')
+  const [editModalOpened, setEditModalOpened] = useState(false)
+  const [selectedCar, setSelectedCar] = useState<Car | undefined>(undefined)
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'ACTIVE': return 'green'
-      case 'INACTIVE': return 'gray'
-      case 'MAINTENANCE': return 'yellow'
-      default: return 'gray'
+      case 'ACTIVE':
+        return 'green'
+      case 'INACTIVE':
+        return 'gray'
+      case 'MAINTENANCE':
+        return 'yellow'
+      default:
+        return 'gray'
     }
   }
 
@@ -67,6 +85,13 @@ export function CarDetailPage() {
   const handleDeletePhoto = (photoId: number) => {
     if (window.confirm('Are you sure you want to delete this photo?')) {
       deletePhoto.mutate(photoId)
+    }
+  }
+
+  const openEditModal = () => {
+    if (car) {
+      setSelectedCar(car)
+      setEditModalOpened(true)
     }
   }
 
@@ -89,385 +114,468 @@ export function CarDetailPage() {
   return (
     <Container size="xl">
       {/* Header */}
-      <Group justify="space-between" align="center" mb="lg">
-        <div>
-          <Title order={2}>
-            {car.numplate} - {car.brand} {car.title}
-          </Title>
-          <Text size="sm" c="dimmed" mt="xs">
-            VIN: {car.vin || 'N/A'} | Year: {car.year || 'N/A'}
-          </Text>
-        </div>
-        <Badge color={getStatusColor(car.status)} size="lg" variant="filled">
-          {car.status}
-        </Badge>
+      <Group justify="space-between" align="flex-start" mb="xl">
+        <Stack gap="xs">
+          <Group gap="md" wrap="nowrap">
+            <Title order={1} style={{ whiteSpace: 'nowrap' }}>
+              {car.numplate}
+            </Title>
+            <Text size="xl" c="dimmed">
+              {car.brand} {car.title}
+            </Text>
+          </Group>
+          <Group gap="lg">
+            <Text size="sm" c="dimmed">
+              VIN: {car.vin || '—'}
+            </Text>
+            <Text size="sm" c="dimmed">
+              {t('carDetail.year')}: {car.year || '—'}
+            </Text>
+            <Text size="sm" c="dimmed">
+              {t('carDetail.commissioned')}: {car.commissioned_at ? formatDate(car.commissioned_at) : '—'}
+            </Text>
+          </Group>
+        </Stack>
+
+        <Group gap="sm">
+          <PermissionGuard canAccess={canEdit} mode="disable">
+            <Button
+              variant="outline"
+              leftSection={<IconEdit size={rem(18)} />}
+              onClick={openEditModal}
+            >
+              {t('common.edit')}
+            </Button>
+          </PermissionGuard>
+          <Badge color={getStatusColor(car.status)} size="lg" variant="filled">
+            {car.status}
+          </Badge>
+        </Group>
       </Group>
 
-      {/* Quick Info Cards */}
-      <Paper withBorder shadow="sm" radius="md" p="md" mb="lg">
-        <SimpleGrid cols={{ base: 2, sm: 3, md: 6 }} spacing="md">
-          <Box>
-            <Text size="xs" c="dimmed">Driver</Text>
-            <Text fw={500}>{car.driver || '-'}</Text>
-          </Box>
-          <Box>
-            <Text size="xs" c="dimmed">Region</Text>
-            <Text fw={500}>{car.region}</Text>
-          </Box>
-          <Box>
-            <Text size="xs" c="dimmed">Fuel Type</Text>
-            <Text fw={500}>{car.fueltype}</Text>
-          </Box>
-          <Box>
-            <Text size="xs" c="dimmed">Type</Text>
-            <Text fw={500}>{car.type}</Text>
-          </Box>
-          <Box>
-            <Text size="xs" c="dimmed">Fuel Card</Text>
-            <Text fw={500}>{car.fuel_card || '-'}</Text>
-          </Box>
-          <Box>
-            <Text size="xs" c="dimmed">Commissioned</Text>
-            <Text fw={500}>{car.commissioned_at ? formatDate(car.commissioned_at) : 'N/A'}</Text>
-          </Box>
-        </SimpleGrid>
-      </Paper>
+      {/* Info Cards */}
+      <SimpleGrid cols={{ base: 2, sm: 3, md: 4, lg: 6 }} spacing="md" mb="xl">
+        <InfoCard label={t('carDetail.region')} value={car.region} />
+        <InfoCard label={t('carDetail.driver')} value={car.driver || '—'} />
+        <InfoCard label={t('carDetail.fueltype')} value={car.fueltype} />
+        <InfoCard label={t('carDetail.type')} value={car.type} />
+        <InfoCard label={t('carDetail.fuel_card')} value={car.fuel_card || '—'} />
+        <InfoCard label={t('carDetail.drivers_phone')} value={car.drivers_phone || '—'} />
+      </SimpleGrid>
 
       {/* Tabs */}
-      <Tabs value={activeTab} onChange={setActiveTab}>
-        <Tabs.List>
-          <Tabs.Tab value="info">{t('carDetail.info') || 'Info'}</Tabs.Tab>
-          <Tabs.Tab value="fuel">{t('carDetail.fuel') || 'Fuel'}</Tabs.Tab>
-          <Tabs.Tab value="insurances">{t('carDetail.insurances') || 'Insurances'}</Tabs.Tab>
-          <Tabs.Tab value="inspections">{t('carDetail.inspections') || 'Inspections'}</Tabs.Tab>
-          <Tabs.Tab value="spares">{t('carDetail.spares') || 'Spares'}</Tabs.Tab>
-          <Tabs.Tab value="tires">{t('carDetail.tires') || 'Tires'}</Tabs.Tab>
-          <Tabs.Tab value="accumulators">{t('carDetail.accumulators') || 'Accumulators'}</Tabs.Tab>
-          <Tabs.Tab value="photos">{t('carDetail.photos') || 'Photos'}</Tabs.Tab>
+      <Tabs value={activeTab} onChange={(value) => setActiveTab(value || 'info')}>
+        <Tabs.List grow>
+          <Tabs.Tab value="info" leftSection={<IconCar size={16} />}>
+            {t('carDetail.info')}
+          </Tabs.Tab>
+          <Tabs.Tab
+            value="fuel"
+            leftSection={<IconGasStation size={16} />}
+            rightSection={
+              fuelData?.count ? (
+                <Badge size="sm" variant="light">
+                  {fuelData.count}
+                </Badge>
+              ) : null
+            }
+          >
+            {t('carDetail.fuel')}
+          </Tabs.Tab>
+          <Tabs.Tab
+            value="insurances"
+            leftSection={<IconFileDescription size={16} />}
+            rightSection={
+              insuranceData?.count ? (
+                <Badge size="sm" variant="light">
+                  {insuranceData.count}
+                </Badge>
+              ) : null
+            }
+          >
+            {t('carDetail.insurances')}
+          </Tabs.Tab>
+          <Tabs.Tab
+            value="inspections"
+            leftSection={<IconClipboardCheck size={16} />}
+            rightSection={
+              inspectionData?.count ? (
+                <Badge size="sm" variant="light">
+                  {inspectionData.count}
+                </Badge>
+              ) : null
+            }
+          >
+            {t('carDetail.inspections')}
+          </Tabs.Tab>
+          <Tabs.Tab
+            value="spares"
+            leftSection={<IconTools size={16} />}
+            rightSection={
+              sparesData?.count ? (
+                <Badge size="sm" variant="light">
+                  {sparesData.count}
+                </Badge>
+              ) : null
+            }
+          >
+            {t('carDetail.spares')}
+          </Tabs.Tab>
+          <Tabs.Tab
+            value="photos"
+            leftSection={<IconPhoto size={16} />}
+            rightSection={
+              photosData?.length ? (
+                <Badge size="sm" variant="light">
+                  {photosData.length}
+                </Badge>
+              ) : null
+            }
+          >
+            {t('carDetail.photos')}
+          </Tabs.Tab>
         </Tabs.List>
 
         {/* Info Tab */}
         <Tabs.Panel value="info" pt="md">
           <Paper withBorder shadow="sm" radius="md" p="md">
-            <Title order={4} mb="md">{t('carDetail.general_info') || 'General Information'}</Title>
+            <Title order={4} mb="md">
+              {t('carDetail.general_info')}
+            </Title>
             <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
-              <InfoRow label={t('carDetail.numplate') || 'Numplate'} value={car.numplate} />
-              <InfoRow label={t('carDetail.brand') || 'Brand'} value={car.brand} />
-              <InfoRow label={t('carDetail.title') || 'Model'} value={car.title} />
-              <InfoRow label={t('carDetail.year') || 'Year'} value={car.year?.toString() || 'N/A'} />
-              <InfoRow label={t('carDetail.vin') || 'VIN'} value={car.vin || 'N/A'} />
-              <InfoRow label={t('carDetail.fueltype') || 'Fuel Type'} value={car.fueltype} />
-              <InfoRow label={t('carDetail.type') || 'Vehicle Type'} value={car.type} />
-              <InfoRow label={t('carDetail.status') || 'Status'} value={car.status} />
-              <InfoRow label={t('carDetail.driver') || 'Driver'} value={car.driver || '-'} />
-              <InfoRow label={t('carDetail.drivers_phone') || 'Driver Phone'} value={car.drivers_phone || '-'} />
-              <InfoRow label={t('carDetail.fuel_card') || 'Fuel Card'} value={car.fuel_card || '-'} />
-              <InfoRow label={t('carDetail.region') || 'Region'} value={car.region} />
-              <InfoRow label={t('carDetail.commissioned') || 'Commissioned'} value={car.commissioned_at ? formatDate(car.commissioned_at) : 'N/A'} />
+              <InfoRow label={t('carDetail.numplate')} value={car.numplate} />
+              <InfoRow label={t('carDetail.brand')} value={car.brand} />
+              <InfoRow label={t('carDetail.title')} value={car.title} />
+              <InfoRow label={t('carDetail.year')} value={car.year?.toString() || '—'} />
+              <InfoRow label={t('carDetail.vin')} value={car.vin || '—'} />
+              <InfoRow label={t('carDetail.fueltype')} value={car.fueltype} />
+              <InfoRow label={t('carDetail.type')} value={car.type} />
+              <InfoRow label={t('carDetail.status')} value={car.status} />
+              <InfoRow label={t('carDetail.driver')} value={car.driver || '—'} />
+              <InfoRow label={t('carDetail.drivers_phone')} value={car.drivers_phone || '—'} />
+              <InfoRow label={t('carDetail.fuel_card')} value={car.fuel_card || '—'} />
+              <InfoRow label={t('carDetail.region')} value={car.region} />
+              <InfoRow label={t('carDetail.commissioned')} value={car.commissioned_at ? formatDate(car.commissioned_at) : '—'} />
             </SimpleGrid>
           </Paper>
         </Tabs.Panel>
 
         {/* Fuel Tab */}
         <Tabs.Panel value="fuel" pt="md">
-          <Paper withBorder shadow="sm" radius="md" p="md">
-            <Group justify="space-between" mb="md">
-              <Title order={4}>{t('carDetail.fuel') || 'Fuel'}</Title>
-              <Button
-                component={Link}
-                to="/fuel"
-                variant="outline"
-                size="xs"
-                rightSection={<IconExternalLink size={14} />}
-              >
-                {t('common.see_all') || 'See all'}
-              </Button>
-            </Group>
-            <Table striped highlightOnHover>
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th>{t('fuel.table.period') || 'Period'}</Table.Th>
-                  <Table.Th>{t('fuel.table.liters') || 'Liters'}</Table.Th>
-                  <Table.Th>{t('fuel.table.mileage') || 'Mileage'}</Table.Th>
-                  <Table.Th>{t('fuel.table.consumption') || 'Consumption'}</Table.Th>
-                  <Table.Th>{t('fuel.table.total_cost') || 'Cost'}</Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                {(fuelData?.results ?? []).map((record) => (
-                  <Table.Tr key={record.id}>
-                    <Table.Td>
-                      {record.year}-{String(record.month).padStart(2, '0')} {record.month_name && `(${record.month_name})`}
-                    </Table.Td>
-                    <Table.Td>{record.liters} L</Table.Td>
-                    <Table.Td>{record.monthly_mileage} km</Table.Td>
-                    <Table.Td>{record.consumption} L/100km</Table.Td>
-                    <Table.Td>{record.total_cost} som</Table.Td>
-                  </Table.Tr>
-                ))}
-              </Table.Tbody>
-            </Table>
-            {(!fuelData?.results || fuelData.results.length === 0) && (
-              <Text c="dimmed" ta="center" py="xl">No fuel records</Text>
-            )}
-          </Paper>
+          <FuelTable data={fuelData} />
         </Tabs.Panel>
 
         {/* Insurances Tab */}
         <Tabs.Panel value="insurances" pt="md">
-          <Paper withBorder shadow="sm" radius="md" p="md">
-            <Group justify="space-between" mb="md">
-              <Title order={4}>{t('carDetail.insurances') || 'Insurances'}</Title>
-              <Button
-                component={Link}
-                to="/insurances"
-                variant="outline"
-                size="xs"
-                rightSection={<IconExternalLink size={14} />}
-              >
-                {t('common.see_all') || 'See all'}
-              </Button>
-            </Group>
-            <Table striped highlightOnHover>
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th>{t('insurances.table.type') || 'Type'}</Table.Th>
-                  <Table.Th>{t('insurances.table.number') || 'Number'}</Table.Th>
-                  <Table.Th>{t('insurances.table.start') || 'Start'}</Table.Th>
-                  <Table.Th>{t('insurances.table.end') || 'End'}</Table.Th>
-                  <Table.Th>{t('insurances.table.cost') || 'Cost'}</Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                {(insuranceData?.results ?? []).map((record) => (
-                  <Table.Tr key={record.id}>
-                    <Table.Td>{record.insurance_type}</Table.Td>
-                    <Table.Td>{record.number}</Table.Td>
-                    <Table.Td>{formatDate(record.start_date)}</Table.Td>
-                    <Table.Td>{formatDate(record.end_date)}</Table.Td>
-                    <Table.Td>{record.cost} som</Table.Td>
-                  </Table.Tr>
-                ))}
-              </Table.Tbody>
-            </Table>
-            {(!insuranceData?.results || insuranceData.results.length === 0) && (
-              <Text c="dimmed" ta="center" py="xl">No insurance records</Text>
-            )}
-          </Paper>
+          <InsurancesTable data={insuranceData} />
         </Tabs.Panel>
 
         {/* Inspections Tab */}
         <Tabs.Panel value="inspections" pt="md">
-          <Paper withBorder shadow="sm" radius="md" p="md">
-            <Group justify="space-between" mb="md">
-              <Title order={4}>{t('carDetail.inspections') || 'Inspections'}</Title>
-              <Button
-                component={Link}
-                to="/inspections"
-                variant="outline"
-                size="xs"
-                rightSection={<IconExternalLink size={14} />}
-              >
-                {t('common.see_all') || 'See all'}
-              </Button>
-            </Group>
-            <Table striped highlightOnHover>
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th>{t('inspections.table.number') || 'Number'}</Table.Th>
-                  <Table.Th>{t('inspections.table.date') || 'Date'}</Table.Th>
-                  <Table.Th>{t('inspections.table.cost') || 'Cost'}</Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                {(inspectionData?.results ?? []).map((record) => (
-                  <Table.Tr key={record.id}>
-                    <Table.Td>{record.number}</Table.Td>
-                    <Table.Td>{formatDate(record.inspected_at)}</Table.Td>
-                    <Table.Td>{record.cost} som</Table.Td>
-                  </Table.Tr>
-                ))}
-              </Table.Tbody>
-            </Table>
-            {(!inspectionData?.results || inspectionData.results.length === 0) && (
-              <Text c="dimmed" ta="center" py="xl">No inspection records</Text>
-            )}
-          </Paper>
+          <InspectionsTable data={inspectionData} />
         </Tabs.Panel>
 
         {/* Spares Tab */}
         <Tabs.Panel value="spares" pt="md">
-          <Paper withBorder shadow="sm" radius="md" p="md">
-            <Group justify="space-between" mb="md">
-              <Title order={4}>{t('carDetail.spares') || 'Spares'}</Title>
-              <Button
-                component={Link}
-                to="/spares"
-                variant="outline"
-                size="xs"
-                rightSection={<IconExternalLink size={14} />}
-              >
-                {t('common.see_all') || 'See all'}
-              </Button>
-            </Group>
-            <Table striped highlightOnHover>
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th>{t('spares.table.title') || 'Part'}</Table.Th>
-                  <Table.Th>{t('spares.table.description') || 'Description'}</Table.Th>
-                  <Table.Th>{t('spares.table.part_price') || 'Part Price'}</Table.Th>
-                  <Table.Th>{t('spares.table.job') || 'Job'}</Table.Th>
-                  <Table.Th>{t('spares.table.job_price') || 'Job Price'}</Table.Th>
-                  <Table.Th>{t('spares.table.total') || 'Total'}</Table.Th>
-                  <Table.Th>{t('spares.table.date') || 'Installed'}</Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                {(sparesData?.results ?? []).map((record) => (
-                  <Table.Tr key={record.id}>
-                    <Table.Td>{record.title}</Table.Td>
-                    <Table.Td>{record.description || '-'}</Table.Td>
-                    <Table.Td>{record.part_price} som</Table.Td>
-                    <Table.Td>{record.job_description || '-'}</Table.Td>
-                    <Table.Td>{record.job_price} som</Table.Td>
-                    <Table.Td>{record.part_price + record.job_price} som</Table.Td>
-                    <Table.Td>{formatDate(record.installed_at)}</Table.Td>
-                  </Table.Tr>
-                ))}
-              </Table.Tbody>
-            </Table>
-            {(!sparesData?.results || sparesData.results.length === 0) && (
-              <Text c="dimmed" ta="center" py="xl">No spare parts records</Text>
-            )}
-          </Paper>
-        </Tabs.Panel>
-
-        {/* Tires Tab */}
-        <Tabs.Panel value="tires" pt="md">
-          <Paper withBorder shadow="sm" radius="md">
-            <Table striped highlightOnHover>
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th>{t('tires.table.model') || 'Model'}</Table.Th>
-                  <Table.Th>{t('tires.table.size') || 'Size'}</Table.Th>
-                  <Table.Th>{t('tires.table.price') || 'Price'}</Table.Th>
-                  <Table.Th>{t('tires.table.installed') || 'Installed'}</Table.Th>
-                  <Table.Th>{t('tires.table.expires') || 'Expires'}</Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                {(tiresData?.results ?? []).map((record) => (
-                  <Table.Tr key={record.id}>
-                    <Table.Td>{record.model}</Table.Td>
-                    <Table.Td>{record.size}</Table.Td>
-                    <Table.Td>{record.price} som</Table.Td>
-                    <Table.Td>{formatDate(record.installed_at)}</Table.Td>
-                    <Table.Td>{record.expires_at ? formatDate(record.expires_at) : 'N/A'}</Table.Td>
-                  </Table.Tr>
-                ))}
-              </Table.Tbody>
-            </Table>
-            {(!tiresData?.results || tiresData.results.length === 0) && (
-              <Text c="dimmed" ta="center" py="xl">No tire records</Text>
-            )}
-          </Paper>
-        </Tabs.Panel>
-
-        {/* Accumulators Tab */}
-        <Tabs.Panel value="accumulators" pt="md">
-          <Paper withBorder shadow="sm" radius="md">
-            <Table striped highlightOnHover>
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th>{t('accumulators.table.model') || 'Model'}</Table.Th>
-                  <Table.Th>{t('accumulators.table.serial') || 'Serial'}</Table.Th>
-                  <Table.Th>{t('accumulators.table.capacity') || 'Capacity'}</Table.Th>
-                  <Table.Th>{t('accumulators.table.price') || 'Price'}</Table.Th>
-                  <Table.Th>{t('accumulators.table.installed') || 'Installed'}</Table.Th>
-                  <Table.Th>{t('accumulators.table.expires') || 'Expires'}</Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                {(accumulatorsData?.results ?? []).map((record) => (
-                  <Table.Tr key={record.id}>
-                    <Table.Td>{record.model}</Table.Td>
-                    <Table.Td>{record.serial_number || '-'}</Table.Td>
-                    <Table.Td>{record.capacity}</Table.Td>
-                    <Table.Td>{record.price} som</Table.Td>
-                    <Table.Td>{formatDate(record.installed_at)}</Table.Td>
-                    <Table.Td>{record.expires_at ? formatDate(record.expires_at) : 'N/A'}</Table.Td>
-                  </Table.Tr>
-                ))}
-              </Table.Tbody>
-            </Table>
-            {(!accumulatorsData?.results || accumulatorsData.results.length === 0) && (
-              <Text c="dimmed" ta="center" py="xl">No accumulator records</Text>
-            )}
-          </Paper>
+          <SparesTable data={sparesData} />
         </Tabs.Panel>
 
         {/* Photos Tab */}
         <Tabs.Panel value="photos" pt="md">
-          <SimpleGrid cols={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing="md">
-            {(photosData ?? []).map((photo) => (
-              <Paper key={photo.id} withBorder shadow="sm" radius="md" p="xs">
-                <Image
-                  src={photo.image}
-                  alt={photo.comment || 'Car photo'}
-                  height={200}
-                  fit="cover"
-                  style={{ cursor: 'pointer' }}
-                  onClick={() => setSelectedPhoto(photo.image)}
-                />
-                {photo.comment && (
-                  <Text size="sm" mt="xs" ta="center">{photo.comment}</Text>
-                )}
-                <Group justify="center" mt="sm">
-                  <ActionIcon
-                    variant="light"
-                    color="red"
-                    onClick={() => handleDeletePhoto(photo.id)}
-                    loading={deletePhoto.isPending}
-                  >
-                    <IconTrash size={16} />
-                  </ActionIcon>
-                  <ActionIcon
-                    variant="light"
-                    color="blue"
-                    component="a"
-                    href={photo.image}
-                    target="_blank"
-                  >
-                    <IconDownload size={16} />
-                  </ActionIcon>
-                </Group>
-              </Paper>
-            ))}
-          </SimpleGrid>
-          {(!photosData || photosData.length === 0) && (
-            <Text c="dimmed" ta="center" py="xl">No photos</Text>
-          )}
+          <PhotosTable data={photosData} deletePhoto={deletePhoto} handleDeletePhoto={handleDeletePhoto} />
         </Tabs.Panel>
       </Tabs>
 
-      {/* Photo Modal */}
-      <Modal
-        opened={!!selectedPhoto}
-        onClose={() => setSelectedPhoto(null)}
-        size="auto"
-        centered
-      >
-        {selectedPhoto && <Image src={selectedPhoto} alt="Full size" />}
-      </Modal>
+      {/* Edit Car Modal */}
+      <CarFormModal
+        opened={editModalOpened}
+        onClose={() => setEditModalOpened(false)}
+        mode="edit"
+        car={selectedCar}
+        onCreate={async () => {}}
+        onUpdate={async (carId, payload) => {
+          await updateCarMutation.mutateAsync({ carId, payload })
+          setEditModalOpened(false)
+        }}
+        isSubmitting={updateCarMutation.isPending}
+      />
     </Container>
+  )
+}
+
+function InfoCard({ label, value }: { label: string; value: string }) {
+  return (
+    <Paper p="md" radius="md" withBorder>
+      <Text size="xs" c="dimmed" mb="xs">
+        {label}
+      </Text>
+      <Text fw={500} size="sm" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        {value}
+      </Text>
+    </Paper>
   )
 }
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <Box>
-      <Text size="xs" c="dimmed">{label}</Text>
-      <Text fw={500}>{value}</Text>
+      <Text size="xs" c="dimmed" mb={4}>
+        {label}
+      </Text>
+      <Text fw={500} size="sm">
+        {value}
+      </Text>
     </Box>
+  )
+}
+
+function FuelTable({ data }: { data: any }) {
+  const { t } = useTranslation()
+  const { user } = useAuth()
+  const currency = user?.currency || 'KGS'
+
+  return (
+    <Paper withBorder radius="md" p="md">
+      <Group justify="space-between" mb="md">
+        <Title order={4}>{t('carDetail.fuel')}</Title>
+        <Button
+          component={Link}
+          to="/fuel"
+          variant="outline"
+          size="xs"
+          rightSection={<IconExternalLink size={14} />}
+        >
+          {t('common.see_all')}
+        </Button>
+      </Group>
+      <ModernTable
+        columns={[
+          { key: 'period', title: t('fuel.table.period'), width: 140 },
+          { key: 'liters', title: t('fuel.table.liters'), width: 100 },
+          { key: 'mileage', title: t('fuel.table.mileage'), width: 120 },
+          { key: 'consumption', title: t('fuel.table.consumption'), width: 130 },
+          { key: 'cost', title: t('fuel.table.total_cost'), width: 120 },
+        ]}
+        data={data?.results ?? []}
+        renderRow={(record) => (
+          <ModernTableRow
+            key={record.id}
+            cells={[
+              <TableCell key="period" fw={500}>
+                {record.year}-{String(record.month).padStart(2, '0')}{' '}
+                {record.month_name && <Text component="span" c="dimmed" size="xs">({record.month_name})</Text>}
+              </TableCell>,
+              <TableCell key="liters">{record.liters} L</TableCell>,
+              <TableCell key="mileage">{record.monthly_mileage} km</TableCell>,
+              <TableCell key="consumption">{record.consumption} L/100km</TableCell>,
+              <TableCell key="cost" fw={500}>{formatPrice(record.total_cost, currency)}</TableCell>,
+            ]}
+          />
+        )}
+        emptyMessage={t('common.no_data')}
+      />
+    </Paper>
+  )
+}
+
+function InsurancesTable({ data }: { data: any }) {
+  const { t } = useTranslation()
+  const { user } = useAuth()
+  const currency = user?.currency || 'KGS'
+
+  return (
+    <Paper withBorder radius="md" p="md">
+      <Group justify="space-between" mb="md">
+        <Title order={4}>{t('carDetail.insurances')}</Title>
+        <Button
+          component={Link}
+          to="/insurances"
+          variant="outline"
+          size="xs"
+          rightSection={<IconExternalLink size={14} />}
+        >
+          {t('common.see_all')}
+        </Button>
+      </Group>
+      <ModernTable
+        columns={[
+          { key: 'type', title: t('insurances.table.type'), width: 140 },
+          { key: 'number', title: t('insurances.table.number'), width: 140 },
+          { key: 'start', title: t('insurances.table.start'), width: 130 },
+          { key: 'end', title: t('insurances.table.end'), width: 130 },
+          { key: 'cost', title: t('insurances.table.cost'), width: 120 },
+        ]}
+        data={data?.results ?? []}
+        renderRow={(record) => (
+          <ModernTableRow
+            key={record.id}
+            cells={[
+              <TableCellBadge key="type" color="blue">{record.insurance_type}</TableCellBadge>,
+              <TableCell key="number" fw={500}>{record.number}</TableCell>,
+              <TableCell key="start">{formatDate(record.start_date)}</TableCell>,
+              <TableCell key="end">{formatDate(record.end_date)}</TableCell>,
+              <TableCell key="cost" fw={500}>{formatPrice(record.cost, currency)}</TableCell>,
+            ]}
+          />
+        )}
+        emptyMessage={t('common.no_data')}
+      />
+    </Paper>
+  )
+}
+
+function formatDate(dateString: string) {
+  return new Date(dateString).toLocaleDateString()
+}
+
+function InspectionsTable({ data }: { data: any }) {
+  const { t } = useTranslation()
+  const { user } = useAuth()
+  const currency = user?.currency || 'KGS'
+
+  return (
+    <Paper withBorder radius="md" p="md">
+      <Group justify="space-between" mb="md">
+        <Title order={4}>{t('carDetail.inspections')}</Title>
+        <Button
+          component={Link}
+          to="/inspections"
+          variant="outline"
+          size="xs"
+          rightSection={<IconExternalLink size={14} />}
+        >
+          {t('common.see_all')}
+        </Button>
+      </Group>
+      <ModernTable
+        columns={[
+          { key: 'number', title: t('inspections.table.number'), width: 140 },
+          { key: 'date', title: t('inspections.table.date'), width: 140 },
+          { key: 'cost', title: t('inspections.table.cost'), width: 120 },
+        ]}
+        data={data?.results ?? []}
+        renderRow={(record) => (
+          <ModernTableRow
+            key={record.id}
+            cells={[
+              <TableCell key="number" fw={500}>{record.number}</TableCell>,
+              <TableCell key="date">{formatDate(record.inspected_at)}</TableCell>,
+              <TableCell key="cost" fw={500}>{formatPrice(record.cost, currency)}</TableCell>,
+            ]}
+          />
+        )}
+        emptyMessage={t('common.no_data')}
+      />
+    </Paper>
+  )
+}
+
+function SparesTable({ data }: { data: any }) {
+  const { t } = useTranslation()
+  const { user } = useAuth()
+  const currency = user?.currency || 'KGS'
+
+  return (
+    <Paper withBorder radius="md" p="md">
+      <Group justify="space-between" mb="md">
+        <Title order={4}>{t('carDetail.spares')}</Title>
+        <Button
+          component={Link}
+          to="/spares"
+          variant="outline"
+          size="xs"
+          rightSection={<IconExternalLink size={14} />}
+        >
+          {t('common.see_all')}
+        </Button>
+      </Group>
+      <ModernTable
+        columns={[
+          { key: 'title', title: t('spares.table.title'), width: 180 },
+          { key: 'description', title: t('spares.table.description'), width: 200 },
+          { key: 'part_price', title: t('spares.table.part_price'), width: 100 },
+          { key: 'job', title: t('spares.table.job'), width: 140 },
+          { key: 'job_price', title: t('spares.table.job_price'), width: 100 },
+          { key: 'total', title: t('spares.table.total'), width: 100 },
+          { key: 'date', title: t('spares.table.date'), width: 120 },
+        ]}
+        data={data?.results ?? []}
+        renderRow={(record) => (
+          <ModernTableRow
+            key={record.id}
+            cells={[
+              <TableCell key="title" fw={500}>{record.title}</TableCell>,
+              <TableCell key="description">{record.description || '—'}</TableCell>,
+              <TableCell key="part_price">{formatPrice(record.part_price, currency)}</TableCell>,
+              <TableCell key="job">{record.job_description || '—'}</TableCell>,
+              <TableCell key="job_price">{formatPrice(record.job_price, currency)}</TableCell>,
+              <TableCell key="total" fw={500}>{formatPrice(record.part_price + record.job_price, currency)}</TableCell>,
+              <TableCell key="date">{formatDate(record.installed_at)}</TableCell>,
+            ]}
+          />
+        )}
+        emptyMessage={t('common.no_data')}
+      />
+    </Paper>
+  )
+}
+
+function PhotosTable({ data, deletePhoto, handleDeletePhoto }: { data: any; deletePhoto: any; handleDeletePhoto: (id: number) => void }) {
+  const { t } = useTranslation()
+
+  if (!data || data.length === 0) {
+    return (
+      <Paper withBorder radius="md" p="xl" style={{ textAlign: 'center' }}>
+        <Text c="dimmed" size="sm">
+          {t('common.no_data')}
+        </Text>
+      </Paper>
+    )
+  }
+
+  return (
+    <Paper withBorder radius="md" p="md">
+      <Group justify="space-between" mb="md">
+        <Title order={4}>{t('carDetail.photos')}</Title>
+      </Group>
+      <SimpleGrid cols={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing="md">
+        {data.map((photo: any) => (
+          <Paper key={photo.id} withBorder radius="md" p="xs">
+            <Box
+              component="img"
+              src={photo.image}
+              alt={photo.comment || 'Car photo'}
+              style={{ width: '100%', height: 200, objectFit: 'cover', borderRadius: 4, cursor: 'pointer' }}
+            />
+            {photo.comment && (
+              <Text size="sm" mt="xs" ta="center" c="dimmed">
+                {photo.comment}
+              </Text>
+            )}
+            <Group justify="center" mt="sm" gap="xs">
+              <Button
+                variant="light"
+                color="red"
+                size="compact-sm"
+                onClick={() => handleDeletePhoto(photo.id)}
+                loading={deletePhoto.isPending}
+              >
+                Delete
+              </Button>
+              <Button
+                variant="light"
+                color="blue"
+                size="compact-sm"
+                component="a"
+                href={photo.image}
+                target="_blank"
+              >
+                Download
+              </Button>
+            </Group>
+          </Paper>
+        ))}
+      </SimpleGrid>
+    </Paper>
   )
 }

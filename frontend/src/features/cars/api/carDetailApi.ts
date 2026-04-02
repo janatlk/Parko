@@ -8,6 +8,17 @@ export type ListParams = {
   ordering?: string
 }
 
+export type CarRelatedStats = {
+  fuel_records: number
+  spares: number
+  insurances: number
+  inspections: number
+  tires: number
+  accumulators: number
+  photos: number
+  total: number
+}
+
 // Fuel
 export async function listFuelByCar(params: ListParams = {}): Promise<PaginatedResponse<Fuel>> {
   const { data } = await http.get<PaginatedResponse<Fuel>>('fuel/', { params })
@@ -52,4 +63,10 @@ export async function listPhotosByCar(carId: number): Promise<CarPhoto[]> {
 
 export async function deletePhoto(photoId: number): Promise<void> {
   await http.delete(`cars/photos/${photoId}/`)
+}
+
+// Car Related Stats
+export async function getCarRelatedStats(carId: number): Promise<CarRelatedStats> {
+  const { data } = await http.get<CarRelatedStats>(`cars/${carId}/stats/`)
+  return data
 }

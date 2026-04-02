@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 
-import { ActionIcon, Button, Container, Group, Pagination, Select, Table, Text, TextInput, Title } from '@mantine/core'
+import { ActionIcon, Button, Container, Group, Select, Text, TextInput, Title } from '@mantine/core'
 import { IconEdit, IconTrash } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
 import { useModals } from '@mantine/modals'
@@ -10,15 +10,22 @@ import { useCarsQuery } from '@features/cars/hooks/useCars'
 import { useSparesQuery, useCreateSpareMutation, useUpdateSpareMutation, useDeleteSpareMutation } from '@features/spares/hooks/useSpares'
 import { SpareFormModal } from '@features/spares/ui/SpareFormModal'
 import type { Spare } from '@entities/fleet/types'
+import { ModernTable, ModernTableRow, TableCell } from '@shared/ui/ModernTable'
+import { formatPrice } from '@shared/utils/formatPrice'
+import { useAuth } from '@features/auth/hooks/useAuth'
 
 export function SparesPage() {
   const { t } = useTranslation()
   const modals = useModals()
   const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
   const [carFilter, setCarFilter] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [yearFilter, setYearFilter] = useState<string | null>(null)
   const [monthFilter, setMonthFilter] = useState<string | null>(null)
+
+  const { user } = useAuth()
+  const currency = user?.currency || 'KGS'
 
   const { data: carsData } = useCarsQuery({ page: 1 })
   const carOptions = useMemo(
@@ -62,6 +69,7 @@ export function SparesPage() {
 
   const { data, isLoading, isError } = useSparesQuery({
     page,
+    page_size: pageSize,
     car: carId,
     search: search.trim() ? search.trim() : undefined,
     installed_at__year: year,
@@ -135,7 +143,18 @@ export function SparesPage() {
   }
 
   const records = data?.results ?? []
-  const totalPages = data ? Math.max(1, Math.ceil(data.count / 20)) : 1
+  const totalPages = data ? Math.max(1, Math.ceil(data.count / pageSize)) : 1
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setPage(newPage)
+    }
+  }
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize)
+    setPage(1)
+  }
 
   return (
     <Container>
@@ -190,35 +209,35 @@ export function SparesPage() {
 
       {!isLoading && !isError && (
         <>
-          <Table withTableBorder withColumnBorders striped highlightOnHover>
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>{t('spares.table.car')}</Table.Th>
-                <Table.Th>{t('spares.table.title')}</Table.Th>
-                <Table.Th>{t('spares.table.description')}</Table.Th>
-                <Table.Th>{t('spares.table.part_price')}</Table.Th>
-                <Table.Th>{t('spares.table.job')}</Table.Th>
-                <Table.Th>{t('spares.table.job_price')}</Table.Th>
-                <Table.Th>{t('spares.table.total')}</Table.Th>
-                <Table.Th>{t('spares.table.date')}</Table.Th>
-                <Table.Th></Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>
-              {records.map((record) => (
-                <Table.Tr key={record.id}>
-                  <Table.Td>{record.car_numplate ?? record.car}</Table.Td>
-                  <Table.Td>{record.title}</Table.Td>
-                  <Table.Td>{record.description || '—'}</Table.Td>
-                  <Table.Td>{record.part_price} с.</Table.Td>
-                  <Table.Td>{record.job_description || '—'}</Table.Td>
-                  <Table.Td>{record.job_price} с.</Table.Td>
-                  <Table.Td fw={700}>{record.part_price + record.job_price} с.</Table.Td>
-                  <Table.Td>{record.installed_at}</Table.Td>
-                  <Table.Td onClick={(e) => e.stopPropagation()}>
-                    <Group gap="xs">
+          <ModernTable
+            columns={[
+              { key: 'car', title: t('spares.table.car'), width: 140 },
+              { key: 'title', title: t('spares.table.title'), width: 180 },
+              { key: 'description', title: t('spares.table.description'), width: 180 },
+              { key: 'part_price', title: t('spares.table.part_price'), width: 100 },
+              { key: 'job', title: t('spares.table.job'), width: 140 },
+              { key: 'job_price', title: t('spares.table.job_price'), width: 100 },
+              { key: 'total', title: t('spares.table.total'), width: 100 },
+              { key: 'date', title: t('spares.table.date'), width: 120 },
+              { key: 'actions', title: '', width: 90 },
+            ]}
+            data={records}
+            renderRow={(record) => (
+              <ModernTableRow
+                key={record.id}
+                cells={[
+                  <TableCell key="car" fw={500}>{record.car_numplate ?? record.car}</TableCell>,
+                  <TableCell key="title" fw={500}>{record.title}</TableCell>,
+                  <TableCell key="description">{record.description || '—'}</TableCell>,
+                  <TableCell key="part_price">{formatPrice(record.part_price, currency)}</TableCell>,
+                  <TableCell key="job">{record.job_description || '—'}</TableCell>,
+                  <TableCell key="job_price">{formatPrice(record.job_price, currency)}</TableCell>,
+                  <TableCell key="total" fw={700}>{formatPrice(record.part_price + record.job_price, currency)}</TableCell>,
+                  <TableCell key="date">{record.installed_at}</TableCell>,
+                  <TableCell key="actions" align="right">
+                    <Group gap="xs" justify="flex-end">
                       <ActionIcon
-                        variant="light"
+                        variant="subtle"
                         color="blue"
                         size="sm"
                         onClick={(e) => openEdit(record, e)}
@@ -227,7 +246,7 @@ export function SparesPage() {
                         <IconEdit size={18} />
                       </ActionIcon>
                       <ActionIcon
-                        variant="light"
+                        variant="subtle"
                         color="red"
                         size="sm"
                         onClick={(e) => confirmDelete(record, e)}
@@ -236,26 +255,17 @@ export function SparesPage() {
                         <IconTrash size={18} />
                       </ActionIcon>
                     </Group>
-                  </Table.Td>
-                </Table.Tr>
-              ))}
-            </Table.Tbody>
-          </Table>
-
-          {records.length === 0 && (
-            <Text c="dimmed" ta="center" py="xl">
-              {t('spares.no_data')}
-            </Text>
-          )}
-
-          {totalPages > 1 && (
-            <Pagination
-              value={page}
-              onChange={setPage}
-              total={totalPages}
-              mt="md"
-            />
-          )}
+                  </TableCell>,
+                ]}
+              />
+            )}
+            emptyMessage={t('spares.no_data') || 'No spare parts records'}
+            total={data?.count}
+            page={page}
+            onPageChange={handlePageChange}
+            pageSize={pageSize}
+            onPageSizeChange={handlePageSizeChange}
+          />
         </>
       )}
 

@@ -4,6 +4,7 @@ import type { Spare } from '@entities/fleet/types'
 
 export type ListSparesParams = {
   page?: number
+  page_size?: number
   car?: number
   search?: string
   ordering?: string

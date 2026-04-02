@@ -10,6 +10,8 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
 import type { ActivityFeedItem } from '../api/dashboardApi'
+import { formatPrice } from '@shared/utils/formatPrice'
+import { useAuth } from '@features/auth/hooks/useAuth'
 
 type ActivityFeedProps = {
   items?: ActivityFeedItem[]
@@ -81,6 +83,8 @@ function formatRelativeDate(dateString: string) {
 
 export function ActivityFeed({ items = [], isLoading, compact = false }: ActivityFeedProps) {
   const { t } = useTranslation()
+  const { user } = useAuth()
+  const currency = user?.currency || 'KGS'
   const navigate = useNavigate()
 
   const handleNavigate = (carId: number) => {
@@ -146,7 +150,7 @@ export function ActivityFeed({ items = [], isLoading, compact = false }: Activit
                     <>
                       <Text size="xs" c="dimmed">•</Text>
                       <Text size="xs" c="dimmed" fw={500}>
-                        {item.cost.toLocaleString('ru-RU')} с.
+                        {formatPrice(item.cost, currency)}
                       </Text>
                     </>
                   )}

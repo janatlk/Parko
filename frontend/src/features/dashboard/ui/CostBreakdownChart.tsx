@@ -24,6 +24,8 @@ import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAx
 import { useTranslation } from 'react-i18next'
 
 import type { CostByMonth } from '../api/dashboardApi'
+import { formatPrice } from '@shared/utils/formatPrice'
+import { useAuth } from '@features/auth/hooks/useAuth'
 
 type CostCategory = 'fuel' | 'spare' | 'insurance' | 'inspection' | 'tires' | 'accumulator'
 
@@ -66,6 +68,8 @@ const defaultCategories: Record<CostCategory, boolean> = {
 
 export function CostBreakdownChart({ data = [], isLoading, monthsRange, setMonthsRange, compact = false }: CostBreakdownChartProps) {
   const { t } = useTranslation()
+  const { user } = useAuth()
+  const currency = user?.currency || 'KGS'
   const [localMonthsRange, setLocalMonthsRange] = useState<string>('6')
   const [opened, setOpened] = useState(false)
   const [visibleCategories, setVisibleCategories] = useState<Record<CostCategory, boolean>>(defaultCategories)
@@ -107,13 +111,13 @@ export function CostBreakdownChart({ data = [], isLoading, monthsRange, setMonth
             return (
               <Group key={index} justify="space-between" gap="lg">
                 <Text c={entry.color} size="sm">{entry.name}:</Text>
-                <Text fw={600} size="sm">{entry.value.toLocaleString('ru-RU')} с.</Text>
+                <Text fw={600} size="sm">{formatPrice(entry.value, currency)}</Text>
               </Group>
             )
           })}
           <Group justify="space-between" gap="lg" mt="xs" pt="xs" style={{ borderTop: '1px solid var(--mantine-color-default-border)' }}>
             <Text fw={600} size="sm">{t('dashboard.total')}:</Text>
-            <Text fw={700} size="sm">{payload[0]?.payload?.total?.toLocaleString('ru-RU') || 0} с.</Text>
+            <Text fw={700} size="sm">{formatPrice(payload[0]?.payload?.total || 0, currency)}</Text>
           </Group>
         </Box>
       )

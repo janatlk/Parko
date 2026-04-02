@@ -2,7 +2,7 @@ from django.contrib import admin
 
 # Register your models here.
 
-from .models import Accumulator, Car, CarPhoto, Spare, Tires
+from .models import Accumulator, Car, CarPhoto, Spare, Tires, Fuel, Insurance, Inspection
 
 
 @admin.register(Car)
@@ -51,3 +51,27 @@ class AccumulatorAdmin(admin.ModelAdmin):
     list_filter = ('installed_at', 'expires_at')
     search_fields = ('model', 'serial_number', 'capacity', 'car__numplate', 'car__vin')
     ordering = ('-installed_at', '-id')
+
+
+@admin.register(Fuel)
+class FuelAdmin(admin.ModelAdmin):
+    list_display = ('id', 'car', 'year', 'month', 'month_name', 'liters', 'total_cost', 'consumption')
+    list_filter = ('year', 'month')
+    search_fields = ('car__numplate', 'car__vin')
+    ordering = ('-year', '-month', '-id')
+
+
+@admin.register(Insurance)
+class InsuranceAdmin(admin.ModelAdmin):
+    list_display = ('id', 'car', 'insurance_type', 'number', 'start_date', 'end_date', 'cost')
+    list_filter = ('insurance_type', 'end_date')
+    search_fields = ('number', 'car__numplate', 'car__vin')
+    ordering = ('-end_date', '-id')
+
+
+@admin.register(Inspection)
+class InspectionAdmin(admin.ModelAdmin):
+    list_display = ('id', 'car', 'number', 'inspected_at', 'cost')
+    list_filter = ('inspected_at',)
+    search_fields = ('number', 'car__numplate', 'car__vin')
+    ordering = ('-inspected_at', '-id')

@@ -4,6 +4,7 @@ import type { Insurance } from '@entities/fleet/types'
 
 export type ListInsurancesParams = {
   page?: number
+  page_size?: number
   car?: number
   insurance_type?: string
   start_date__gte?: string

@@ -10,8 +10,25 @@ class LanguageChoices(models.TextChoices):
     KY = "ky", "Кыргызча"
 
 
+class ThemeChoices(models.TextChoices):
+    LIGHT = "light", "Light"
+    DARK = "dark", "Dark"
+    SYSTEM = "system", "System (auto)"
+
+
 class RegionChoices(models.TextChoices):
     UNKNOWN = "unknown", "Unknown"
+    BISHKEK = "bishkek", "Бишкек"
+    OSH = "osh", "Ош"
+    JALAL_ABAD = "jalal_abad", "Джалал-Абад"
+    NARYN = "naryn", "Нарын"
+    TALAS = "talas", "Талас"
+    CHUY = "chuy", "Чуйская область"
+    ISSYK_KUL = "issyk_kul", "Иссык-Кульская область"
+    BATKEN = "batken", "Баткен"
+    MOSCOW = "moscow", "Москва"
+    ALMATY = "almaty", "Алматы"
+    OTHER = "other", "Другой"
 
 
 class UserRole(models.TextChoices):
@@ -51,6 +68,23 @@ class User(AbstractUser):
         max_length=2,
         choices=LanguageChoices.choices,
         default=LanguageChoices.RU,
+    )
+    theme = models.CharField(
+        max_length=10,
+        choices=ThemeChoices.choices,
+        default=ThemeChoices.SYSTEM,
+        help_text='Theme preference for UI'
+    )
+    currency = models.CharField(
+        max_length=3,
+        choices=[
+            ('KGS', 'Киргизский сом (KGS)'),
+            ('USD', 'Доллар США (USD)'),
+            ('EUR', 'Евро (EUR)'),
+            ('RUB', 'Российский рубль (RUB)'),
+        ],
+        default='KGS',
+        help_text='Валюта для отображения цен'
     )
     email_api_key = models.CharField(
         max_length=255,

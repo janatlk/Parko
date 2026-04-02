@@ -6,7 +6,6 @@ import {
   Group,
   Pagination,
   Select,
-  Table,
   Text,
   Title,
 } from '@mantine/core'
@@ -23,6 +22,7 @@ import { UserFormModal } from '@features/users/ui/UserFormModal'
 import { USER_ROLES } from '@shared/constants/roles'
 import { canEditUsers } from '@shared/lib/permissions'
 import { PermissionGuard } from '@shared/ui/PermissionGuard'
+import { ModernTable, ModernTableRow, TableCell, TableCellBadge } from '@shared/ui/ModernTable'
 
 export function UsersPage() {
   const { t } = useTranslation()
@@ -106,40 +106,45 @@ export function UsersPage() {
 
       {!isLoading && !isError && (
         <>
-          <Table withTableBorder withColumnBorders striped highlightOnHover>
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>ID</Table.Th>
-                <Table.Th>{t('auth.username')}</Table.Th>
-                <Table.Th>{t('users.role')}</Table.Th>
-                <Table.Th>{t('users.language')}</Table.Th>
-                <Table.Th>{t('users.status')}</Table.Th>
-                <Table.Th></Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>
-              {filteredUsers.map((u) => (
-                <Table.Tr key={u.id}>
-                  <Table.Td>{u.id}</Table.Td>
-                  <Table.Td>{u.username}</Table.Td>
-                  <Table.Td>{u.role}</Table.Td>
-                  <Table.Td>{u.language}</Table.Td>
-                  <Table.Td>{u.is_active ? t('users.active') : t('users.inactive')}</Table.Td>
-                  <Table.Td>
+          <ModernTable
+            columns={[
+              { key: 'id', title: 'ID', width: 70 },
+              { key: 'username', title: t('auth.username'), width: 180 },
+              { key: 'role', title: t('users.role'), width: 140 },
+              { key: 'language', title: t('users.language'), width: 100 },
+              { key: 'status', title: t('users.status'), width: 110 },
+              { key: 'actions', title: '', width: 100 },
+            ]}
+            data={filteredUsers}
+            renderRow={(u) => (
+              <ModernTableRow
+                key={u.id}
+                cells={[
+                  <TableCell key="id" align="center" fw={500}>#{u.id}</TableCell>,
+                  <TableCell key="username" fw={500}>{u.username}</TableCell>,
+                  <TableCell key="role">{u.role}</TableCell>,
+                  <TableCell key="language">{u.language.toUpperCase()}</TableCell>,
+                  <TableCell key="status">
+                    <TableCellBadge color={u.is_active ? 'green' : 'gray'}>
+                      {u.is_active ? t('users.active') : t('users.inactive')}
+                    </TableCellBadge>
+                  </TableCell>,
+                  <TableCell key="actions" align="right">
                     <PermissionGuard canAccess={canEdit} mode="disable">
                       <Button size="xs" variant="light" onClick={() => openEdit(u)}>
                         {t('users.edit')}
                       </Button>
                     </PermissionGuard>
-                  </Table.Td>
-                </Table.Tr>
-              ))}
-            </Table.Tbody>
-          </Table>
+                  </TableCell>,
+                ]}
+              />
+            )}
+            emptyMessage={t('users.no_data') || 'No users found'}
+          />
 
           <Group justify="space-between" align="center" mt="md">
             <Text size="sm" c="dimmed">
-              Total: {data?.count ?? 0}
+              {t('common.total')}: {data?.count ?? 0}
             </Text>
             <Pagination total={totalPages} value={page} onChange={setPage} />
           </Group>

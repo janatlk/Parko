@@ -4,6 +4,7 @@ import type { Inspection } from '@entities/fleet/types'
 
 export type ListInspectionsParams = {
   page?: number
+  page_size?: number
   car?: number
   inspected_at__gte?: string
   inspected_at__lte?: string

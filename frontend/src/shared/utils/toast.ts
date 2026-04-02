@@ -31,7 +31,7 @@ export const showInfo = (message: string, title?: string) => {
     notifications.show({
         title: title || 'Информация',
         message,
-        color: 'blue',
+        color: 'gray',
         autoClose: 3000,
     })
 }

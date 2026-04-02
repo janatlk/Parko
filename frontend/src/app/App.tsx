@@ -6,8 +6,11 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import '@mantine/notifications/styles.css'
 import '@mantine/dates/styles.css'
 
+import { ThemeProvider } from '@app/providers/ThemeProvider'
 import { ProtectedRoute } from '@app/router/ProtectedRoute'
 import { AppLayout } from '@widgets/layout/AppLayout'
+import { darkTheme } from '@shared/theme/darkTheme'
+import { useTheme } from '@app/providers/ThemeProvider'
 import { CarsPage } from '@pages/CarsPage'
 import { CarDetailPage } from '@pages/CarDetailPage'
 import { DashboardPage } from '@pages/DashboardPage'
@@ -22,13 +25,13 @@ import { ReportsPage } from '@pages/ReportsPage'
 import { SparesPage } from '@pages/SparesPage'
 import { UsersPage } from '@pages/UsersPage'
 
-export function App() {
+function AppContent() {
+  const { resolvedTheme } = useTheme()
+  
   return (
     <MantineProvider
-      defaultColorScheme="light"
-      theme={{
-        primaryColor: 'blue',
-      }}
+      forceColorScheme={resolvedTheme}
+      theme={darkTheme}
     >
       <ModalsProvider>
         <Notifications
@@ -71,6 +74,14 @@ export function App() {
         </BrowserRouter>
       </ModalsProvider>
     </MantineProvider>
+  )
+}
+
+export function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
   )
 }
 

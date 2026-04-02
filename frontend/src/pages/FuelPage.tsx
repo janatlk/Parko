@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 
-import { ActionIcon, Button, Container, Group, Pagination, Select, Table, Text, Title } from '@mantine/core'
+import { ActionIcon, Button, Container, Group, Select, Text, Title } from '@mantine/core'
 import { IconEdit, IconTrash } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
 import { useModals } from '@mantine/modals'
@@ -10,12 +10,19 @@ import { useCarsQuery } from '@features/cars/hooks/useCars'
 import { useCreateFuelMutation, useFuelQuery, useUpdateFuelMutation, useDeleteFuelMutation } from '@features/fuel/hooks/useFuel'
 import { FuelFormModal } from '@features/fuel/ui/FuelFormModal'
 import type { Fuel } from '@entities/fleet/types'
+import { ModernTable, ModernTableRow, TableCell } from '@shared/ui/ModernTable'
+import { formatPrice } from '@shared/utils/formatPrice'
+import { useAuth } from '@features/auth/hooks/useAuth'
 
 export function FuelPage() {
   const { t } = useTranslation()
   const modals = useModals()
   const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
   const [carFilter, setCarFilter] = useState<string | null>(null)
+
+  const { user } = useAuth()
+  const currency = user?.currency || 'KGS'
 
   const { data: carsData } = useCarsQuery({ page: 1 })
   const carOptions = useMemo(
@@ -31,6 +38,7 @@ export function FuelPage() {
 
   const { data, isLoading, isError } = useFuelQuery({
     page,
+    page_size: pageSize,
     car: carId,
   })
 
@@ -81,7 +89,18 @@ export function FuelPage() {
   }
 
   const records = data?.results ?? []
-  const totalPages = data ? Math.max(1, Math.ceil(data.count / 20)) : 1
+  const totalPages = data ? Math.max(1, Math.ceil(data.count / pageSize)) : 1
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setPage(newPage)
+    }
+  }
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize)
+    setPage(1)
+  }
 
   return (
     <Container>
@@ -108,62 +127,61 @@ export function FuelPage() {
 
       {!isLoading && !isError && (
         <>
-          <Table withTableBorder withColumnBorders striped highlightOnHover>
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>{t('fuel.table.car')}</Table.Th>
-                <Table.Th>{t('fuel.table.period')}</Table.Th>
-                <Table.Th>{t('fuel.table.liters')}</Table.Th>
-                <Table.Th>{t('fuel.table.mileage')}</Table.Th>
-                <Table.Th>{t('fuel.table.consumption')}</Table.Th>
-                <Table.Th>{t('fuel.table.total_cost')}</Table.Th>
-                <Table.Th></Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>
-              {records.map((r) => (
-                <Table.Tr key={r.id}>
-                  <Table.Td>{r.car_numplate ?? r.car}</Table.Td>
-                  <Table.Td>
+          <ModernTable
+            columns={[
+              { key: 'car', title: t('fuel.table.car'), width: 160 },
+              { key: 'period', title: t('fuel.table.period'), width: 120 },
+              { key: 'liters', title: t('fuel.table.liters'), width: 100 },
+              { key: 'mileage', title: t('fuel.table.mileage'), width: 120 },
+              { key: 'consumption', title: t('fuel.table.consumption'), width: 130 },
+              { key: 'cost', title: t('fuel.table.total_cost'), width: 120 },
+              { key: 'actions', title: '', width: 90 },
+            ]}
+            data={records}
+            renderRow={(r) => (
+              <ModernTableRow
+                key={r.id}
+                cells={[
+                  <TableCell key="car" fw={500}>{r.car_numplate ?? r.car}</TableCell>,
+                  <TableCell key="period">
                     {r.year}-{String(r.month).padStart(2, '0')}
-                  </Table.Td>
-                  <Table.Td>{r.liters}</Table.Td>
-                  <Table.Td>{r.monthly_mileage}</Table.Td>
-                  <Table.Td>{r.consumption}</Table.Td>
-                  <Table.Td>{r.total_cost}</Table.Td>
-                  <Table.Td onClick={(e) => e.stopPropagation()}>
-                    <Group gap="xs">
+                  </TableCell>,
+                  <TableCell key="liters">{r.liters} L</TableCell>,
+                  <TableCell key="mileage">{r.monthly_mileage} km</TableCell>,
+                  <TableCell key="consumption">{r.consumption} L/100km</TableCell>,
+                  <TableCell key="cost" fw={500}>{formatPrice(r.total_cost, currency)}</TableCell>,
+                  <TableCell key="actions" align="right">
+                    <Group gap="xs" justify="flex-end">
                       <ActionIcon
-                        variant="light"
+                        variant="subtle"
                         color="blue"
                         size="sm"
                         onClick={(e) => openEdit(r, e)}
                         title={t('common.edit')}
                       >
-                        <IconEdit size={16} />
+                        <IconEdit size={18} />
                       </ActionIcon>
                       <ActionIcon
-                        variant="light"
+                        variant="subtle"
                         color="red"
                         size="sm"
                         onClick={(e) => confirmDelete(r, e)}
                         title={t('common.delete')}
                       >
-                        <IconTrash size={16} />
+                        <IconTrash size={18} />
                       </ActionIcon>
                     </Group>
-                  </Table.Td>
-                </Table.Tr>
-              ))}
-            </Table.Tbody>
-          </Table>
-
-          <Group justify="space-between" align="center" mt="md">
-            <Text size="sm" c="dimmed">
-              Total: {data?.count ?? 0}
-            </Text>
-            <Pagination total={totalPages} value={page} onChange={setPage} />
-          </Group>
+                  </TableCell>,
+                ]}
+              />
+            )}
+            emptyMessage={t('fuel.no_data') || 'No fuel records'}
+            total={data?.count}
+            page={page}
+            onPageChange={handlePageChange}
+            pageSize={pageSize}
+            onPageSizeChange={handlePageSizeChange}
+          />
         </>
       )}
 

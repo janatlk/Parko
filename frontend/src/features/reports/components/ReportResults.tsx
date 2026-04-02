@@ -32,6 +32,8 @@ import { useState } from 'react'
 import type { ChartData, ReportResponse } from '../api/reportsApi'
 import { ShareReportModal } from './ShareReportModal'
 import { SaveReportModal } from './SaveReportModal'
+import { formatPrice } from '@shared/utils/formatPrice'
+import { useAuth } from '@features/auth/hooks/useAuth'
 
 interface ReportResultsProps {
   report: ReportResponse
@@ -45,6 +47,9 @@ const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'
  * Render different chart types based on data
  */
 function ChartRenderer({ chart }: { chart: ChartData }) {
+  const { t } = useTranslation()
+  const { user } = useAuth()
+  const currency = user?.currency || 'KGS'
   const { type, title, data } = chart
 
   if (type === 'bar') {
@@ -116,7 +121,7 @@ function ChartRenderer({ chart }: { chart: ChartData }) {
               cx="50%"
               cy="50%"
               labelLine={false}
-              label={({ name, value }) => `${name}: ${formatNumber(value)}`}
+              label={({ name, value }) => `${name}: ${formatPrice(value as number, currency)}`}
               outerRadius={type === 'doughnut' ? 80 : 100}
               fill="#8884d8"
               dataKey="value"
@@ -126,7 +131,7 @@ function ChartRenderer({ chart }: { chart: ChartData }) {
                 <Cell key={`cell-${index}`} fill={entry.fill || COLORS[index % COLORS.length]} />
               ))}
             </Pie>
-            <Tooltip formatter={(value) => formatNumber(value as number)} />
+            <Tooltip formatter={(value) => formatPrice(value as number, currency)} />
             <Legend />
           </PieChart>
         </ResponsiveContainer>
@@ -188,15 +193,16 @@ function formatNumber(num: number): string {
 /**
  * Summary Card Component
  */
-function SummaryCard({ label, value, t }: { label: string; value: string | number; t: (key: string) => string }) {
+function SummaryCard({ label, value, t, currency }: { label: string; value: string | number; t: (key: string) => string; currency?: string }) {
   const translatedLabel = label.startsWith('reports.') ? t(label) : label
+  const curr = currency || 'KGS'
   return (
     <Paper p="md" withBorder>
       <Text size="sm" c="dimmed">
         {translatedLabel}
       </Text>
       <Text size="xl" fw={700}>
-        {typeof value === 'number' ? formatNumber(value) : value}
+        {typeof value === 'number' ? formatPrice(value, curr) : value}
       </Text>
     </Paper>
   )
@@ -204,6 +210,8 @@ function SummaryCard({ label, value, t }: { label: string; value: string | numbe
 
 export function ReportResults({ report, onExport, onSave }: ReportResultsProps) {
   const { t } = useTranslation()
+  const { user } = useAuth()
+  const currency = user?.currency || 'KGS'
   const { data, summary, charts } = report
   const [shareModalOpened, setShareModalOpened] = useState(false)
   const [saveModalOpened, setSaveModalOpened] = useState(false)
@@ -311,7 +319,7 @@ export function ReportResults({ report, onExport, onSave }: ReportResultsProps) 
       {hasSummary && (
         <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="md">
           {Object.entries(summary).slice(0, 4).map(([key, value]) => (
-            <SummaryCard key={key} label={formatLabel(key)} value={value as number} t={t} />
+            <SummaryCard key={key} label={formatLabel(key)} value={value as number} t={t} currency={currency} />
           ))}
         </SimpleGrid>
       )}

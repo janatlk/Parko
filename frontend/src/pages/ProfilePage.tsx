@@ -27,6 +27,7 @@ import {
   IconCheck,
   IconX,
   IconAlertCircle,
+  IconCurrencyDollar,
 } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
 
@@ -35,6 +36,21 @@ import { useUpdateMeMutation } from '@features/auth/hooks/useMe'
 import { LANGUAGES } from '@shared/constants/languages'
 import type { Language } from '@shared/constants/languages'
 import { showSuccess, showError } from '@shared/utils/toast'
+
+const REGIONS = [
+  { value: 'unknown', label: 'Не выбран' },
+  { value: 'bishkek', label: 'Бишкек' },
+  { value: 'osh', label: 'Ош' },
+  { value: 'jalal_abad', label: 'Джалал-Абад' },
+  { value: 'naryn', label: 'Нарын' },
+  { value: 'talas', label: 'Талас' },
+  { value: 'chuy', label: 'Чуйская область' },
+  { value: 'issyk_kul', label: 'Иссык-Кульская область' },
+  { value: 'batken', label: 'Баткен' },
+  { value: 'moscow', label: 'Москва' },
+  { value: 'almaty', label: 'Алматы' },
+  { value: 'other', label: 'Другой' },
+]
 
 export function ProfilePage() {
   const { t } = useTranslation()
@@ -47,6 +63,8 @@ export function ProfilePage() {
     email: user?.email ?? '',
     region: user?.region ?? '',
     language: user?.language ?? 'ru',
+    currency: user?.currency ?? 'KGS',
+    theme: user?.theme ?? 'system',
   })
 
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -88,6 +106,8 @@ export function ProfilePage() {
         email: formData.email,
         region: formData.region,
         language: formData.language as Language,
+        currency: formData.currency,
+        theme: formData.theme as 'light' | 'dark' | 'system',
       })
       setUser(updated)
       showSuccess(t('profile.saved') || 'Profile updated successfully')
@@ -184,16 +204,16 @@ export function ProfilePage() {
                   error={errors.email}
                   size="sm"
                 />
-                <TextInput
+                <Select
                   label={
                     <Group gap="xs">
                       <IconMapPin size={16} />
                       <Text size="sm" fw={500}>{t('users.region')}</Text>
                     </Group>
                   }
-                  placeholder={t('users.region_placeholder') || 'Enter region'}
+                  data={REGIONS}
                   value={formData.region}
-                  onChange={handleInputChange('region')}
+                  onChange={(value) => handleInputChange('region')(value || 'unknown')}
                   size="sm"
                 />
                 <Select
@@ -206,6 +226,23 @@ export function ProfilePage() {
                   data={LANGUAGES.map((l) => ({ value: l, label: l.toUpperCase() }))}
                   value={formData.language}
                   onChange={(value) => handleInputChange('language')(value || 'ru')}
+                  size="sm"
+                />
+                <Select
+                  label={
+                    <Group gap="xs">
+                      <IconCurrencyDollar size={16} />
+                      <Text size="sm" fw={500}>{t('profile.currency')}</Text>
+                    </Group>
+                  }
+                  data={[
+                    { value: 'KGS', label: 'KGS - Киргизский сом' },
+                    { value: 'USD', label: 'USD - Доллар США' },
+                    { value: 'EUR', label: 'EUR - Евро' },
+                    { value: 'RUB', label: 'RUB - Российский рубль' },
+                  ]}
+                  value={formData.currency}
+                  onChange={(value) => handleInputChange('currency')(value || 'KGS')}
                   size="sm"
                 />
                 <div>
@@ -235,6 +272,35 @@ export function ProfilePage() {
           </Paper>
         )}
 
+        {/* Theme Settings */}
+        <Paper withBorder shadow="sm" radius="md" p="md">
+          <Group gap="sm">
+            <ThemeIcon variant="light" size="lg" color="violet">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="4"/>
+                <path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>
+              </svg>
+            </ThemeIcon>
+            <div>
+              <Text size="sm" c="dimmed" fw={500}>{t('profile.theme') || 'Theme'}</Text>
+              <Text size="xs" c="dimmed" pt={2}>{t('profile.theme_description') || 'Choose your preferred theme'}</Text>
+            </div>
+            <div style={{ marginLeft: 'auto' }}>
+              <Select
+                data={[
+                  { value: 'light', label: t('theme.light') },
+                  { value: 'dark', label: t('theme.dark') },
+                  { value: 'system', label: t('theme.system') },
+                ]}
+                value={formData.theme}
+                onChange={(value) => handleInputChange('theme')(value || 'system')}
+                size="sm"
+                w={140}
+              />
+            </div>
+          </Group>
+        </Paper>
+
         {/* Action Buttons */}
         <Group justify="flex-end" gap="sm">
           <Button
@@ -246,6 +312,8 @@ export function ProfilePage() {
                 email: user.email ?? '',
                 region: user.region ?? '',
                 language: user.language ?? 'ru',
+                currency: user.currency ?? 'KGS',
+                theme: user.theme ?? 'system',
               })
               setErrors({})
             }}

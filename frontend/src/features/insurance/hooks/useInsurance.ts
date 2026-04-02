@@ -8,6 +8,7 @@ import type { InsuranceCreatePayload, InsuranceUpdatePayload, ListInsurancesPara
 
 type InsurancesQueryArgs = {
   page: number
+  page_size?: number
   car?: number
 }
 
@@ -19,6 +20,7 @@ const insuranceKeys = {
 export function useInsurancesQuery(args: InsurancesQueryArgs) {
   const params: ListInsurancesParams = {
     page: args.page,
+    page_size: args.page_size,
     car: args.car,
   }
 

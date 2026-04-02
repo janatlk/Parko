@@ -8,6 +8,7 @@ export type ReportType =
   | 'insurance_inspection'
   | 'vehicle_utilization'
   | 'cost_analysis'
+  | 'cost_per_km'
 
 export type ChartType = 'bar' | 'line' | 'pie' | 'doughnut' | 'area'
 
@@ -379,6 +380,67 @@ export async function getMaintenanceCostsReport(
       from: params.from,
       to: params.to,
       car: params.car,
+    },
+  })
+  return data
+}
+
+// Cost Per Km Report
+export type CostPerKmParams = {
+  start_date?: string
+  end_date?: string
+  vehicle_ids?: string
+  vehicle_type?: string
+  region?: string
+  export?: 'csv' | 'xlsx' | 'json'
+}
+
+export interface CostPerKmVehicle {
+  vehicle_id: number
+  numplate: string
+  brand: string
+  model: string
+  fuel_cost: number
+  maintenance_cost: number
+  insurance_cost: number
+  inspection_cost: number
+  total_cost: number
+  total_distance: number
+  cost_per_km: number
+  fuel_cost_per_km: number
+  maintenance_cost_per_km: number
+}
+
+export interface CostPerKmSummary {
+  total_cost: number
+  total_distance: number
+  avg_cost_per_km: number
+  vehicle_count: number
+}
+
+export interface CostPerKmReportResponse {
+  filters: {
+    start_date: string | null
+    end_date: string | null
+    vehicle_ids: number[] | null
+    vehicle_type: string | null
+    region: string | null
+  }
+  summary: CostPerKmSummary
+  by_vehicle: CostPerKmVehicle[]
+}
+
+export async function getCostPerKmReport(
+  params: CostPerKmParams = {},
+): Promise<CostPerKmReportResponse> {
+  const { data } = await http.get<CostPerKmReportResponse>('cost-per-km/', {
+    params: {
+      start_date: params.start_date,
+      end_date: params.end_date,
+      vehicle_ids: params.vehicle_ids,
+      vehicle_type: params.vehicle_type,
+      region: params.region,
+      export: params.export,
     },
   })
   return data

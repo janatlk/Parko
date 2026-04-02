@@ -1,0 +1,544 @@
+[
+{
+  "model": "accounts.user",
+  "fields": {
+    "password": "!dLAnBEPPaF8WrvfjflLZM2x44IlSYfDyyb25mlUr",
+    "last_login": null,
+    "is_superuser": true,
+    "username": "admin",
+    "first_name": "",
+    "last_name": "",
+    "email": "admin@parko.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-04-02T04:26:31.629Z",
+    "company": null,
+    "region": "unknown",
+    "role": "COMPANY_ADMIN",
+    "language": "ru",
+    "theme": "system",
+    "currency": "KGS",
+    "email_api_key": null,
+    "email_service": "sendgrid",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "accounts.user",
+  "fields": {
+    "password": "pbkdf2_sha256$600000$5CRwiKi7dJVMtyAxtJSfxs$yEzkU4yC5+DU6ROy+1xAW9FM6j+nJSp42C8z6kArAZE=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "dispatcher",
+    "first_name": "",
+    "last_name": "",
+    "email": "dispatcher@parko.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-04-02T04:27:08.479Z",
+    "company": 1,
+    "region": "unknown",
+    "role": "dispatcher",
+    "language": "ru",
+    "theme": "system",
+    "currency": "KGS",
+    "email_api_key": null,
+    "email_service": "sendgrid",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "accounts.user",
+  "fields": {
+    "password": "pbkdf2_sha256$600000$YxcLVXUwid1XExxvyYVyvX$MS4Q/jeZl5/xgRv7cCGXobDFXAezSWKTY6NXCMZ4TYk=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "mechanic",
+    "first_name": "",
+    "last_name": "",
+    "email": "mechanic@parko.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-04-02T04:27:08.928Z",
+    "company": 1,
+    "region": "unknown",
+    "role": "mechanic",
+    "language": "ru",
+    "theme": "system",
+    "currency": "KGS",
+    "email_api_key": null,
+    "email_service": "sendgrid",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "accounts.user",
+  "fields": {
+    "password": "pbkdf2_sha256$600000$TQK8PQqJsoCvgvg4O2zLBF$yivdajpyOTv8l+3s9yhGBERBCixV8hsGoRc26QxLXZM=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "driver1",
+    "first_name": "",
+    "last_name": "",
+    "email": "driver1@parko.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-04-02T04:27:09.358Z",
+    "company": 1,
+    "region": "unknown",
+    "role": "driver",
+    "language": "ru",
+    "theme": "system",
+    "currency": "KGS",
+    "email_api_key": null,
+    "email_service": "sendgrid",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "accounts.user",
+  "fields": {
+    "password": "pbkdf2_sha256$600000$38jx0m1wg0A4Zu71hsGGwE$VeOndl+sKy6IH0fLhUnIxXCjmHYcQ+yj0MyjKQ83p4A=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "accountant",
+    "first_name": "",
+    "last_name": "",
+    "email": "accountant@parko.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-04-02T04:27:09.782Z",
+    "company": 1,
+    "region": "unknown",
+    "role": "accountant",
+    "language": "ru",
+    "theme": "system",
+    "currency": "KGS",
+    "email_api_key": null,
+    "email_service": "sendgrid",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "companies.company",
+  "pk": 1,
+  "fields": {
+    "name": "Демо Компания",
+    "slug": "demo-company",
+    "country": "Кыргызстан",
+    "timezone": "Asia/Bishkek",
+    "default_language": "ru",
+    "default_currency": "KGS",
+    "legal_name": null,
+    "inn": null,
+    "address": null,
+    "phone": null,
+    "email": null,
+    "created_by": null,
+    "created_at": "2026-04-02T04:27:08.443Z",
+    "updated_at": "2026-04-02T04:27:08.443Z",
+    "is_active": true
+  }
+},
+{
+  "model": "fleet.car",
+  "pk": 1,
+  "fields": {
+    "company": 1,
+    "region": "Bishkek",
+    "brand": "Volkswagen",
+    "title": "Passat B5",
+    "numplate": "B 001 AA",
+    "year": 2020,
+    "vin": "WVWZZZ3CZWE123456",
+    "fueltype": "Бензин",
+    "type": "Седан",
+    "driver": "Водитель",
+    "drivers_phone": null,
+    "fuel_card": "-",
+    "status": "ACTIVE",
+    "commissioned_at": "2026-04-02",
+    "created_at": "2026-04-02T04:27:33.981Z",
+    "updated_at": "2026-04-02T04:27:33.981Z"
+  }
+},
+{
+  "model": "fleet.car",
+  "pk": 2,
+  "fields": {
+    "company": 1,
+    "region": "Bishkek",
+    "brand": "Volkswagen",
+    "title": "Golf 8",
+    "numplate": "B 002 BB",
+    "year": 2021,
+    "vin": "WVWZZZ3CZWE123457",
+    "fueltype": "Бензин",
+    "type": "Хэтчбек",
+    "driver": "-",
+    "drivers_phone": null,
+    "fuel_card": "-",
+    "status": "ACTIVE",
+    "commissioned_at": "2026-04-02",
+    "created_at": "2026-04-02T04:27:34.007Z",
+    "updated_at": "2026-04-02T04:27:34.007Z"
+  }
+},
+{
+  "model": "fleet.car",
+  "pk": 3,
+  "fields": {
+    "company": 1,
+    "region": "Bishkek",
+    "brand": "Toyota",
+    "title": "Camry",
+    "numplate": "B 003 CC",
+    "year": 2022,
+    "vin": "WVWZZZ3CZWE123458",
+    "fueltype": "Бензин",
+    "type": "Седан",
+    "driver": "-",
+    "drivers_phone": null,
+    "fuel_card": "-",
+    "status": "ACTIVE",
+    "commissioned_at": "2026-04-02",
+    "created_at": "2026-04-02T04:27:34.015Z",
+    "updated_at": "2026-04-02T04:27:34.015Z"
+  }
+},
+{
+  "model": "fleet.car",
+  "pk": 4,
+  "fields": {
+    "company": 1,
+    "region": "Bishkek",
+    "brand": "Honda",
+    "title": "Accord",
+    "numplate": "B 004 DD",
+    "year": 2021,
+    "vin": "WVWZZZ3CZWE123459",
+    "fueltype": "Бензин",
+    "type": "Седан",
+    "driver": "-",
+    "drivers_phone": null,
+    "fuel_card": "-",
+    "status": "ACTIVE",
+    "commissioned_at": "2026-04-02",
+    "created_at": "2026-04-02T04:27:34.015Z",
+    "updated_at": "2026-04-02T04:27:34.015Z"
+  }
+},
+{
+  "model": "fleet.car",
+  "pk": 5,
+  "fields": {
+    "company": 1,
+    "region": "Bishkek",
+    "brand": "Mercedes-Benz",
+    "title": "E-Class",
+    "numplate": "B 005 EE",
+    "year": 2023,
+    "vin": "WVWZZZ3CZWE123460",
+    "fueltype": "Бензин",
+    "type": "Седан",
+    "driver": "-",
+    "drivers_phone": null,
+    "fuel_card": "-",
+    "status": "ACTIVE",
+    "commissioned_at": "2026-04-02",
+    "created_at": "2026-04-02T04:27:34.015Z",
+    "updated_at": "2026-04-02T04:27:34.015Z"
+  }
+},
+{
+  "model": "fleet.insurance",
+  "pk": 1,
+  "fields": {
+    "car": 1,
+    "insurance_type": "OSAGO",
+    "number": "POL-B001AA-2026",
+    "start_date": "2026-04-02",
+    "end_date": "2027-04-02",
+    "cost": 15000,
+    "created_at": "2026-04-02T04:28:36.060Z",
+    "updated_at": "2026-04-02T04:28:36.060Z"
+  }
+},
+{
+  "model": "fleet.insurance",
+  "pk": 2,
+  "fields": {
+    "car": 2,
+    "insurance_type": "OSAGO",
+    "number": "POL-B002BB-2026",
+    "start_date": "2026-04-02",
+    "end_date": "2027-04-02",
+    "cost": 15000,
+    "created_at": "2026-04-02T04:28:36.066Z",
+    "updated_at": "2026-04-02T04:28:36.066Z"
+  }
+},
+{
+  "model": "fleet.inspection",
+  "pk": 1,
+  "fields": {
+    "car": 1,
+    "number": "TO-B001AA-2026",
+    "inspected_at": "2026-04-02",
+    "cost": 5000,
+    "created_at": "2026-04-02T04:28:36.072Z",
+    "updated_at": "2026-04-02T04:28:36.072Z"
+  }
+},
+{
+  "model": "fleet.inspection",
+  "pk": 2,
+  "fields": {
+    "car": 2,
+    "number": "TO-B002BB-2026",
+    "inspected_at": "2026-04-02",
+    "cost": 5000,
+    "created_at": "2026-04-02T04:28:36.079Z",
+    "updated_at": "2026-04-02T04:28:36.079Z"
+  }
+},
+{
+  "model": "fleet.spare",
+  "pk": 1,
+  "fields": {
+    "car": 1,
+    "title": "Замена масла",
+    "description": "",
+    "part_price": 3000,
+    "job_description": "",
+    "job_price": 1000,
+    "installed_at": "2026-03-18",
+    "created_at": "2026-04-02T04:28:36.086Z",
+    "updated_at": "2026-04-02T04:28:36.086Z"
+  }
+},
+{
+  "model": "fleet.spare",
+  "pk": 2,
+  "fields": {
+    "car": 1,
+    "title": "Замена тормозных колодок",
+    "description": "",
+    "part_price": 5000,
+    "job_description": "",
+    "job_price": 2000,
+    "installed_at": "2026-03-18",
+    "created_at": "2026-04-02T04:28:36.093Z",
+    "updated_at": "2026-04-02T04:28:36.093Z"
+  }
+},
+{
+  "model": "fleet.spare",
+  "pk": 3,
+  "fields": {
+    "car": 1,
+    "title": "Замена фильтров",
+    "description": "",
+    "part_price": 1500,
+    "job_description": "",
+    "job_price": 500,
+    "installed_at": "2026-03-18",
+    "created_at": "2026-04-02T04:28:36.099Z",
+    "updated_at": "2026-04-02T04:28:36.099Z"
+  }
+},
+{
+  "model": "fleet.spare",
+  "pk": 4,
+  "fields": {
+    "car": 2,
+    "title": "Замена масла",
+    "description": "",
+    "part_price": 3000,
+    "job_description": "",
+    "job_price": 1000,
+    "installed_at": "2026-03-18",
+    "created_at": "2026-04-02T04:28:36.103Z",
+    "updated_at": "2026-04-02T04:28:36.103Z"
+  }
+},
+{
+  "model": "fleet.spare",
+  "pk": 5,
+  "fields": {
+    "car": 2,
+    "title": "Замена тормозных колодок",
+    "description": "",
+    "part_price": 5000,
+    "job_description": "",
+    "job_price": 2000,
+    "installed_at": "2026-03-18",
+    "created_at": "2026-04-02T04:28:36.111Z",
+    "updated_at": "2026-04-02T04:28:36.111Z"
+  }
+},
+{
+  "model": "fleet.spare",
+  "pk": 6,
+  "fields": {
+    "car": 2,
+    "title": "Замена фильтров",
+    "description": "",
+    "part_price": 1500,
+    "job_description": "",
+    "job_price": 500,
+    "installed_at": "2026-03-18",
+    "created_at": "2026-04-02T04:28:36.118Z",
+    "updated_at": "2026-04-02T04:28:36.118Z"
+  }
+},
+{
+  "model": "fleet.fuel",
+  "pk": 1,
+  "fields": {
+    "car": 1,
+    "year": 2026,
+    "month": 4,
+    "liters": 150,
+    "total_cost": 7500,
+    "monthly_mileage": 1500,
+    "consumption": "10.00",
+    "month_name": "April",
+    "created_at": "2026-04-02T04:28:11.124Z",
+    "updated_at": "2026-04-02T04:28:11.124Z"
+  }
+},
+{
+  "model": "fleet.fuel",
+  "pk": 2,
+  "fields": {
+    "car": 1,
+    "year": 2026,
+    "month": 3,
+    "liters": 150,
+    "total_cost": 7500,
+    "monthly_mileage": 1500,
+    "consumption": "10.00",
+    "month_name": "March",
+    "created_at": "2026-04-02T04:28:11.132Z",
+    "updated_at": "2026-04-02T04:28:11.132Z"
+  }
+},
+{
+  "model": "fleet.fuel",
+  "pk": 3,
+  "fields": {
+    "car": 1,
+    "year": 2026,
+    "month": 2,
+    "liters": 150,
+    "total_cost": 7500,
+    "monthly_mileage": 1500,
+    "consumption": "10.00",
+    "month_name": "February",
+    "created_at": "2026-04-02T04:28:11.138Z",
+    "updated_at": "2026-04-02T04:28:11.138Z"
+  }
+},
+{
+  "model": "fleet.fuel",
+  "pk": 4,
+  "fields": {
+    "car": 2,
+    "year": 2026,
+    "month": 4,
+    "liters": 150,
+    "total_cost": 7500,
+    "monthly_mileage": 1500,
+    "consumption": "10.00",
+    "month_name": "April",
+    "created_at": "2026-04-02T04:28:11.144Z",
+    "updated_at": "2026-04-02T04:28:11.144Z"
+  }
+},
+{
+  "model": "fleet.fuel",
+  "pk": 5,
+  "fields": {
+    "car": 2,
+    "year": 2026,
+    "month": 3,
+    "liters": 150,
+    "total_cost": 7500,
+    "monthly_mileage": 1500,
+    "consumption": "10.00",
+    "month_name": "March",
+    "created_at": "2026-04-02T04:28:11.150Z",
+    "updated_at": "2026-04-02T04:28:11.150Z"
+  }
+},
+{
+  "model": "fleet.fuel",
+  "pk": 6,
+  "fields": {
+    "car": 2,
+    "year": 2026,
+    "month": 2,
+    "liters": 150,
+    "total_cost": 7500,
+    "monthly_mileage": 1500,
+    "consumption": "10.00",
+    "month_name": "February",
+    "created_at": "2026-04-02T04:28:11.155Z",
+    "updated_at": "2026-04-02T04:28:11.155Z"
+  }
+},
+{
+  "model": "fleet.fuel",
+  "pk": 7,
+  "fields": {
+    "car": 3,
+    "year": 2026,
+    "month": 4,
+    "liters": 150,
+    "total_cost": 7500,
+    "monthly_mileage": 1500,
+    "consumption": "10.00",
+    "month_name": "April",
+    "created_at": "2026-04-02T04:28:11.162Z",
+    "updated_at": "2026-04-02T04:28:11.162Z"
+  }
+},
+{
+  "model": "fleet.fuel",
+  "pk": 8,
+  "fields": {
+    "car": 3,
+    "year": 2026,
+    "month": 3,
+    "liters": 150,
+    "total_cost": 7500,
+    "monthly_mileage": 1500,
+    "consumption": "10.00",
+    "month_name": "March",
+    "created_at": "2026-04-02T04:28:11.166Z",
+    "updated_at": "2026-04-02T04:28:11.166Z"
+  }
+},
+{
+  "model": "fleet.fuel",
+  "pk": 9,
+  "fields": {
+    "car": 3,
+    "year": 2026,
+    "month": 2,
+    "liters": 150,
+    "total_cost": 7500,
+    "monthly_mileage": 1500,
+    "consumption": "10.00",
+    "month_name": "February",
+    "created_at": "2026-04-02T04:28:11.172Z",
+    "updated_at": "2026-04-02T04:28:11.172Z"
+  }
+}
+]

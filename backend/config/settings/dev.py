@@ -10,13 +10,21 @@ SECRET_KEY = env.str('DJANGO_SECRET_KEY', default='django-insecure-change-this-i
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 
-# Database
+# Database - Support both SQLite (local) and PostgreSQL (Supabase)
+# Use PostgreSQL if POSTGRES_HOST is set, otherwise use SQLite
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql' if env.str('POSTGRES_HOST', default='') else 'django.db.backends.sqlite3',
+        'NAME': env.str('POSTGRES_DB', default=str(BASE_DIR / 'db.sqlite3')),
+        'USER': env.str('POSTGRES_USER', default=''),
+        'PASSWORD': env.str('POSTGRES_PASSWORD', default=''),
+        'HOST': env.str('POSTGRES_HOST', default=''),
+        'PORT': env.str('POSTGRES_PORT', default='5432'),
+        # Supabase-specific connection pooling settings
+        'CONN_MAX_AGE': 600 if env.str('POSTGRES_HOST', default='') else 0,
+        'CONN_HEALTH_CHECKS': True if env.str('POSTGRES_HOST', default='') else False,
     }
 }
 

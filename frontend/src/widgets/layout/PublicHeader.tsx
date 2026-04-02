@@ -36,8 +36,8 @@ export function PublicHeader() {
     }}>
       <Group h={64} px="xl" justify="space-between">
         <Group gap="xs">
-          <IconCar size={28} stroke={1.8} color="var(--mantine-color-blue-6)" />
-          <Text size="xl" fw={700} c="blue.6">
+          <IconCar size={28} stroke={1.8} color="#ffffff" />
+          <Text size="xl" fw={700} c="#ffffff">
             Parko
           </Text>
         </Group>

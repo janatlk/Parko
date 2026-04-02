@@ -39,6 +39,7 @@ const reportTypes = [
   { value: 'insurance_inspection', label: 'reports.type_insurance_inspection' },
   { value: 'vehicle_utilization', label: 'reports.type_utilization' },
   { value: 'cost_analysis', label: 'reports.type_cost_analysis' },
+  { value: 'cost_per_km', label: 'reports.type_cost_per_km' },
 ] as const
 
 export function ReportBuilder({ carOptions, onGenerate, isLoading }: ReportBuilderProps) {

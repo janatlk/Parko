@@ -1,0 +1,401 @@
+/* Dark Theme Styles for Parko */
+
+[data-mantine-color-scheme='dark'] {
+  /* Navigation Sidebar */
+  .app-shell-navbar {
+    background-color: #1a1b1e !important;
+    border-right: 1px solid #373A40 !important;
+  }
+
+  .app-shell-navbar .navlink {
+    color: #e9ecef !important;
+  }
+
+  .app-shell-navbar .navlink:hover {
+    background-color: #25262b !important;
+  }
+
+  .app-shell-navbar .navlink[data-active='true'] {
+    background-color: #3b82f6 !important;
+    color: white !important;
+  }
+
+  /* Header */
+  .app-shell-header {
+    background-color: #1a1b1e !important;
+    border-bottom: 1px solid #373A40 !important;
+  }
+
+  /* Papers and Cards */
+  .mantine-Paper-root {
+    background-color: #25262b !important;
+    border-color: #373A40 !important;
+  }
+
+  /* Tables */
+  .mantine-Table-root {
+    background-color: #25262b !important;
+  }
+
+  .mantine-Table-root thead tr {
+    background-color: #1a1b1e !important;
+    border-bottom: 1px solid #373A40 !important;
+  }
+
+  .mantine-Table-root tbody tr {
+    border-bottom: 1px solid #373A40 !important;
+  }
+
+  .mantine-Table-root tbody tr:hover {
+    background-color: #2c2e33 !important;
+  }
+
+  /* Inputs */
+  .mantine-Input-input {
+    background-color: #2c2e33 !important;
+    border-color: #373A40 !important;
+    color: #e9ecef !important;
+  }
+
+  .mantine-Input-input:focus {
+    border-color: #3b82f6 !important;
+  }
+
+  /* Select Dropdown */
+  .mantine-Select-dropdown,
+  .mantine-Combobox-dropdown {
+    background-color: #25262b !important;
+    border-color: #373A40 !important;
+  }
+
+  .mantine-Select-option {
+    color: #e9ecef !important;
+  }
+
+  .mantine-Select-option:hover {
+    background-color: #2c2e33 !important;
+  }
+
+  /* Modals */
+  .mantine-Modal-content,
+  .mantine-Modal-body {
+    background-color: #25262b !important;
+    color: #e9ecef !important;
+  }
+
+  .mantine-Modal-header {
+    border-bottom: 1px solid #373A40 !important;
+  }
+
+  /* Tabs */
+  .mantine-Tabs-tab {
+    color: #909296 !important;
+  }
+
+  .mantine-Tabs-tab:hover {
+    background-color: #25262b !important;
+  }
+
+  .mantine-Tabs-tab[data-active='true'] {
+    color: #3b82f6 !important;
+  }
+
+  .mantine-Tabs-list {
+    border-bottom: 1px solid #373A40 !important;
+  }
+
+  /* Accordion */
+  .mantine-Accordion-item {
+    border-bottom: 1px solid #373A40 !important;
+  }
+
+  .mantine-Accordion-control {
+    color: #e9ecef !important;
+  }
+
+  .mantine-Accordion-control:hover {
+    background-color: #25262b !important;
+  }
+
+  .mantine-Accordion-panel {
+    background-color: #1a1b1e !important;
+  }
+
+  /* Badges */
+  .mantine-Badge-root {
+    background-color: #2c2e33 !important;
+    color: #e9ecef !important;
+  }
+
+  /* Buttons - черно-белая тема */
+  .mantine-Button-root {
+    color: #000000 !important;
+    background-color: #ffffff !important;
+    border: 1px solid #ffffff !important;
+  }
+
+  .mantine-Button-root:hover {
+    background-color: #e9ecef !important;
+    border-color: #e9ecef !important;
+  }
+
+  .mantine-Button-root[data-variant='default'] {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid #ffffff !important;
+  }
+
+  .mantine-Button-root[data-variant='default']:hover {
+    background-color: #e9ecef !important;
+    border-color: #e9ecef !important;
+  }
+
+  .mantine-Button-root[data-variant='outline'] {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border: 1px solid #444444 !important;
+  }
+
+  .mantine-Button-root[data-variant='outline']:hover {
+    background-color: #111111 !important;
+    border-color: #666666 !important;
+  }
+
+  .mantine-Button-root[data-variant='filled'] {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid #ffffff !important;
+  }
+
+  .mantine-Button-root[data-variant='filled']:hover {
+    background-color: #e9ecef !important;
+    border-color: #e9ecef !important;
+  }
+
+  .mantine-Button-root[data-variant='subtle'] {
+    background-color: transparent !important;
+    color: #ffffff !important;
+  }
+
+  .mantine-Button-root[data-variant='subtle']:hover {
+    background-color: #2c2e33 !important;
+  }
+
+  .mantine-Button-root[data-variant='light'] {
+    background-color: #2c2e33 !important;
+    color: #ffffff !important;
+  }
+
+  .mantine-Button-root[data-variant='light']:hover {
+    background-color: #373A40 !important;
+  }
+
+  /* ActionIcon - используется в кнопках-иконках */
+  .mantine-ActionIcon-root {
+    background-color: #2c2e33 !important;
+    color: #ffffff !important;
+  }
+
+  .mantine-ActionIcon-root:hover {
+    background-color: #373A40 !important;
+  }
+
+  /* Alerts */
+  .mantine-Alert-root {
+    background-color: #25262b !important;
+    border: 1px solid #373A40 !important;
+  }
+
+  /* Progress Bar */
+  .mantine-Progress-root {
+    background-color: #373A40 !important;
+  }
+
+  /* Theme Icon */
+  .mantine-ThemeIcon-root {
+    background-color: #2c2e33 !important;
+  }
+
+  /* Scroll Area */
+  .mantine-ScrollArea-thumb {
+    background-color: #373A40 !important;
+  }
+
+  /* Pagination */
+  .mantine-Pagination-control {
+    background-color: #2c2e33 !important;
+    border-color: #373A40 !important;
+    color: #e9ecef !important;
+  }
+
+  .mantine-Pagination-control:hover {
+    background-color: #373A40 !important;
+  }
+
+  /* Segmented Control */
+  .mantine-SegmentedControl-root {
+    background-color: #2c2e33 !important;
+  }
+
+  .mantine-SegmentedControl-label {
+    color: #909296 !important;
+  }
+
+  .mantine-SegmentedControl-label[data-active='true'] {
+    background-color: #3b82f6 !important;
+    color: white !important;
+  }
+
+  /* Text colors */
+  .mantine-Text-root {
+    color: #e9ecef !important;
+  }
+
+  .mantine-Text-root[c='dimmed'] {
+    color: #909296 !important;
+  }
+
+  /* Title colors */
+  .mantine-Title-root {
+    color: #e9ecef !important;
+  }
+
+  /* Group borders */
+  .mantine-Group-root {
+    border-color: #373A40 !important;
+  }
+
+  /* Stack borders */
+  .mantine-Stack-root {
+    border-color: #373A40 !important;
+  }
+
+  /* Simple Grid */
+  .mantine-SimpleGrid-root {
+    border-color: #373A40 !important;
+  }
+
+  /* Container */
+  .mantine-Container-root {
+    color: #e9ecef !important;
+  }
+
+  /* Avatar */
+  .mantine-Avatar-root {
+    border-color: #373A40 !important;
+  }
+
+  /* Divider */
+  .mantine-Divider-root {
+    border-color: #373A40 !important;
+  }
+
+  /* Notification */
+  .mantine-Notification-root {
+    background-color: #25262b !important;
+    color: #e9ecef !important;
+  }
+
+  /* Tooltip */
+  .mantine-Tooltip-tooltip {
+    background-color: #373A40 !important;
+    color: #e9ecef !important;
+  }
+
+  /* Menu */
+  .mantine-Menu-dropdown {
+    background-color: #25262b !important;
+    border-color: #373A40 !important;
+  }
+
+  .mantine-Menu-item {
+    color: #e9ecef !important;
+  }
+
+  .mantine-Menu-item:hover {
+    background-color: #2c2e33 !important;
+  }
+
+  /* Popover */
+  .mantine-Popover-dropdown {
+    background-color: #25262b !important;
+    border-color: #373A40 !important;
+  }
+
+  /* Chart containers */
+  .recharts-wrapper {
+    background-color: #25262b !important;
+  }
+
+  .recharts-text {
+    fill: #909296 !important;
+  }
+
+  .recharts-cartesian-grid-line {
+    stroke: #373A40 !important;
+  }
+
+  /* Loading */
+  .mantine-Loader-root {
+    border-color: #373A40 !important;
+  }
+}
+
+/* Additional navbar specific styles */
+[data-mantine-color-scheme='dark'] .app-shell-navbar {
+  background: linear-gradient(180deg, #1a1b1e 0%, #141517 100%);
+}
+
+[data-mantine-color-scheme='dark'] .navbar-user-card {
+  background-color: #25262b !important;
+}
+
+[data-mantine-color-scheme='dark'] .app-shell-navbar .mantine-NavLink-root {
+  margin: 2px 8px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+[data-mantine-color-scheme='dark'] .app-shell-navbar .mantine-NavLink-root:hover {
+  transform: translateX(4px);
+}
+
+[data-mantine-color-scheme='dark'] .app-shell-navbar .mantine-NavLink-root[data-active='true'] {
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+/* Header gradient */
+[data-mantine-color-scheme='dark'] .app-shell-header {
+  background: linear-gradient(135deg, #1a1b1e 0%, #25262b 100%);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+/* Smooth transitions */
+[data-mantine-color-scheme='dark'] * {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Focus states */
+[data-mantine-color-scheme='dark'] *:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Scrollbar styling */
+[data-mantine-color-scheme='dark'] ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+[data-mantine-color-scheme='dark'] ::-webkit-scrollbar-track {
+  background: #1a1b1e;
+}
+
+[data-mantine-color-scheme='dark'] ::-webkit-scrollbar-thumb {
+  background: #373A40;
+  border-radius: 5px;
+}
+
+[data-mantine-color-scheme='dark'] ::-webkit-scrollbar-thumb:hover {
+  background: #5c5f66;
+}

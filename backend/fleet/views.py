@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 from core.permissions import IsCompanyAdminOrDispatcher, IsCompanyMember
 from core.viewsets import CompanyScopedModelViewSet
 
+from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 
 from .models import Accumulator, Car, CarPhoto, Fuel, Insurance, Inspection, Spare, Tires
@@ -18,6 +19,7 @@ from .serializers import (
     CarDetailSerializer,
     CarListSerializer,
     CarPhotoSerializer,
+    CarRelatedStatsSerializer,
     FuelCreateUpdateSerializer,
     FuelDetailSerializer,
     FuelListSerializer,
@@ -34,6 +36,13 @@ from .serializers import (
     TiresDetailSerializer,
     TiresListSerializer,
 )
+
+
+import logging
+
+from django.db.models import Count
+
+logger = logging.getLogger(__name__)
 
 
 class CarViewSet(CompanyScopedModelViewSet):
@@ -57,6 +66,54 @@ class CarViewSet(CompanyScopedModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(company=self.request.user.company)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        
+        # Подсчет связанных записей перед удалением
+        related_counts = {
+            'fuel_records': instance.fuel_records.count(),
+            'spares': instance.spares.count(),
+            'insurances': instance.insurances.count(),
+            'inspections': instance.inspections.count(),
+            'tires': instance.tires.count(),
+            'accumulators': instance.accumulators.count(),
+            'photos': instance.photos.count(),
+        }
+        
+        # Логирование удаления
+        logger.info(
+            f"User {request.user.username} is deleting car {instance.numplate} "
+            f"(ID={instance.id}). Related records: {related_counts}"
+        )
+        
+        response = super().destroy(request, *args, **kwargs)
+        
+        logger.info(
+            f"Car {instance.numplate} (ID={instance.id}) successfully deleted "
+            f"by user {request.user.username}"
+        )
+        
+        return response
+
+    @action(detail=True, methods=['get'])
+    def stats(self, request, pk=None):
+        """Получить статистику связанных записей автомобиля"""
+        instance = self.get_object()
+        
+        stats = {
+            'fuel_records': instance.fuel_records.count(),
+            'spares': instance.spares.count(),
+            'insurances': instance.insurances.count(),
+            'inspections': instance.inspections.count(),
+            'tires': instance.tires.count(),
+            'accumulators': instance.accumulators.count(),
+            'photos': instance.photos.count(),
+        }
+        stats['total'] = sum(stats.values())
+        
+        serializer = CarRelatedStatsSerializer(stats)
+        return Response(serializer.data)
 
 
 class CarPhotoListCreateView(APIView):

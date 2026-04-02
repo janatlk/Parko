@@ -20,6 +20,8 @@ class UserListSerializer(serializers.ModelSerializer):
             "role",
             "region",
             "language",
+            "theme",
+            "currency",
             "company",
             "company_name",
             "is_active",
@@ -43,6 +45,8 @@ class UserCreateUpdateSerializer(serializers.ModelSerializer):
             "role",
             "region",
             "language",
+            "theme",
+            "currency",
             "company",
             "is_active",
         ]
@@ -103,4 +107,6 @@ class MeUpdateSerializer(serializers.ModelSerializer):
             'email',
             'region',
             'language',
+            'theme',
+            'currency',
         ]

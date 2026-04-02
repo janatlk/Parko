@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react'
 
-import { Box, Group, RingProgress, SimpleGrid, Stack, Text, ThemeIcon } from '@mantine/core'
-import type { MantineColor } from '@mantine/core'
+import { Group, SimpleGrid, Stack, Text, ThemeIcon } from '@mantine/core'
 
 import { TrendIndicator } from './TrendIndicator'
 
@@ -13,7 +12,6 @@ type StatCardProps = {
   currentValue?: number
   previousValue?: number
   inverseTrend?: boolean
-  ringValue?: number
   compact?: boolean
 }
 
@@ -25,53 +23,43 @@ export function StatCard({
   currentValue,
   previousValue,
   inverseTrend = false,
-  ringValue,
   compact = false,
 }: StatCardProps) {
   return (
-    <Box
+    <Group
+      justify="space-between"
+      align="center"
+      p={compact ? 'sm' : 'md'}
       style={{
         backgroundColor: 'var(--mantine-color-body)',
         borderRadius: 'var(--mantine-radius-md)',
-        padding: compact ? 'var(--mantine-spacing-sm)' : 'var(--mantine-spacing-md)',
         border: '1px solid var(--mantine-color-default-border)',
       }}
     >
-      <Group justify="space-between" align="flex-start" gap="xl">
-        <Stack gap={compact ? 2 : 'xs'}>
-          <Text size={compact ? 'xs' : undefined} c="dimmed" fw={500}>
-            {label}
-          </Text>
-          <Text size={compact ? 'lg' : 'xl'} fw={700}>
-            {value}
-          </Text>
-          {currentValue !== undefined && previousValue !== undefined && (
-            <TrendIndicator
-              currentValue={currentValue}
-              previousValue={previousValue}
-              inverseGood={inverseTrend}
-            />
-          )}
-        </Stack>
-        {ringValue !== undefined ? (
-          <RingProgress
-            size={compact ? 50 : 60}
-            thickness={6}
-            roundCaps
-            sections={[{ value: ringValue, color }]}
-            label={
-              <ThemeIcon size={compact ? 28 : 34} variant="light" color={color}>
-                {icon}
-              </ThemeIcon>
-            }
+      <Stack gap={compact ? 2 : 'xs'}>
+        <Text size={compact ? 'xs' : 'sm'} c="dimmed" fw={500}>
+          {label}
+        </Text>
+        <Text size={compact ? 'lg' : 'xl'} fw={700}>
+          {value}
+        </Text>
+        {currentValue !== undefined && previousValue !== undefined && (
+          <TrendIndicator
+            currentValue={currentValue}
+            previousValue={previousValue}
+            inverseGood={inverseTrend}
           />
-        ) : (
-          <ThemeIcon size={compact ? 36 : 44} variant="light" color={color}>
-            {icon}
-          </ThemeIcon>
         )}
-      </Group>
-    </Box>
+      </Stack>
+      <ThemeIcon 
+        size={compact ? 40 : 48} 
+        variant="light" 
+        color={color}
+        radius="md"
+      >
+        {icon}
+      </ThemeIcon>
+    </Group>
   )
 }
 
@@ -80,11 +68,10 @@ type StatsGridProps = {
     icon: ReactNode
     label: string
     value: string | number
-    color?: MantineColor
+    color?: string
     currentValue?: number
     previousValue?: number
     inverseTrend?: boolean
-    ringValue?: number
   }>
   compact?: boolean
 }
