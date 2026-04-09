@@ -440,8 +440,28 @@ export async function getCostPerKmReport(
       vehicle_ids: params.vehicle_ids,
       vehicle_type: params.vehicle_type,
       region: params.region,
-      export: params.export,
     },
   })
   return data
+}
+
+/**
+ * Download cost per km report as a file (csv/xlsx)
+ */
+export async function downloadCostPerKmReport(
+  params: CostPerKmParams,
+  format: 'csv' | 'xlsx',
+): Promise<Blob> {
+  const response = await http.get('cost-per-km/', {
+    params: {
+      start_date: params.start_date,
+      end_date: params.end_date,
+      vehicle_ids: params.vehicle_ids,
+      vehicle_type: params.vehicle_type,
+      region: params.region,
+      export: format,
+    },
+    responseType: 'blob',
+  })
+  return response.data as Blob
 }

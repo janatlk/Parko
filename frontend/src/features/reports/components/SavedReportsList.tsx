@@ -30,6 +30,7 @@ const reportTypeLabels: Record<string, string> = {
   insurance_inspection: 'reports.type_insurance_inspection',
   vehicle_utilization: 'reports.type_utilization',
   cost_analysis: 'reports.type_cost_analysis',
+  cost_per_km: 'reports.type_cost_per_km',
 }
 
 export function SavedReportsList({ reports, isLoading, onView, onExport }: SavedReportsListProps) {

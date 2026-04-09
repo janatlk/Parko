@@ -65,6 +65,17 @@ export async function deletePhoto(photoId: number): Promise<void> {
   await http.delete(`cars/photos/${photoId}/`)
 }
 
+export async function uploadPhoto(carId: number, file: File, comment?: string): Promise<CarPhoto> {
+  const formData = new FormData()
+  formData.append('image', file)
+  if (comment) {
+    formData.append('comment', comment)
+  }
+  // Don't set Content-Type — browser sets it with boundary automatically
+  const { data } = await http.post<CarPhoto>(`cars/${carId}/photos/`, formData)
+  return data
+}
+
 // Car Related Stats
 export async function getCarRelatedStats(carId: number): Promise<CarRelatedStats> {
   const { data } = await http.get<CarRelatedStats>(`cars/${carId}/stats/`)

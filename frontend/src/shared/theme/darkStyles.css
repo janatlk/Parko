@@ -1,5 +1,82 @@
 /* Dark Theme Styles for Parko */
 
+/* ===== LIGHT THEME STYLES ===== */
+[data-mantine-color-scheme='light'] {
+  /* Buttons - черно-белая тема для светлого режима */
+  .mantine-Button-root {
+    color: #ffffff !important;
+    background-color: #000000 !important;
+    border: 1px solid #000000 !important;
+  }
+
+  .mantine-Button-root:hover {
+    background-color: #1a1a1a !important;
+    border-color: #1a1a1a !important;
+  }
+
+  .mantine-Button-root[data-variant='default'] {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border: 1px solid #000000 !important;
+  }
+
+  .mantine-Button-root[data-variant='default']:hover {
+    background-color: #1a1a1a !important;
+    border-color: #1a1a1a !important;
+  }
+
+  .mantine-Button-root[data-variant='outline'] {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid #cccccc !important;
+  }
+
+  .mantine-Button-root[data-variant='outline']:hover {
+    background-color: #f5f5f5 !important;
+    border-color: #999999 !important;
+  }
+
+  .mantine-Button-root[data-variant='filled'] {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border: 1px solid #000000 !important;
+  }
+
+  .mantine-Button-root[data-variant='filled']:hover {
+    background-color: #1a1a1a !important;
+    border-color: #1a1a1a !important;
+  }
+
+  .mantine-Button-root[data-variant='subtle'] {
+    background-color: transparent !important;
+    color: #000000 !important;
+  }
+
+  .mantine-Button-root[data-variant='subtle']:hover {
+    background-color: #f0f0f0 !important;
+  }
+
+  .mantine-Button-root[data-variant='light'] {
+    background-color: #e0e0e0 !important;
+    color: #000000 !important;
+  }
+
+  .mantine-Button-root[data-variant='light']:hover {
+    background-color: #d0d0d0 !important;
+  }
+
+  /* ActionIcon */
+  .mantine-ActionIcon-root {
+    background-color: #e0e0e0 !important;
+    color: #000000 !important;
+  }
+
+  .mantine-ActionIcon-root:hover {
+    background-color: #d0d0d0 !important;
+  }
+}
+
+/* ===== DARK THEME STYLES ===== */
 [data-mantine-color-scheme='dark'] {
   /* Navigation Sidebar */
   .app-shell-navbar {

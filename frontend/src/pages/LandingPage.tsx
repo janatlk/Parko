@@ -56,15 +56,15 @@ export function LandingPage() {
     try {
       await axios.post('/api/v1/feedback/', formData)
       notifications.show({
-        title: 'Сообщение отправлено',
-        message: 'Мы свяжемся с вами в ближайшее время',
+        title: t('landing.form_success_title'),
+        message: t('landing.form_success_message'),
         color: 'green',
       })
       setFormData({ name: '', email: '', message: '' })
     } catch (error) {
       notifications.show({
-        title: 'Ошибка',
-        message: 'Не удалось отправить сообщение. Попробуйте позже.',
+        title: t('landing.form_error_title'),
+        message: t('landing.form_error_message'),
         color: 'red',
       })
     } finally {
@@ -75,70 +75,87 @@ export function LandingPage() {
   const features = [
     {
       icon: IconCar,
-      title: 'Управление автопарком',
-      description: 'Полный учёт машин, водителей и документов в единой системе',
-      stat: '100+',
-      statLabel: 'компаний',
+      title: t('landing.feature_1_title'),
+      description: t('landing.feature_1_desc'),
+      stat: t('landing.feature_1_stat'),
+      statLabel: t('landing.feature_1_stat_label'),
     },
     {
       icon: IconGasStation,
-      title: 'Контроль топлива',
-      description: 'Отслеживание расхода топлива и пробега с аналитикой',
-      stat: '30%',
-      statLabel: 'экономия',
+      title: t('landing.feature_2_title'),
+      description: t('landing.feature_2_desc'),
+      stat: t('landing.feature_2_stat'),
+      statLabel: t('landing.feature_2_stat_label'),
     },
     {
       icon: IconTool,
-      title: 'Техническое обслуживание',
-      description: 'Планирование и учёт всех видов ТО и ремонтов',
-      stat: '24/7',
-      statLabel: 'мониторинг',
+      title: t('landing.feature_3_title'),
+      description: t('landing.feature_3_desc'),
+      stat: t('landing.feature_3_stat'),
+      statLabel: t('landing.feature_3_stat_label'),
     },
     {
       icon: IconReportAnalytics,
-      title: 'Отчёты и аналитика',
-      description: 'Детальные отчёты с экспортом в Excel и PDF',
-      stat: '15+',
-      statLabel: 'видов отчётов',
+      title: t('landing.feature_4_title'),
+      description: t('landing.feature_4_desc'),
+      stat: t('landing.feature_4_stat'),
+      statLabel: t('landing.feature_4_stat_label'),
     },
   ]
 
   const benefits = [
-    { icon: IconShield, title: 'Надёжность', desc: 'Защита данных и стабильная работа' },
-    { icon: IconClock, title: 'Экономия времени', desc: 'Автоматизация рутинных задач' },
-    { icon: IconDatabase, title: 'Аналитика', desc: 'Полная статистика по автопарку' },
-    { icon: IconDeviceMobile, title: 'Доступность', desc: 'Работа с любого устройства' },
+    { icon: IconShield, title: t('landing.benefit_1_title'), desc: t('landing.benefit_1_desc') },
+    { icon: IconClock, title: t('landing.benefit_2_title'), desc: t('landing.benefit_2_desc') },
+    { icon: IconDatabase, title: t('landing.benefit_3_title'), desc: t('landing.benefit_3_desc') },
+    { icon: IconDeviceMobile, title: t('landing.benefit_4_title'), desc: t('landing.benefit_4_desc') },
   ]
 
   const pricing = [
     {
-      name: 'Старт',
+      name: t('landing.plan_starter'),
       price: '990',
-      period: 'сом/мес',
-      features: ['До 10 автомобилей', 'Базовые отчёты', 'Учёт топлива', 'Email поддержка'],
+      period: t('landing.pricing_period'),
+      features: [
+        t('landing.plan_starter_f1'),
+        t('landing.plan_starter_f2'),
+        t('landing.plan_starter_f3'),
+        t('landing.plan_starter_f4'),
+      ],
       popular: false,
     },
     {
-      name: 'Бизнес',
+      name: t('landing.plan_business'),
       price: '2490',
-      period: 'сом/мес',
-      features: ['До 50 автомобилей', 'Все отчёты', 'ТО и ремонты', 'Приоритетная поддержка', 'API доступ'],
+      period: t('landing.pricing_period'),
+      features: [
+        t('landing.plan_business_f1'),
+        t('landing.plan_business_f2'),
+        t('landing.plan_business_f3'),
+        t('landing.plan_business_f4'),
+        t('landing.plan_business_f5'),
+      ],
       popular: true,
     },
     {
-      name: 'Корпорация',
+      name: t('landing.plan_corporate'),
       price: '4990',
-      period: 'сом/мес',
-      features: ['Без ограничений', 'Индивидуальные отчёты', 'Персональный менеджер', 'Обучение сотрудников', 'SLA'],
+      period: t('landing.pricing_period'),
+      features: [
+        t('landing.plan_corporate_f1'),
+        t('landing.plan_corporate_f2'),
+        t('landing.plan_corporate_f3'),
+        t('landing.plan_corporate_f4'),
+        t('landing.plan_corporate_f5'),
+      ],
       popular: false,
     },
   ]
 
   const stats = [
-    { value: '500+', label: 'Клиентов' },
-    { value: '15 000+', label: 'Автомобилей' },
-    { value: '30%', label: 'Экономия топлива' },
-    { value: '99.9%', label: 'Uptime' },
+    { value: '500+', label: t('landing.stat_clients') },
+    { value: '15 000+', label: t('landing.stat_cars') },
+    { value: '30%', label: t('landing.stat_fuel_savings') },
+    { value: '99.9%', label: t('landing.stat_uptime') },
   ]
 
   return (
@@ -197,9 +214,9 @@ export function LandingPage() {
           <Grid align="center" gutter="xl">
             <Grid.Col span={{ base: 12, md: 6 }}>
               <Stack gap="xl">
-                <Badge 
-                  color="gray" 
-                  variant="outline" 
+                <Badge
+                  color="gray"
+                  variant="outline"
                   size="lg"
                   styles={{
                     root: {
@@ -208,16 +225,16 @@ export function LandingPage() {
                     }
                   }}
                 >
-                  SaaS платформа v2.0
+                  {t('landing.hero_badge')}
                 </Badge>
-                
+
                 <Title
                   order={1}
                   size={56}
                   fw={700}
                   lh={1.1}
                 >
-                  Управление{' '}
+                  {t('landing.hero_title_part1')}{' '}
                   <Text
                     component="span"
                     style={{
@@ -226,16 +243,15 @@ export function LandingPage() {
                       WebkitTextFillColor: 'transparent',
                     }}
                   >
-                    автопарком
+                    {t('landing.hero_title_part2')}
                   </Text>{' '}
-                  нового поколения
+                  {t('landing.hero_title_part3')}
                 </Title>
-                
+
                 <Text size="xl" c="#888888" lh={1.6}>
-                  Parko — современная SaaS-система для эффективного управления 
-                  корпоративным транспортом. Контроль топлива, ТО, отчёты в реальном времени.
+                  {t('landing.hero_description')}
                 </Text>
-                
+
                 <Group gap="sm">
                   <Button
                     size="lg"
@@ -247,7 +263,7 @@ export function LandingPage() {
                       border: '1px solid #ffffff !important',
                     }}
                   >
-                    Начать работу
+                    {t('landing.btn_start')}
                   </Button>
                   <Button
                     size="lg"
@@ -260,7 +276,7 @@ export function LandingPage() {
                     }}
                     rightSection={<IconArrowRight size={18} />}
                   >
-                    Демо доступ
+                    {t('landing.btn_demo')}
                   </Button>
                 </Group>
 
@@ -292,9 +308,9 @@ export function LandingPage() {
                   style={{ filter: 'grayscale(100%)' }}
                 />
                 <Box mt="lg">
-                  <Group position="apart">
-                    <Text c="#888888" size="sm">Панель управления</Text>
-                    <Badge color="green" variant="light">Real-time</Badge>
+                  <Group justify="space-between">
+                    <Text c="#888888" size="sm">{t('landing.dashboard_preview_title')}</Text>
+                    <Badge color="green" variant="light">{t('landing.dashboard_realtime')}</Badge>
                   </Group>
                 </Box>
               </Box>
@@ -307,10 +323,10 @@ export function LandingPage() {
       <Box id="features" style={{ padding: '120px 0', background: '#000000' }}>
         <Container size="lg">
           <Text c="#666666" tt="uppercase" fw={600} size="sm" mb="xs">
-            Возможности
+            {t('landing.features_section_subtitle')}
           </Text>
           <Title order={2} size={42} fw={600} c="#ffffff" mb="xl">
-            Всё для управления автопарком
+            {t('landing.features_section_title')}
           </Title>
 
           <Grid gutter="lg">
@@ -375,10 +391,10 @@ export function LandingPage() {
             </Grid.Col>
             <Grid.Col span={{ base: 12, md: 6 }}>
               <Text c="#666666" tt="uppercase" fw={600} size="sm" mb="xs">
-                Преимущества
+                {t('landing.benefits_subtitle')}
               </Text>
               <Title order={2} size={42} fw={600} c="#ffffff" mb="xl">
-                Почему выбирают Parko
+                {t('landing.benefits_title')}
               </Title>
               <Stack gap="lg">
                 {benefits.map((benefit, i) => (
@@ -417,28 +433,28 @@ export function LandingPage() {
       <Box id="about" style={{ padding: '120px 0', background: '#000000' }}>
         <Container size="lg">
           <Text c="#666666" tt="uppercase" fw={600} size="sm" mb="xs">
-            О системе
+            {t('landing.about_subtitle')}
           </Text>
           <Title order={2} size={42} fw={600} c="#ffffff" mb="xl">
-            Комплексный подход к управлению
+            {t('landing.about_title')}
           </Title>
 
           <SimpleGrid cols={{ base: 1, md: 3 }} spacing="lg">
             {[
               {
                 img: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=300&fit=crop',
-                title: 'Мониторинг',
-                desc: 'Отслеживание всех показателей в реальном времени',
+                title: t('landing.about_1_title'),
+                desc: t('landing.about_1_desc'),
               },
               {
                 img: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400&h=300&fit=crop',
-                title: 'Аналитика',
-                desc: 'Глубокий анализ данных для оптимизации',
+                title: t('landing.about_2_title'),
+                desc: t('landing.about_2_desc'),
               },
               {
                 img: 'https://images.unsplash.com/photo-1556761175-b413da4baf72?w=400&h=300&fit=crop',
-                title: 'Отчётность',
-                desc: 'Готовые отчёты для руководства и госорганов',
+                title: t('landing.about_3_title'),
+                desc: t('landing.about_3_desc'),
               },
             ].map((item, i) => (
               <Paper 
@@ -465,10 +481,10 @@ export function LandingPage() {
       <Box style={{ padding: '120px 0', background: '#050505' }}>
         <Container size="lg">
           <Text c="#666666" tt="uppercase" fw={600} size="sm" mb="xs">
-            Тарифы
+            {t('landing.pricing_subtitle')}
           </Text>
           <Title order={2} size={42} fw={600} c="#ffffff" mb="xl" ta="center">
-            Прозрачное ценообразование
+            {t('landing.pricing_title')}
           </Title>
 
           <Grid gutter="lg" justify="center">
@@ -495,7 +511,7 @@ export function LandingPage() {
                         color: '#000000',
                       }}
                     >
-                      Популярный
+                      {t('landing.popular_badge')}
                     </Badge>
                   )}
                   <Text size="md" fw={600} c="#ffffff" mb="xs">
@@ -523,7 +539,7 @@ export function LandingPage() {
                       border: '1px solid #444444 !important',
                     }}
                   >
-                    Выбрать тариф
+                    {t('landing.btn_select_plan')}
                   </Button>
                 </Paper>
               </Grid.Col>
@@ -536,20 +552,19 @@ export function LandingPage() {
       <Box id="contact" style={{ padding: '120px 0', background: '#000000' }}>
         <Container size="md">
           <Text c="#666666" tt="uppercase" fw={600} size="sm" mb="xs">
-            Контакты
+            {t('landing.contact_subtitle')}
           </Text>
           <Title order={2} size={42} fw={600} c="#ffffff" mb="xl">
-            Связаться с нами
+            {t('landing.contact_title')}
           </Title>
 
           <Grid gutter="xl">
             <Grid.Col span={{ base: 12, md: 5 }}>
               <Stack gap="lg">
                 <Text c="#888888" lh={1.6}>
-                  Оставьте заявку и мы свяжемся с вами в ближайшее время 
-                  для обсуждения деталей.
+                  {t('landing.contact_description')}
                 </Text>
-                
+
                 <Group gap="md">
                   <Box
                     style={{
@@ -566,7 +581,7 @@ export function LandingPage() {
                     <IconMail size={24} color="#ffffff" />
                   </Box>
                   <div>
-                    <Text size="sm" c="#666666">Email</Text>
+                    <Text size="sm" c="#666666">{t('landing.contact_email_label')}</Text>
                     <Text c="#ffffff">info@parko.kg</Text>
                   </div>
                 </Group>
@@ -587,7 +602,7 @@ export function LandingPage() {
                     <IconPhone size={24} color="#ffffff" />
                   </Box>
                   <div>
-                    <Text size="sm" c="#666666">Телефон</Text>
+                    <Text size="sm" c="#666666">{t('landing.contact_phone_label')}</Text>
                     <Text c="#ffffff">+996 (555) 123-456</Text>
                   </div>
                 </Group>
@@ -608,8 +623,8 @@ export function LandingPage() {
                     <IconMapPin size={24} color="#ffffff" />
                   </Box>
                   <div>
-                    <Text size="sm" c="#666666">Адрес</Text>
-                    <Text c="#ffffff">Бишкек, Кыргызстан</Text>
+                    <Text size="sm" c="#666666">{t('landing.contact_address_label')}</Text>
+                    <Text c="#ffffff">{t('landing.contact_address')}</Text>
                   </div>
                 </Group>
               </Stack>
@@ -629,8 +644,8 @@ export function LandingPage() {
                     <Grid gutter="md">
                       <Grid.Col span={{ base: 12, sm: 6 }}>
                         <TextInput
-                          label="Имя"
-                          placeholder="Ваше имя"
+                          label={t('landing.form_name_label')}
+                          placeholder={t('landing.form_name_placeholder')}
                           value={formData.name}
                           onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                           styles={{
@@ -647,8 +662,8 @@ export function LandingPage() {
                       </Grid.Col>
                       <Grid.Col span={{ base: 12, sm: 6 }}>
                         <TextInput
-                          label="Email"
-                          placeholder="email@example.com"
+                          label={t('landing.form_email_label')}
+                          placeholder={t('landing.form_email_placeholder')}
                           type="email"
                           value={formData.email}
                           onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
@@ -667,8 +682,8 @@ export function LandingPage() {
                     </Grid>
 
                     <Textarea
-                      label="Сообщение"
-                      placeholder="Ваше сообщение..."
+                      label={t('landing.form_message_label')}
+                      placeholder={t('landing.form_message_placeholder')}
                       minRows={4}
                       value={formData.message}
                       onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
@@ -696,7 +711,7 @@ export function LandingPage() {
                         border: '1px solid #ffffff !important',
                       }}
                     >
-                      Отправить сообщение
+                      {t('landing.form_submit')}
                     </Button>
                   </Stack>
                 </form>
@@ -719,16 +734,16 @@ export function LandingPage() {
                 </Text>
               </Group>
               <Text size="sm" c="#444444">
-                © 2026 Parko. Fleet Management System. Все права защищены.
+                {t('landing.footer_copyright')}
               </Text>
             </Grid.Col>
             <Grid.Col span={{ base: 12, md: 6 }}>
               <Group justify="flex-end" gap="lg">
                 <Text size="sm" c="#444444" style={{ cursor: 'pointer' }}>
-                  Политика конфиденциальности
+                  {t('landing.footer_privacy')}
                 </Text>
                 <Text size="sm" c="#444444" style={{ cursor: 'pointer' }}>
-                  Условия использования
+                  {t('landing.footer_terms')}
                 </Text>
               </Group>
             </Grid.Col>

@@ -10,6 +10,7 @@ import {
   Text,
   ThemeIcon,
   Title,
+  useMantineColorScheme,
 } from '@mantine/core'
 import { IconGasStation, IconTarget } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
@@ -27,6 +28,8 @@ type VehicleConsumptionListProps = {
 
 export function VehicleConsumptionList({ items = [], isLoading, compact = false }: VehicleConsumptionListProps) {
   const { t } = useTranslation()
+  const { colorScheme } = useMantineColorScheme()
+  const isDark = colorScheme === 'dark'
   const navigate = useNavigate()
   const [consumptionGoal, setConsumptionGoal] = useState<number>(() => {
     const stored = localStorage.getItem(STORAGE_KEY)
@@ -66,6 +69,10 @@ export function VehicleConsumptionList({ items = [], isLoading, compact = false 
     )
   }
 
+  const borderColor = isDark ? '#373A40' : '#dee2e6'
+  const headerColor = isDark ? '#868e96' : '#495057'
+  const textColor = isDark ? '#e9ecef' : 'inherit'
+
   return (
     <Box>
       <Group justify="space-between" mb="md">
@@ -103,9 +110,9 @@ export function VehicleConsumptionList({ items = [], isLoading, compact = false 
         <Table verticalSpacing="sm" highlightOnHover>
           <Table.Thead>
             <Table.Tr>
-              <Table.Th>{t('dashboard.vehicle')}</Table.Th>
-              <Table.Th ta="right">{t('dashboard.avg_consumption')}</Table.Th>
-              <Table.Th ta="right">{t('dashboard.total_fuel')}</Table.Th>
+              <Table.Th style={{ color: headerColor, borderColor }}>{t('dashboard.vehicle')}</Table.Th>
+              <Table.Th ta="right" style={{ color: headerColor, borderColor }}>{t('dashboard.avg_consumption')}</Table.Th>
+              <Table.Th ta="right" style={{ color: headerColor, borderColor }}>{t('dashboard.total_fuel')}</Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
@@ -119,18 +126,18 @@ export function VehicleConsumptionList({ items = [], isLoading, compact = false 
                   onClick={() => handleNavigate(vehicle.id)}
                   style={{ cursor: 'pointer' }}
                 >
-                  <Table.Td>
+                  <Table.Td style={{ borderColor }}>
                     <Group gap="xs">
                       <ThemeIcon variant="light" size="sm" color="blue">
                         <IconGasStation size={16} />
                       </ThemeIcon>
                       <div>
-                        <Text size="sm" fw={500}>{vehicle.numplate}</Text>
+                        <Text size="sm" fw={500} style={{ color: textColor }}>{vehicle.numplate}</Text>
                         <Text size="xs" c="dimmed">{vehicle.brand} {vehicle.title}</Text>
                       </div>
                     </Group>
                   </Table.Td>
-                  <Table.Td ta="right">
+                  <Table.Td ta="right" style={{ borderColor }}>
                     <Group gap="xs" justify="flex-end">
                       <Badge
                         size="sm"
@@ -141,7 +148,7 @@ export function VehicleConsumptionList({ items = [], isLoading, compact = false 
                       </Badge>
                     </Group>
                   </Table.Td>
-                  <Table.Td ta="right">
+                  <Table.Td ta="right" style={{ borderColor }}>
                     <Text size="sm" c="dimmed">
                       {vehicle.total_fuel_liters.toFixed(0)}л
                     </Text>

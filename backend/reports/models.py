@@ -11,6 +11,7 @@ class SavedReport(models.Model):
         ('insurance_inspection', 'Insurance & Inspection'),
         ('vehicle_utilization', 'Vehicle Utilization'),
         ('cost_analysis', 'Cost Analysis'),
+        ('cost_per_km', 'Cost per Km'),
         ('custom', 'Custom Report'),
     ]
 

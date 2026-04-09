@@ -13,14 +13,19 @@
 ```
 Project URL: https://vulnzaoagtxzpayyjjct.supabase.co
 Project Ref: vulnzaoagtxzpayyjjct
-Database Password: NwC1e3oj09s4nrLs
 
+# Database Credentials (ОБНОВЛЕНО)
 POSTGRES_DB=postgres
-POSTGRES_USER=postgres
+POSTGRES_USER=postgres.vulnzaoagtxzpayyjjct
 POSTGRES_PASSWORD=NwC1e3oj09s4nrLs
-POSTGRES_HOST=db.vulnzaoagtxzpayyjjct.supabase.co
+POSTGRES_HOST=aws-1-ap-northeast-2.pooler.supabase.com
 POSTGRES_PORT=5432
+
+# Connection String
+postgresql://postgres.vulnzaoagtxzpayyjjct:NwC1e3oj09s4nrLs@aws-1-ap-northeast-2.pooler.supabase.com:5432/postgres
 ```
+
+✅ **Статус:** Миграции применены, тестовые данные созданы (5 пользователей, 5 авто)
 
 ---
 

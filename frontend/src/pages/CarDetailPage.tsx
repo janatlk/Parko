@@ -8,14 +8,17 @@ import {
   Button,
   Container,
   Group,
+  Modal,
   Paper,
   SimpleGrid,
   Stack,
   Tabs,
   Text,
+  TextInput,
   Title,
   rem,
 } from '@mantine/core'
+import { notifications } from '@mantine/notifications'
 import {
   IconCar,
   IconGasStation,
@@ -25,6 +28,7 @@ import {
   IconPhoto,
   IconEdit,
   IconExternalLink,
+  IconUpload,
 } from '@tabler/icons-react'
 
 import { useAuth } from '@features/auth/hooks/useAuth'
@@ -36,6 +40,7 @@ import {
   useCarSparesQuery,
   useCarPhotosQuery,
   useDeletePhotoMutation,
+  useUploadPhotoMutation,
 } from '@features/cars/hooks/useCarDetail'
 import { CarFormModal } from '@features/cars/ui/CarFormModal'
 import type { Car } from '@entities/car/types'
@@ -49,7 +54,6 @@ export function CarDetailPage() {
   const params = useParams()
   const carId = Number(params.id)
   const { user } = useAuth()
-  const currency = user?.currency || 'KGS'
   const canEdit = canEditCars(user)
 
   const { data: car, isLoading: carLoading, isError: carError } = useCarQuery(carId)
@@ -59,11 +63,15 @@ export function CarDetailPage() {
   const { data: sparesData } = useCarSparesQuery(carId, 1)
   const { data: photosData } = useCarPhotosQuery(carId)
   const deletePhoto = useDeletePhotoMutation(carId)
+  const uploadPhoto = useUploadPhotoMutation(carId)
   const updateCarMutation = useUpdateCarMutation()
 
   const [activeTab, setActiveTab] = useState<string>('info')
   const [editModalOpened, setEditModalOpened] = useState(false)
   const [selectedCar, setSelectedCar] = useState<Car | undefined>(undefined)
+  const [uploadModalOpened, setUploadModalOpened] = useState(false)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [photoComment, setPhotoComment] = useState('')
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -83,8 +91,29 @@ export function CarDetailPage() {
   }
 
   const handleDeletePhoto = (photoId: number) => {
-    if (window.confirm('Are you sure you want to delete this photo?')) {
+    if (window.confirm(t('carDetail.delete_photo_confirm') || 'Are you sure you want to delete this photo?')) {
       deletePhoto.mutate(photoId)
+    }
+  }
+
+  const handleUploadPhoto = async () => {
+    if (!selectedFile) return
+    try {
+      await uploadPhoto.mutateAsync({ file: selectedFile, comment: photoComment || undefined })
+      notifications.show({
+        title: t('carDetail.upload_success') || 'Success',
+        message: t('carDetail.upload_success_message') || 'Photo uploaded successfully',
+        color: 'green',
+      })
+      setUploadModalOpened(false)
+      setSelectedFile(null)
+      setPhotoComment('')
+    } catch {
+      notifications.show({
+        title: t('carDetail.upload_error') || 'Error',
+        message: t('carDetail.upload_error_message') || 'Failed to upload photo',
+        color: 'red',
+      })
     }
   }
 
@@ -282,7 +311,12 @@ export function CarDetailPage() {
 
         {/* Photos Tab */}
         <Tabs.Panel value="photos" pt="md">
-          <PhotosTable data={photosData} deletePhoto={deletePhoto} handleDeletePhoto={handleDeletePhoto} />
+          <PhotosTable
+            data={photosData}
+            deletePhoto={deletePhoto}
+            handleDeletePhoto={handleDeletePhoto}
+            onUploadClick={() => setUploadModalOpened(true)}
+          />
         </Tabs.Panel>
       </Tabs>
 
@@ -299,6 +333,62 @@ export function CarDetailPage() {
         }}
         isSubmitting={updateCarMutation.isPending}
       />
+
+      {/* Upload Photo Modal */}
+      <Modal
+        opened={uploadModalOpened}
+        onClose={() => {
+          setUploadModalOpened(false)
+          setSelectedFile(null)
+          setPhotoComment('')
+        }}
+        title={t('carDetail.upload_photo_title') || 'Upload Photo'}
+        size="md"
+      >
+        <Stack>
+          <Box>
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={(e) => {
+                const file = e.target.files?.[0]
+                if (file) setSelectedFile(file)
+              }}
+              style={{ display: 'block', width: '100%' }}
+            />
+            {selectedFile && (
+              <Text size="sm" mt="xs" c="dimmed">
+                {t('carDetail.upload_selected') || 'Selected'}: {selectedFile.name}
+              </Text>
+            )}
+          </Box>
+          <TextInput
+            label={t('carDetail.upload_comment_label') || 'Comment (optional)'}
+            placeholder={t('carDetail.upload_comment_placeholder') || 'Add a description for this photo'}
+            value={photoComment}
+            onChange={(e) => setPhotoComment(e.currentTarget.value)}
+          />
+          <Group justify="flex-end" mt="md">
+            <Button
+              variant="default"
+              onClick={() => {
+                setUploadModalOpened(false)
+                setSelectedFile(null)
+                setPhotoComment('')
+              }}
+            >
+              {t('common.cancel') || 'Cancel'}
+            </Button>
+            <Button
+              onClick={handleUploadPhoto}
+              disabled={!selectedFile}
+              loading={uploadPhoto.isPending}
+            >
+              {t('carDetail.upload_button') || 'Upload'}
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
     </Container>
   )
 }
@@ -520,62 +610,68 @@ function SparesTable({ data }: { data: any }) {
   )
 }
 
-function PhotosTable({ data, deletePhoto, handleDeletePhoto }: { data: any; deletePhoto: any; handleDeletePhoto: (id: number) => void }) {
+function PhotosTable({ data, deletePhoto, handleDeletePhoto, onUploadClick }: { data: any; deletePhoto: any; handleDeletePhoto: (id: number) => void; onUploadClick: () => void }) {
   const { t } = useTranslation()
-
-  if (!data || data.length === 0) {
-    return (
-      <Paper withBorder radius="md" p="xl" style={{ textAlign: 'center' }}>
-        <Text c="dimmed" size="sm">
-          {t('common.no_data')}
-        </Text>
-      </Paper>
-    )
-  }
 
   return (
     <Paper withBorder radius="md" p="md">
       <Group justify="space-between" mb="md">
         <Title order={4}>{t('carDetail.photos')}</Title>
+        <Button
+          leftSection={<IconUpload size={rem(18)} />}
+          onClick={onUploadClick}
+          size="sm"
+        >
+          {t('carDetail.upload_photo_button') || 'Upload Photo'}
+        </Button>
       </Group>
-      <SimpleGrid cols={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing="md">
-        {data.map((photo: any) => (
-          <Paper key={photo.id} withBorder radius="md" p="xs">
-            <Box
-              component="img"
-              src={photo.image}
-              alt={photo.comment || 'Car photo'}
-              style={{ width: '100%', height: 200, objectFit: 'cover', borderRadius: 4, cursor: 'pointer' }}
-            />
-            {photo.comment && (
-              <Text size="sm" mt="xs" ta="center" c="dimmed">
-                {photo.comment}
-              </Text>
-            )}
-            <Group justify="center" mt="sm" gap="xs">
-              <Button
-                variant="light"
-                color="red"
-                size="compact-sm"
-                onClick={() => handleDeletePhoto(photo.id)}
-                loading={deletePhoto.isPending}
-              >
-                Delete
-              </Button>
-              <Button
-                variant="light"
-                color="blue"
-                size="compact-sm"
-                component="a"
-                href={photo.image}
-                target="_blank"
-              >
-                Download
-              </Button>
-            </Group>
-          </Paper>
-        ))}
-      </SimpleGrid>
+
+      {!data || data.length === 0 ? (
+        <Paper withBorder radius="md" p="xl" style={{ textAlign: 'center' }}>
+          <Text c="dimmed" size="sm">
+            {t('common.no_data')}
+          </Text>
+        </Paper>
+      ) : (
+        <SimpleGrid cols={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing="md">
+          {data.map((photo: any) => (
+            <Paper key={photo.id} withBorder radius="md" p="xs">
+              <Box
+                component="img"
+                src={photo.image}
+                alt={photo.comment || 'Car photo'}
+                style={{ width: '100%', height: 200, objectFit: 'cover', borderRadius: 4, cursor: 'pointer' }}
+              />
+              {photo.comment && (
+                <Text size="sm" mt="xs" ta="center" c="dimmed">
+                  {photo.comment}
+                </Text>
+              )}
+              <Group justify="center" mt="sm" gap="xs">
+                <Button
+                  variant="light"
+                  color="red"
+                  size="compact-sm"
+                  onClick={() => handleDeletePhoto(photo.id)}
+                  loading={deletePhoto.isPending}
+                >
+                  {t('carDetail.delete_photo') || 'Delete'}
+                </Button>
+                <Button
+                  variant="light"
+                  color="blue"
+                  size="compact-sm"
+                  component="a"
+                  href={photo.image}
+                  target="_blank"
+                >
+                  {t('carDetail.download_photo') || 'Download'}
+                </Button>
+              </Group>
+            </Paper>
+          ))}
+        </SimpleGrid>
+      )}
     </Paper>
   )
 }

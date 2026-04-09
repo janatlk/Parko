@@ -13,6 +13,7 @@ import {
   listAccumulatorsByCar,
   listPhotosByCar,
   deletePhoto,
+  uploadPhoto,
   getCarRelatedStats,
 } from '../api/carDetailApi'
 
@@ -87,6 +88,16 @@ export function useDeletePhotoMutation(carId: number) {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (photoId: number) => deletePhoto(photoId),
+    onSuccess: async () => {
+      await qc.invalidateQueries({ queryKey: detailKeys.photos(carId) })
+    },
+  })
+}
+
+export function useUploadPhotoMutation(carId: number) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ file, comment }: { file: File; comment?: string }) => uploadPhoto(carId, file, comment),
     onSuccess: async () => {
       await qc.invalidateQueries({ queryKey: detailKeys.photos(carId) })
     },

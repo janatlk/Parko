@@ -3,16 +3,17 @@ import { useState } from 'react'
 import {
   ActionIcon,
   Alert,
+  Box,
   Container,
   Group,
   Loader,
   Paper,
-  SimpleGrid,
   Stack,
   Text,
   Title,
+  Tooltip,
 } from '@mantine/core'
-import { IconAlertTriangle, IconCar, IconFlame, IconSettings, IconTools } from '@tabler/icons-react'
+import { IconAlertTriangle, IconCar, IconFlame, IconSettings, IconTools, IconRefresh } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -41,6 +42,15 @@ export function DashboardPage() {
   const [preferencesOpen, setPreferencesOpen] = useState(false)
   const [preferences, setPreferences] = useState(() => loadDashboardPreferences())
   const [chartMonths, setChartMonths] = useState<string>('6')
+  const [costChartSize, setCostChartSize] = useState<{ w: number; h: number } | null>(null)
+  const [carsChartSize, setCarsChartSize] = useState<{ w: number; h: number } | null>(null)
+
+  const handleResetLayout = () => {
+    setCostChartSize(null)
+    setCarsChartSize(null)
+    localStorage.removeItem('parko_cost_chart_size')
+    localStorage.removeItem('parko_cars_chart_size')
+  }
 
   const { data: stats, isLoading: statsLoading, error: statsError } = useDashboardStats()
   const { data: expiringData, isLoading: expiringLoading } = useExpiringItems()
@@ -70,7 +80,6 @@ export function DashboardPage() {
 
   const totalCars = stats?.total_cars ?? 0
 
-  // Build stat cards array based on preferences
   const statCards = [
     preferences.showOperationalCost ? {
       icon: <IconCar size={24} />,
@@ -113,79 +122,119 @@ export function DashboardPage() {
     } : null,
   ].filter((card): card is NonNullable<typeof card> => card !== null)
 
-  // Determine grid columns based on visible widgets
-  const visibleWidgets = [
-    preferences.showCostChart,
-    preferences.showActivityFeed,
-    preferences.showExpiringSoon,
-    preferences.showFleetStatus,
-    preferences.showVehicleConsumption,
-  ].filter(Boolean).length
-
-  const gridCols = visibleWidgets <= 2 ? 2 : 3
-
   return (
-    <Container size="fluid" px={preferences.compactMode ? 'md' : 'xl'} py={preferences.compactMode ? 'md' : 'xl'} className={preferences.compactMode ? 'dashboard-compact' : ''}>
-      <Stack gap={preferences.compactMode ? 'sm' : 'xl'}>
+    <Container size="fluid" px="md" py="md">
+      <Stack gap="md">
         {/* Header */}
         <Group justify="space-between">
           <div>
-            <Title order={2} fw={700} size={preferences.compactMode ? 'xl' : undefined}>{t('dashboard.title')}</Title>
-            <Text c="dimmed" size={preferences.compactMode ? 'xs' : 'sm'}>{t('dashboard.welcome')}</Text>
+            <Title order={2} fw={700}>{t('dashboard.title')}</Title>
+            <Text c="dimmed" size="xs">{t('dashboard.welcome')}</Text>
           </div>
-          <ActionIcon
-            variant="outline"
-            size={preferences.compactMode ? 'md' : 'lg'}
-            radius="md"
-            onClick={() => setPreferencesOpen(true)}
-          >
-            <IconSettings size={20} />
-          </ActionIcon>
+          <Group gap="xs">
+            <Tooltip label="Reset chart sizes">
+              <ActionIcon
+                variant="outline"
+                size="md"
+                radius="md"
+                onClick={handleResetLayout}
+              >
+                <IconRefresh size={20} />
+              </ActionIcon>
+            </Tooltip>
+            <ActionIcon
+              variant="outline"
+              size="md"
+              radius="md"
+              onClick={() => setPreferencesOpen(true)}
+            >
+              <IconSettings size={20} />
+            </ActionIcon>
+          </Group>
         </Group>
 
         {/* Stat Cards Grid */}
         {statCards.length > 0 && (
-          <StatsGrid stats={statCards} compact={preferences.compactMode} />
+          <StatsGrid stats={statCards} compact />
         )}
 
-        {/* Main Dashboard Grid */}
-        <SimpleGrid cols={{ base: 1, sm: 2, lg: gridCols }} spacing={preferences.compactMode ? 'sm' : 'md'}>
+        {/* Main Dashboard Grid — Flexbox for dynamic sizing */}
+        <Box
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 8,
+            alignItems: 'flex-start',
+          }}
+        >
           {preferences.showCostChart && (
-            <Paper p={preferences.compactMode ? 'sm' : 'md'} radius="md" withBorder style={{ minHeight: preferences.compactMode ? 280 : 380 }}>
-              <CostBreakdownChart data={costData} isLoading={costLoading} monthsRange={chartMonths} setMonthsRange={setChartMonths} compact={preferences.compactMode} />
-            </Paper>
+            <Box
+              style={{
+                flex: costChartSize && costChartSize.w > 0
+                  ? `0 0 ${costChartSize.w}px`
+                  : '1 1 300px',
+                minWidth: 280,
+              }}
+            >
+              <Paper p="sm" radius="md" withBorder style={{ overflow: 'visible' }}>
+                <CostBreakdownChart
+                  data={costData}
+                  isLoading={costLoading}
+                  monthsRange={chartMonths}
+                  setMonthsRange={setChartMonths}
+                  compact
+                  onResize={setCostChartSize}
+                />
+              </Paper>
+            </Box>
           )}
 
           {preferences.showActivityFeed && (
-            <Paper p={preferences.compactMode ? 'sm' : 'md'} radius="md" withBorder style={{ minHeight: preferences.compactMode ? 280 : 380 }}>
-              <ActivityFeed items={activityItems} isLoading={activityLoading} compact={preferences.compactMode} />
-            </Paper>
+            <Box style={{ flex: '1 1 300px', minWidth: 280 }}>
+              <Paper p="sm" radius="md" withBorder>
+                <ActivityFeed items={activityItems} isLoading={activityLoading} compact />
+              </Paper>
+            </Box>
           )}
 
           {preferences.showExpiringSoon && (
-            <Paper p={preferences.compactMode ? 'sm' : 'md'} radius="md" withBorder style={{ minHeight: preferences.compactMode ? 280 : 380 }}>
-              <ExpiringSoon data={expiringData} isLoading={expiringLoading} compact={preferences.compactMode} />
-            </Paper>
+            <Box style={{ flex: '1 1 300px', minWidth: 280 }}>
+              <Paper p="sm" radius="md" withBorder>
+                <ExpiringSoon data={expiringData} isLoading={expiringLoading} compact />
+              </Paper>
+            </Box>
           )}
 
           {preferences.showFleetStatus && (
-            <Paper p={preferences.compactMode ? 'sm' : 'md'} radius="md" withBorder style={{ minHeight: preferences.compactMode ? 240 : 340 }}>
-              <CarsByStatus
-                total={stats?.total_cars}
-                active={stats?.active_cars}
-                maintenance={stats?.maintenance_cars}
-                inactive={stats?.inactive_cars}
-                compact={preferences.compactMode}
-              />
-            </Paper>
+            <Box
+              style={{
+                flex: carsChartSize && carsChartSize.w > 0
+                  ? `0 0 ${carsChartSize.w}px`
+                  : '1 1 300px',
+                minWidth: 280,
+              }}
+            >
+              <Paper p="sm" radius="md" withBorder style={{ overflow: 'visible' }}>
+                <CarsByStatus
+                  total={stats?.total_cars}
+                  active={stats?.active_cars}
+                  maintenance={stats?.maintenance_cars}
+                  inactive={stats?.inactive_cars}
+                  compact
+                  onResize={setCarsChartSize}
+                />
+              </Paper>
+            </Box>
           )}
 
           {preferences.showVehicleConsumption && (
-            <Paper p={preferences.compactMode ? 'sm' : 'md'} radius="md" withBorder style={{ minHeight: preferences.compactMode ? 240 : 340 }}>
-              <VehicleConsumptionList items={vehicleConsumption} isLoading={vehicleLoading} compact={preferences.compactMode} />
-            </Paper>
+            <Box style={{ flex: '1 1 300px', minWidth: 280 }}>
+              <Paper p="sm" radius="md" withBorder>
+                <VehicleConsumptionList items={vehicleConsumption} isLoading={vehicleLoading} compact />
+              </Paper>
+            </Box>
           )}
-        </SimpleGrid>
+        </Box>
       </Stack>
 
       {/* Customization Drawer */}

@@ -4,6 +4,7 @@ from django.db.models import Sum, Count, Q, Avg, F
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.core.cache import cache
 
 from fleet.models import Car, Fuel, Insurance, Inspection, Spare, Tires, Accumulator
 
@@ -38,6 +39,15 @@ class DashboardStatsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        company_id = request.user.company.id
+        cache_key = f'dashboard_stats_{company_id}'
+        
+        # Try to get from cache
+        data = cache.get(cache_key)
+        if data is not None:
+            return Response(data)
+        
+        # Calculate stats
         company = request.user.company
         now = timezone.now()
         current_month = now.month
@@ -170,7 +180,7 @@ class DashboardStatsView(APIView):
             if 0 <= (i.inspected_at + timedelta(days=365) - now.date()).days <= 30
         )
 
-        return Response({
+        data = {
             'total_cars': total_cars,
             'active_cars': active_cars,
             'maintenance_cars': maintenance_cars,
@@ -186,7 +196,12 @@ class DashboardStatsView(APIView):
             'expiring_items_count': expiring_count + expiring_inspections,
             'avg_fuel_consumption': avg_fuel_consumption,
             'prev_avg_fuel_consumption': round(prev_avg_consumption, 2) if prev_avg_consumption else 0,
-        })
+        }
+        
+        # Cache for 5 minutes
+        cache.set(cache_key, data, 300)
+        
+        return Response(data)
 
 
 class DashboardExpiringView(APIView):
@@ -350,9 +365,16 @@ class DashboardCostByMonthView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        company = request.user.company
+        company_id = request.user.company.id
         months = int(request.query_params.get('months', 6))
-
+        cache_key = f'dashboard_cost_by_month_{company_id}_{months}'
+        
+        # Try to get from cache
+        data = cache.get(cache_key)
+        if data is not None:
+            return Response(data)
+        
+        company = request.user.company
         now = timezone.now()
 
         # Generate month ranges
@@ -454,7 +476,10 @@ class DashboardCostByMonthView(APIView):
 
         # Sort chronologically (oldest first)
         data.sort(key=lambda x: (x['year'], x['month']))
-
+        
+        # Cache for 10 minutes
+        cache.set(cache_key, data, 600)
+        
         return Response(data)
 
 

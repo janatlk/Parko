@@ -12,6 +12,7 @@ import {
   Text,
   ThemeIcon,
   Title,
+  useMantineColorScheme,
 } from '@mantine/core'
 import { IconCalendar, IconCar, IconChevronDown, IconChevronUp, IconShield, IconShieldCheck, IconExternalLink } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
@@ -27,6 +28,8 @@ type ExpiringSoonProps = {
 
 export function ExpiringSoon({ data, isLoading, compact = false }: ExpiringSoonProps) {
   const { t } = useTranslation()
+  const { colorScheme } = useMantineColorScheme()
+  const isDark = colorScheme === 'dark'
   const navigate = useNavigate()
   const [expanded, setExpanded] = useState(false)
 
@@ -122,6 +125,7 @@ export function ExpiringSoon({ data, isLoading, compact = false }: ExpiringSoonP
             const color = getExpiryColor(item.days_until_expiry)
             const status = getExpiryStatus(item.days_until_expiry)
             const progressValue = Math.max(0, Math.min(100, (item.days_until_expiry / 30) * 100))
+            const borderColor = isDark ? '#373A40' : 'var(--mantine-color-default-border)'
 
             return (
               <Box
@@ -131,10 +135,10 @@ export function ExpiringSoon({ data, isLoading, compact = false }: ExpiringSoonP
                   cursor: 'pointer',
                   padding: 'var(--mantine-spacing-sm)',
                   borderRadius: 'var(--mantine-radius-md)',
-                  border: '1px solid var(--mantine-color-default-border)',
+                  border: `1px solid ${borderColor}`,
                   backgroundColor: isExpired
-                    ? 'var(--mantine-color-red-light)'
-                    : `var(--mantine-color-${color}-light)`,
+                    ? (isDark ? 'rgba(255, 87, 87, 0.1)' : 'var(--mantine-color-red-light)')
+                    : (isDark ? 'rgba(255, 165, 0, 0.08)' : `var(--mantine-color-${color}-light)`),
                   transition: 'background-color 0.15s ease',
                 }}
               >
@@ -143,7 +147,7 @@ export function ExpiringSoon({ data, isLoading, compact = false }: ExpiringSoonP
                     <ThemeIcon variant="white" size="sm" color={color}>
                       {item.type === 'insurance' ? <IconShield size={16} /> : <IconCalendar size={16} />}
                     </ThemeIcon>
-                    <Text fw={600} size="sm">
+                    <Text fw={600} size="sm" style={{ color: isDark ? '#e9ecef' : 'inherit' }}>
                       {item.type === 'insurance' ? t('insurances.title') : t('inspections.title')}
                     </Text>
                   </Group>
@@ -153,8 +157,8 @@ export function ExpiringSoon({ data, isLoading, compact = false }: ExpiringSoonP
                 </Group>
                 <Group justify="space-between" mb="xs">
                   <Group gap="xs">
-                    <IconCar size={16} stroke={1.5} />
-                    <Text size="sm">{item.car_numplate}</Text>
+                    <IconCar size={16} stroke={1.5} color={isDark ? '#adb5bd' : undefined} />
+                    <Text size="sm" style={{ color: isDark ? '#e9ecef' : 'inherit' }}>{item.car_numplate}</Text>
                   </Group>
                   <Text size="sm" fw={600} c={color}>
                     {item.days_until_expiry < 0

@@ -1,4 +1,4 @@
-import { Box, Group, ScrollArea, Stack, Text, ThemeIcon, Title } from '@mantine/core'
+import { Box, Group, ScrollArea, Stack, Text, ThemeIcon, Title, useMantineColorScheme } from '@mantine/core'
 import {
   IconCar,
   IconFlame,
@@ -84,6 +84,8 @@ function formatRelativeDate(dateString: string) {
 export function ActivityFeed({ items = [], isLoading, compact = false }: ActivityFeedProps) {
   const { t } = useTranslation()
   const { user } = useAuth()
+  const { colorScheme } = useMantineColorScheme()
+  const isDark = colorScheme === 'dark'
   const currency = user?.currency || 'KGS'
   const navigate = useNavigate()
 
@@ -125,7 +127,10 @@ export function ActivityFeed({ items = [], isLoading, compact = false }: Activit
                 padding: 'var(--mantine-spacing-sm)',
                 borderRadius: 'var(--mantine-radius-md)',
                 transition: 'background-color 0.15s ease',
+                backgroundColor: isDark ? 'transparent' : 'transparent',
               }}
+              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = isDark ? 'rgba(255,255,255,0.05)' : 'var(--mantine-color-gray-0)' }}
+              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent' }}
             >
               <ThemeIcon
                 variant="light"
@@ -149,7 +154,7 @@ export function ActivityFeed({ items = [], isLoading, compact = false }: Activit
                   {item.cost > 0 && (
                     <>
                       <Text size="xs" c="dimmed">•</Text>
-                      <Text size="xs" c="dimmed" fw={500}>
+                      <Text size="xs" fw={500} style={{ color: isDark ? '#74c0fc' : '#1971c2' }}>
                         {formatPrice(item.cost, currency)}
                       </Text>
                     </>

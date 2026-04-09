@@ -460,6 +460,52 @@ def prepare_cost_analysis_for_export(report_data: Dict[str, Any]) -> List[Dict[s
     return rows
 
 
+def prepare_cost_per_km_for_export(report_data: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """
+    Подготовка данных отчета по стоимости за км для экспорта.
+
+    Args:
+        report_data: Данные отчета из ReportGenerator (cost_per_km)
+    """
+    rows = []
+
+    for car_data in report_data.get('data', []):
+        rows.append({
+            'car_numplate': car_data.get('car_numplate', ''),
+            'brand': car_data.get('brand', ''),
+            'model': car_data.get('model', ''),
+            'fuel_cost': car_data.get('fuel_cost', 0),
+            'maintenance_cost': car_data.get('maintenance_cost', 0),
+            'insurance_cost': car_data.get('insurance_cost', 0),
+            'inspection_cost': car_data.get('inspection_cost', 0),
+            'total_cost': car_data.get('total_cost', 0),
+            'total_distance': car_data.get('total_distance', 0),
+            'cost_per_km': car_data.get('cost_per_km', 0),
+            'fuel_cost_per_km': car_data.get('fuel_cost_per_km', 0),
+            'maintenance_cost_per_km': car_data.get('maintenance_cost_per_km', 0),
+        })
+
+    # Add totals row
+    summary = report_data.get('summary', {})
+    if summary:
+        rows.append({
+            'car_numplate': 'TOTAL',
+            'brand': '',
+            'model': '',
+            'fuel_cost': summary.get('total_cost', 0),
+            'maintenance_cost': 0,
+            'insurance_cost': 0,
+            'inspection_cost': 0,
+            'total_cost': summary.get('total_cost', 0),
+            'total_distance': summary.get('total_distance', 0),
+            'cost_per_km': summary.get('avg_cost_per_km', 0),
+            'fuel_cost_per_km': 0,
+            'maintenance_cost_per_km': 0,
+        })
+
+    return rows
+
+
 def get_export_preparator(report_type: str):
     """
     Возвращает функцию для подготовки данных отчета к экспорту.
@@ -476,6 +522,7 @@ def get_export_preparator(report_type: str):
         'insurance_inspection': prepare_insurance_inspection_for_export,
         'vehicle_utilization': prepare_vehicle_utilization_for_export,
         'cost_analysis': prepare_cost_analysis_for_export,
+        'cost_per_km': prepare_cost_per_km_for_export,
     }
     
     return preparators.get(report_type)

@@ -14,28 +14,41 @@ ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 
 # Database - Support both SQLite (local) and PostgreSQL (Supabase)
 # Use PostgreSQL if POSTGRES_HOST is set, otherwise use SQLite
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql' if env.str('POSTGRES_HOST', default='') else 'django.db.backends.sqlite3',
-        'NAME': env.str('POSTGRES_DB', default=str(BASE_DIR / 'db.sqlite3')),
-        'USER': env.str('POSTGRES_USER', default=''),
-        'PASSWORD': env.str('POSTGRES_PASSWORD', default=''),
-        'HOST': env.str('POSTGRES_HOST', default=''),
-        'PORT': env.str('POSTGRES_PORT', default='5432'),
-        # Supabase-specific connection pooling settings
-        'CONN_MAX_AGE': 600 if env.str('POSTGRES_HOST', default='') else 0,
-        'CONN_HEALTH_CHECKS': True if env.str('POSTGRES_HOST', default='') else False,
+if env.str('POSTGRES_HOST', default=''):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': env.str('POSTGRES_DB', default='postgres'),
+            'USER': env.str('POSTGRES_USER', default='postgres'),
+            'PASSWORD': env.str('POSTGRES_PASSWORD', default=''),
+            'HOST': env.str('POSTGRES_HOST', default=''),
+            'PORT': env.str('POSTGRES_PORT', default='5432'),
+            'CONN_MAX_AGE': 600,
+            'CONN_HEALTH_CHECKS': True,
+            'OPTIONS': {
+                'connect_timeout': 30,
+                'sslmode': 'require',
+            },
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
-# Cache for demo sessions
+# Cache for dashboard and API responses
+# Using database cache for better persistence
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-        'LOCATION': 'demo_cache_table',
-        'TIMEOUT': 7200,  # 2 hours
+        'LOCATION': 'django_cache_table',
+        'TIMEOUT': 300,  # 5 минут
         'OPTIONS': {
-            'MAX_ENTRIES': 1000
+            'MAX_ENTRIES': 500,
+            'CULL_FREQUENCY': 3,
         }
     }
 }
@@ -46,6 +59,19 @@ DEMO_SESSION_TTL = 7200  # 2 hours in seconds
 
 # CORS settings
 CORS_ALLOW_ALL_ORIGINS = True  # Only for development!
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+]
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'authorization',
+    'content-type',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
 
 # Logging configuration for debugging
 LOGGING = {

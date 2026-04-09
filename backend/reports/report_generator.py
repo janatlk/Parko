@@ -55,6 +55,7 @@ class ReportGenerator:
             'insurance_inspection': InsuranceInspectionReportGenerator,
             'vehicle_utilization': VehicleUtilizationReportGenerator,
             'cost_analysis': CostAnalysisReportGenerator,
+            'cost_per_km': CostPerKmReportGenerator,
         }
 
         generator_class = generator_map.get(report_type)
@@ -700,5 +701,156 @@ class CostAnalysisReportGenerator:
                         ][:len(non_zero_costs)],
                     }
                 })
-        
+
+        return charts
+
+
+class CostPerKmReportGenerator:
+    """Cost per kilometer report"""
+
+    @staticmethod
+    def generate(from_date, to_date, company, car_ids, filters):
+        from .services_cost_per_km import get_cost_per_km_report
+
+        try:
+            raw_data = get_cost_per_km_report(
+                company_id=company.id,
+                start_date=str(from_date) if from_date else None,
+                end_date=str(to_date) if to_date else None,
+                vehicle_ids=car_ids,
+                vehicle_type=filters.get('vehicle_type'),
+                region=filters.get('region'),
+            )
+
+            data = []
+            for vehicle_row in raw_data.get('by_vehicle', []):
+                data.append({
+                    'car_id': vehicle_row.get('vehicle_id'),
+                    'car_numplate': vehicle_row.get('numplate', ''),
+                    'brand': vehicle_row.get('brand', ''),
+                    'model': vehicle_row.get('model', ''),
+                    'fuel_cost': float(vehicle_row.get('fuel_cost', 0)),
+                    'maintenance_cost': float(vehicle_row.get('maintenance_cost', 0)),
+                    'insurance_cost': float(vehicle_row.get('insurance_cost', 0)),
+                    'inspection_cost': float(vehicle_row.get('inspection_cost', 0)),
+                    'total_cost': float(vehicle_row.get('total_cost', 0)),
+                    'total_distance': float(vehicle_row.get('total_distance', 0)),
+                    'cost_per_km': float(vehicle_row.get('cost_per_km', 0)),
+                    'fuel_cost_per_km': float(vehicle_row.get('fuel_cost_per_km', 0)),
+                    'maintenance_cost_per_km': float(vehicle_row.get('maintenance_cost_per_km', 0)),
+                })
+        except Exception as e:
+            data = []
+
+        summary = {
+            'total_vehicles': len(data),
+            'total_cost': sum(d['total_cost'] for d in data),
+            'total_distance': sum(d['total_distance'] for d in data),
+            'avg_cost_per_km': sum(d['cost_per_km'] for d in data) / len(data) if data else 0,
+        }
+
+        return {
+            'report_type': 'cost_per_km',
+            'from_date': str(from_date),
+            'to_date': str(to_date),
+            'data': data,
+            'summary': summary
+        }
+
+    @staticmethod
+    def generate_charts(report_data):
+        """Generate chart data for cost per km report"""
+        charts = []
+        data = report_data.get('data', [])
+
+        if not data:
+            return charts
+
+        # Chart 1: Cost per Km by Vehicle (Bar Chart)
+        cars = [d['car_numplate'] for d in data]
+        costs_per_km = [d['cost_per_km'] for d in data]
+
+        charts.append({
+            'type': 'bar',
+            'title': 'Cost per Km by Vehicle',
+            'data': {
+                'labels': cars,
+                'datasets': [
+                    {
+                        'label': 'Cost per Km (som/km)',
+                        'data': costs_per_km,
+                        'backgroundColor': 'rgba(239, 68, 68, 0.7)',
+                    },
+                ]
+            }
+        })
+
+        # Chart 2: Total Costs by Vehicle (Bar Chart)
+        total_costs = [d['total_cost'] for d in data]
+
+        charts.append({
+            'type': 'bar',
+            'title': 'Total Costs by Vehicle',
+            'data': {
+                'labels': cars,
+                'datasets': [
+                    {
+                        'label': 'Total Cost (som)',
+                        'data': total_costs,
+                        'backgroundColor': 'rgba(59, 130, 246, 0.7)',
+                    },
+                ]
+            }
+        })
+
+        # Chart 3: Cost Breakdown by Category (Stacked Bar Chart)
+        if len(data) > 1:
+            fuel_costs = [d['fuel_cost'] for d in data]
+            maintenance_costs = [d['maintenance_cost'] for d in data]
+            insurance_costs = [d['insurance_cost'] for d in data]
+            inspection_costs = [d['inspection_cost'] for d in data]
+
+            charts.append({
+                'type': 'bar',
+                'title': 'Cost Breakdown by Category',
+                'data': {
+                    'labels': cars,
+                    'datasets': [
+                        {
+                            'label': 'Fuel',
+                            'data': fuel_costs,
+                            'backgroundColor': 'rgba(59, 130, 246, 0.7)',
+                        },
+                        {
+                            'label': 'Maintenance',
+                            'data': maintenance_costs,
+                            'backgroundColor': 'rgba(16, 185, 129, 0.7)',
+                        },
+                        {
+                            'label': 'Insurance',
+                            'data': insurance_costs,
+                            'backgroundColor': 'rgba(245, 158, 11, 0.7)',
+                        },
+                        {
+                            'label': 'Inspection',
+                            'data': inspection_costs,
+                            'backgroundColor': 'rgba(139, 92, 246, 0.7)',
+                        },
+                    ]
+                }
+            })
+
+        # Chart 4: Cost Distribution (Pie Chart)
+        summary = report_data.get('summary', {})
+        if summary and summary.get('total_cost', 0) > 0:
+            charts.append({
+                'type': 'pie',
+                'title': 'Cost Distribution by Vehicle',
+                'data': {
+                    'labels': cars,
+                    'data': total_costs,
+                    'backgroundColor': ReportGenerator.CHART_COLORS[:len(cars)],
+                }
+            })
+
         return charts

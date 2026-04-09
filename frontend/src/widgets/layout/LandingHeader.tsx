@@ -1,7 +1,7 @@
 import { Button, Group, Select, Text, Box, Burger } from '@mantine/core'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { IconCar, IconLanguage, IconMenu, IconX } from '@tabler/icons-react'
+import { IconCar, IconLanguage } from '@tabler/icons-react'
 import { useState } from 'react'
 
 import { LANGUAGES } from '@shared/constants/languages'

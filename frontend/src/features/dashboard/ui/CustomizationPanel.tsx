@@ -4,11 +4,10 @@ import {
   Drawer,
   Group,
   Stack,
-  Switch,
   Text,
   Title,
 } from '@mantine/core'
-import { IconLayout, IconSettings, IconTable, IconTypeface } from '@tabler/icons-react'
+import { IconLayout, IconSettings, IconTable } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
 
 type DashboardPreferences = {
@@ -24,8 +23,6 @@ type DashboardPreferences = {
   showAvgConsumption: boolean
   showSparePartsCost: boolean
   showMaintenanceCars: boolean
-  // Display options
-  compactMode: boolean
 }
 
 const defaultPreferences: DashboardPreferences = {
@@ -39,7 +36,6 @@ const defaultPreferences: DashboardPreferences = {
   showAvgConsumption: true,
   showSparePartsCost: true,
   showMaintenanceCars: true,
-  compactMode: false,
 }
 
 const STORAGE_KEY = 'parko_dashboard_preferences'
@@ -165,22 +161,6 @@ export function CustomizationPanel({
               label={t('dashboard.maintenance_cars')}
               checked={preferences.showMaintenanceCars}
               onChange={() => handleToggle('showMaintenanceCars')}
-            />
-          </Stack>
-        </Box>
-
-        {/* Display Options */}
-        <Box>
-          <Group gap="xs" mb="sm">
-            <IconTypeface size={18} />
-            <Text fw={600} size="sm">{t('dashboard.display_options')}</Text>
-          </Group>
-          <Stack gap="sm" pl="md">
-            <Switch
-              label={t('dashboard.compact_mode')}
-              description={t('dashboard.compact_mode_desc')}
-              checked={preferences.compactMode}
-              onChange={() => handleToggle('compactMode')}
             />
           </Stack>
         </Box>

@@ -395,6 +395,12 @@ function formatLabel(key: string): string {
     grand_total: 'reports.grand_total',
     total_parts_cost: 'reports.total_parts_cost',
     total_labor_cost: 'reports.total_labor_cost',
+    // Cost per Km
+    total_distance: 'reports.cost_per_km.total_distance',
+    avg_cost_per_km: 'reports.cost_per_km.avg_cost_per_km',
+    vehicle_count: 'reports.cost_per_km.vehicle_count',
+    fuel_cost_per_km: 'reports.cost_per_km.fuel_cost',
+    maintenance_cost_per_km: 'reports.cost_per_km.maintenance_cost',
     // Insurance/Inspection
     type: 'reports.type_label',
     status: 'reports.status',
