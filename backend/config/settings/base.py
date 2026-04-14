@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'reports',
     'dashboard',
     'feedback',
+    'ai',
 ]
 
 MIDDLEWARE = [
@@ -132,4 +133,11 @@ from datetime import timedelta
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+}
+
+# AI Assistant settings (overridden in dev.py / prod.py from env vars)
+AI_SETTINGS = {
+    'provider': 'groq',
+    'api_key': '',
+    'model': 'llama-3.1-8b-instant',
 }

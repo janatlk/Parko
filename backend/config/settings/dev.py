@@ -111,3 +111,10 @@ LOGGING = {
         },
     },
 }
+
+# AI Assistant settings (override base defaults)
+AI_SETTINGS = {
+    'provider': env.str('AI_PROVIDER', default='groq'),
+    'api_key': env.str('AI_API_KEY', default=''),
+    'model': env.str('AI_MODEL', default='llama-3.1-8b-instant'),
+}

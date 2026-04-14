@@ -24,6 +24,7 @@ import { ProfilePage } from '@pages/ProfilePage'
 import { ReportsPage } from '@pages/ReportsPage'
 import { SparesPage } from '@pages/SparesPage'
 import { UsersPage } from '@pages/UsersPage'
+import { AIPage } from '@pages/AIPage'
 
 function AppContent() {
   const { resolvedTheme } = useTheme()
@@ -67,6 +68,7 @@ function AppContent() {
               <Route path="/inspections" element={<InspectionsPage />} />
               <Route path="/users" element={<UsersPage />} />
               <Route path="/reports" element={<ReportsPage />} />
+              <Route path="/ai" element={<AIPage />} />
               <Route path="/profile" element={<ProfilePage />} />
             </Route>
             <Route path="*" element={<NotFoundPage />} />

@@ -10,6 +10,7 @@ import {
   IconCalendarStats,
   IconUsers,
   IconFileAnalytics,
+  IconBrain,
   IconUser,
   IconLogout,
   IconLanguage,
@@ -248,6 +249,15 @@ export function AppLayout() {
             active={activePath.startsWith('/reports')}
             onClick={() => toggle()}
             styles={() => getNavStyles(isDark, activePath.startsWith('/reports'))}
+          />
+          <NavLink
+            component={RouterNavLink}
+            to="/ai"
+            label={t('ai.title')}
+            leftSection={<IconBrain size={18} stroke={1.5} color={isDark ? '#868e96' : undefined} />}
+            active={activePath.startsWith('/ai')}
+            onClick={() => toggle()}
+            styles={() => getNavStyles(isDark, activePath.startsWith('/ai'))}
           />
           <NavLink
             component={RouterNavLink}

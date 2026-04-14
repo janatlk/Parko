@@ -93,7 +93,6 @@ export function CostBreakdownChart({ data = [], isLoading, monthsRange, setMonth
   const [opened, setOpened] = useState(false)
   const [visibleCategories, setVisibleCategories] = useState<Record<CostCategory, boolean>>(defaultCategories)
   const [resizeMode, setResizeMode] = useState(false)
-  const savedSize = useRef<{ w: number; h: number } | null>(null)
 
   const containerRef = useRef<HTMLDivElement>(null)
   const startMouse = useRef({ x: 0, y: 0 })
@@ -104,27 +103,21 @@ export function CostBreakdownChart({ data = [], isLoading, monthsRange, setMonth
   const handleMonthsChange = setMonthsRange ?? setLocalMonthsRange
   const categoryConfig = getCategoryColors(isDark)
 
-  // Load saved size on mount — NO onResize call here (that causes setState during render)
-  const loadSavedSize = useCallback(() => {
+  // Load saved size on mount
+  const sizeRef = useRef({ w: 0, h: compact ? 240 : 300 })
+
+  useEffect(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY)
       if (stored) {
         const parsed = JSON.parse(stored)
         if (parsed.w > 0) {
-          return parsed
+          sizeRef.current = parsed
+          currentSize.current = parsed
+          onResize?.(parsed)
         }
       }
     } catch { /* ignore */ }
-    return { w: 0, h: compact ? 240 : 300 }
-  }, [compact])
-
-  const size = useRef(loadSavedSize()).current
-
-  // Report saved size to parent AFTER mount (not during render)
-  useEffect(() => {
-    if (size.w > 0) {
-      onResize?.(size)
-    }
   }, [])
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
@@ -141,7 +134,6 @@ export function CostBreakdownChart({ data = [], isLoading, monthsRange, setMonth
       const newW = Math.max(200, Math.min(1200, startSize.current.w + dw))
       const newH = Math.max(150, Math.min(600, startSize.current.h + dh))
       currentSize.current = { w: newW, h: newH }
-      // Directly update container style — no React state
       if (containerRef.current) {
         containerRef.current.style.width = `${newW}px`
         containerRef.current.style.height = `${newH}px`
@@ -160,12 +152,8 @@ export function CostBreakdownChart({ data = [], isLoading, monthsRange, setMonth
   }, [onResize])
 
   const handleResetClick = useCallback(() => {
-    if (resizeMode) {
-      setResizeMode(false)
-    } else {
-      setResizeMode(true)
-    }
-  }, [resizeMode])
+    setResizeMode(prev => !prev)
+  }, [])
 
   const getChartData = (): ChartData[] => {
     if (!data || data.length === 0) return []
@@ -291,7 +279,7 @@ export function CostBreakdownChart({ data = [], isLoading, monthsRange, setMonth
       <div
         ref={containerRef}
         style={{
-          height: size.h || undefined,
+          height: sizeRef.current.h || undefined,
           minHeight: 150,
           maxHeight: 600,
           position: 'relative',

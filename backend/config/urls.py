@@ -7,7 +7,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 urlpatterns = [
     # Django admin
     path("admin/", admin.site.urls),
-    
+
     # API URLs
     path("api/v1/", include("accounts.urls")),
     path("api/v1/", include("core.urls")),
@@ -16,10 +16,11 @@ urlpatterns = [
     path("api/v1/", include("reports.urls")),
     path("api/v1/dashboard/", include("dashboard.urls")),
     path("api/v1/", include("feedback.urls")),
+    path("api/v1/ai/", include("ai.urls")),
 
     # Legacy/info endpoints
     path("api/", include("api.urls")),
-    
+
     # API Schema
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
