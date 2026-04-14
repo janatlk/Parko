@@ -1,10 +1,23 @@
 import ReactMarkdown from 'react-markdown'
+import rehypeRaw from 'rehype-raw'
 
 import { Box, Code, Table, Text } from '@mantine/core'
 
 interface MarkdownTextProps {
   content: string
   isUser?: boolean
+}
+
+// Sanitize style attributes to only allow color property
+function sanitizeStyle(styleStr: string): string {
+  if (!styleStr) return ''
+  const allowedProperties = ['color', 'background-color', 'font-weight', 'font-style']
+  const styles = styleStr.split(';').filter(Boolean)
+  const sanitized = styles.filter((style) => {
+    const prop = style.split(':')[0]?.trim().toLowerCase()
+    return allowedProperties.includes(prop)
+  })
+  return sanitized.join('; ')
 }
 
 // Check if a code block is a structured data JSON (table, chart, etc.)
@@ -76,7 +89,13 @@ export function MarkdownText({ content, isUser }: MarkdownTextProps) {
   return (
     <Box className="markdown-content" style={{ lineHeight: 1.6 }}>
       <ReactMarkdown
+        rehypePlugins={[rehypeRaw]}
         components={{
+          span: ({ children, ...props }) => {
+            // Allow span tags with sanitized inline styles for colors
+            const style = props.style ? sanitizeStyle(props.style as string) : undefined
+            return <span style={style}>{children}</span>
+          },
           strong: ({ children }) => <Text component="span" fw={700} inherit>{children}</Text>,
           em: ({ children }) => <Text component="em" inherit>{children}</Text>,
           code: ({ children, className }: any) => {
