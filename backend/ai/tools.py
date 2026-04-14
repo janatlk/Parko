@@ -4,6 +4,7 @@ Each function validates permissions, ensures company data isolation,
 and returns a structured result dict.
 """
 import logging
+import re
 
 from django.db import models
 from django.utils import timezone
@@ -12,6 +13,30 @@ from accounts.models import UserRole
 from fleet.models import Car, Fuel, Spare, Insurance, Inspection, CarStatus
 
 logger = logging.getLogger(__name__)
+
+
+def _parse_car_id(value):
+    """
+    Extract integer car_id from various formats AI might send.
+    Examples:
+        - 32 → 32
+        - "32" → 32
+        - "car_id=32" → 32
+        - "ID: 32" → 32
+    """
+    if isinstance(value, int):
+        return value
+    if isinstance(value, str):
+        # Try to extract number from strings like "car_id=32" or "ID: 32"
+        match = re.search(r'(\d+)', value)
+        if match:
+            return int(match.group(1))
+        # Try direct conversion
+        try:
+            return int(value)
+        except (ValueError, TypeError):
+            pass
+    return value  # Return as-is, will fail validation later
 
 
 def _check_admin(user):
@@ -177,10 +202,15 @@ def tool_add_fuel(user, company, data):
         if field not in data or data[field] is None:
             return {'success': False, 'error': f"Required field missing: {field}"}
 
+    # Parse car_id from various formats
+    car_id = _parse_car_id(data['car_id'])
+    if not isinstance(car_id, int):
+        return {'success': False, 'error': f"Invalid car_id format: {data['car_id']}. Must be an integer."}
+
     try:
-        car = Car.objects.get(id=data['car_id'], company=company)
+        car = Car.objects.get(id=car_id, company=company)
     except Car.DoesNotExist:
-        return {'success': False, 'error': f"Vehicle with ID {data['car_id']} not found."}
+        return {'success': False, 'error': f"Vehicle with ID {car_id} not found."}
 
     try:
         fuel = Fuel.objects.create(
@@ -218,10 +248,15 @@ def tool_add_spare(user, company, data):
         if field not in data or data[field] is None:
             return {'success': False, 'error': f"Required field missing: {field}"}
 
+    # Parse car_id from various formats
+    car_id = _parse_car_id(data['car_id'])
+    if not isinstance(car_id, int):
+        return {'success': False, 'error': f"Invalid car_id format: {data['car_id']}. Must be an integer."}
+
     try:
-        car = Car.objects.get(id=data['car_id'], company=company)
+        car = Car.objects.get(id=car_id, company=company)
     except Car.DoesNotExist:
-        return {'success': False, 'error': f"Vehicle with ID {data['car_id']} not found."}
+        return {'success': False, 'error': f"Vehicle with ID {car_id} not found."}
 
     try:
         spare = Spare.objects.create(
@@ -261,10 +296,15 @@ def tool_add_insurance(user, company, data):
         if field not in data or data[field] is None:
             return {'success': False, 'error': f"Required field missing: {field}"}
 
+    # Parse car_id from various formats
+    car_id = _parse_car_id(data['car_id'])
+    if not isinstance(car_id, int):
+        return {'success': False, 'error': f"Invalid car_id format: {data['car_id']}. Must be an integer."}
+
     try:
-        car = Car.objects.get(id=data['car_id'], company=company)
+        car = Car.objects.get(id=car_id, company=company)
     except Car.DoesNotExist:
-        return {'success': False, 'error': f"Vehicle with ID {data['car_id']} not found."}
+        return {'success': False, 'error': f"Vehicle with ID {car_id} not found."}
 
     try:
         insurance = Insurance.objects.create(
@@ -302,10 +342,15 @@ def tool_add_inspection(user, company, data):
         if field not in data or data[field] is None:
             return {'success': False, 'error': f"Required field missing: {field}"}
 
+    # Parse car_id from various formats
+    car_id = _parse_car_id(data['car_id'])
+    if not isinstance(car_id, int):
+        return {'success': False, 'error': f"Invalid car_id format: {data['car_id']}. Must be an integer."}
+
     try:
-        car = Car.objects.get(id=data['car_id'], company=company)
+        car = Car.objects.get(id=car_id, company=company)
     except Car.DoesNotExist:
-        return {'success': False, 'error': f"Vehicle with ID {data['car_id']} not found."}
+        return {'success': False, 'error': f"Vehicle with ID {car_id} not found."}
 
     try:
         inspection = Inspection.objects.create(

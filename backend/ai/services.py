@@ -44,7 +44,14 @@ FORMATTING RULES — ALWAYS USE MARKDOWN:
 - Make your responses clean, structured, and easy to read
 - Always highlight: car numbers, costs, dates, percentages in **bold**
 - License plates should be in `code` format like `O143O`
-- Vehicle IDs should be in `code` format like `car_id=5`
+- Vehicle IDs should be in `code` format like `ID: 5`
+
+CRITICAL RULE FOR JSON ACTIONS:
+- When generating JSON action blocks, car_id MUST be an INTEGER (e.g., 32), NOT a string
+- NEVER write "car_id=32" or "car_id=32" as a string — use just the number: 32
+- CORRECT: {"action": "tool_add_fuel", "params": {"car_id": 32, "year": 2026, "month": 4, "liters": 150}}
+- WRONG: {"action": "tool_add_fuel", "params": {"car_id": "car_id=32", ...}}
+- WRONG: {"action": "tool_add_fuel", "params": {"car_id": "32", ...}}
 
 EXAMPLE RESPONSE STYLE:
 ### 🚗 Автопарк
@@ -184,13 +191,13 @@ def collect_company_context(user) -> str:
     # List ALL cars with IDs — IMPORTANT: user may reference by ID
     all_cars = Car.objects.filter(company=company).order_by('id')
     if all_cars:
-        parts.append("All vehicles (use the car_id when adding fuel/spare/insurance/inspection):")
+        parts.append("All vehicles (use the ID number when adding fuel/spare/insurance/inspection):")
         for car in all_cars:
             driver_info = f"Driver: {car.driver}" if car.driver and car.driver != '-' else "No driver"
             fc = f"Fuel card: {car.fuel_card}" if car.fuel_card else "No fuel card"
             parts.append(
-                f"  car_id={car.id}: {car.brand} {car.title} ({car.numplate}), "
-                f"Status: {car.status}, {driver_info}, {fc}"
+                f"  ID: {car.id} | {car.brand} {car.title} | Numplate: {car.numplate} | "
+                f"Status: {car.status} | {driver_info} | {fc}"
             )
     parts.append("")
 
@@ -515,10 +522,15 @@ def _execute_tool(user, company, tool_name, arguments):
         return json.dumps({"success": False, "error": str(e)})
 
 
-def ask_ai(user, question: str) -> str:
+def ask_ai(user, question: str, conversation=None) -> str:
     """
     Send a question to the AI provider (Groq) and return the response.
     Supports function calling with tool loop (max 3 iterations).
+    
+    Args:
+        user: The user making the request
+        question: The user's question
+        conversation: Optional AIConversation object for context
     """
     # Check relevance
     if not _is_relevant_to_parko(question):
@@ -532,6 +544,11 @@ def ask_ai(user, question: str) -> str:
     ai_settings = getattr(settings, 'AI_SETTINGS', {})
     api_key = ai_settings.get('api_key', '')
     model = ai_settings.get('model', 'llama-3.1-8b-instant')
+
+    # Log configuration (mask API key for security)
+    masked_key = api_key[:10] + '...' + api_key[-4:] if len(api_key) > 14 else '***NOT SET***'
+    logger.info(f"AI Settings - Provider: {ai_settings.get('provider')}, Model: {model}, API Key: {masked_key}")
+    logger.info(f"API Key length: {len(api_key)}, starts with: {api_key[:15] if len(api_key) > 15 else 'N/A'}")
 
     if not api_key:
         logger.warning("AI API key is not configured")
@@ -560,6 +577,7 @@ def ask_ai(user, question: str) -> str:
 
     try:
         client = Groq(api_key=api_key)
+        logger.info(f"Groq client initialized for user {user.id}")
 
         # Build the messages (no Groq tool calling — too slow with 9 tools)
         # Instead, instruct AI to respond with JSON for actions
@@ -590,8 +608,16 @@ def ask_ai(user, question: str) -> str:
             "2. For example, if user says 'add fuel' — reply: 'Which vehicle? How many liters? What month and year?'\n"
             "3. If user says 'add car BMW' (missing title and numplate) — reply: 'I need a model name and license plate number.'\n"
             "4. If user provides brand + model + numplate in one message — GENERATE THE JSON ACTION IMMEDIATELY.\n"
-            "5. If user says 'for car #1' or 'for the first car', look at the vehicle list in the context above and find car_id=1.\n"
-            "6. ALWAYS remember the conversation context. If user previously said '90 liters for April 2026', remember it.\n\n"
+            "5. If user says 'for car #1' or 'for the first car', look at the vehicle list in the context above and find the ID number (e.g., ID: 32 means car_id=32).\n"
+            "6. CRITICAL: In JSON params, car_id must be an INTEGER, not a string. Use 32, NOT '32' or 'car_id=32'.\n"
+            "7. ALWAYS remember the conversation context. If user previously said '90 liters for April 2026', remember it.\n\n"
+            "CORRECT JSON examples:\n"
+            '```json\n{"action": "tool_add_fuel", "params": {"car_id": 32, "year": 2026, "month": 4, "liters": 150}, "description": "Add 150L fuel to car #32"}\n```\n'
+            '```json\n{"action": "tool_add_car", "params": {"brand": "Toyota", "title": "Camry", "numplate": "ABC123"}, "description": "Add new Toyota Camry"}\n```\n'
+            '```json\n{"action": "tool_update_car", "params": {"car_id": 32, "driver": "Иванов"}, "description": "Assign driver to car #32"}\n```\n\n'
+            "WRONG (DO NOT DO THIS):\n"
+            '```json\n{"action": "tool_add_fuel", "params": {"car_id": "car_id=32", ...}}  ← WRONG! Use 32, not "car_id=32"\n```\n'
+            '```json\n{"action": "tool_add_fuel", "params": {"car_id": "32", ...}}  ← WRONG! Use 32 (integer), not "32" (string)\n```\n\n'
             "When you DO have all required fields, respond in this EXACT format:\n\n"
             "I will [describe what you're going to do in 1-2 sentences].\n\n"
             "```json\n"
@@ -628,10 +654,17 @@ def ask_ai(user, question: str) -> str:
         )
 
         # Get recent conversation history for context
-        recent_msgs = AIChatMessage.objects.filter(
-            company=company,
-            user=user,
-        ).order_by('-created_at')[:10]
+        if conversation:
+            # Use the specific conversation's messages
+            recent_msgs = AIChatMessage.objects.filter(
+                conversation=conversation,
+            ).order_by('-created_at')[:10]
+        else:
+            # Fallback to user's messages (legacy behavior)
+            recent_msgs = AIChatMessage.objects.filter(
+                company=company,
+                user=user,
+            ).order_by('-created_at')[:10]
 
         messages = [
             {"role": "system", "content": SYSTEM_PROMPT},
@@ -646,25 +679,77 @@ def ask_ai(user, question: str) -> str:
 
         messages.append({"role": "user", "content": question})
 
-        response = client.chat.completions.create(
-            model=model,
-            messages=messages,
-            temperature=0.7,
-            max_tokens=2000,
-        )
+        # Log the API call details
+        logger.info(f"Making Groq API call for user {user.id}")
+        logger.info(f"Model: {model}")
+        logger.info(f"Messages count: {len(messages)}")
+        logger.debug(f"First 500 chars of last message: {messages[-1]['content'][:500] if messages else 'N/A'}")
 
-        answer = response.choices[0].message.content
-        logger.info(f"AI response for user {user.id}: {len(answer)} chars")
-        return answer
+        try:
+            response = client.chat.completions.create(
+                model=model,
+                messages=messages,
+                temperature=0.7,
+                max_tokens=2000,
+            )
+            
+            # Log successful response
+            logger.info(f"Groq API response received for user {user.id}")
+            logger.info(f"Response ID: {getattr(response, 'id', 'N/A')}")
+            logger.info(f"Response model: {getattr(response, 'model', 'N/A')}")
+            logger.info(f"Usage - Prompt tokens: {getattr(getattr(response, 'usage', None), 'prompt_tokens', 'N/A')}, "
+                       f"Completion tokens: {getattr(getattr(response, 'usage', None), 'completion_tokens', 'N/A')}")
+            
+            answer = response.choices[0].message.content
+            logger.info(f"AI response for user {user.id}: {len(answer)} chars, first 100 chars: {answer[:100]}")
+            return answer
+        except Exception as api_error:
+            # Log the full API error details
+            error_type = type(api_error).__name__
+            error_msg = str(api_error)
+            logger.error(f"Groq API call failed for user {user.id}")
+            logger.error(f"Error type: {error_type}")
+            logger.error(f"Error message: {error_msg}")
+            logger.error(f"Full traceback:", exc_info=True)
+            
+            # If it's a Groq error, try to get more details
+            if hasattr(api_error, 'message'):
+                logger.error(f"Groq error message attribute: {api_error.message}")
+            if hasattr(api_error, 'status_code'):
+                logger.error(f"HTTP status code: {api_error.status_code}")
+            if hasattr(api_error, 'response'):
+                logger.error(f"Response object: {api_error.response}")
+            
+            raise  # Re-raise to be caught by outer exception handler
 
     except Exception as e:
         error_msg = str(e)
+        error_type = type(e).__name__
         logger.error(f"Groq API error for user {user.id}: {error_msg}", exc_info=True)
+        logger.error(f"Error type name: {error_type}")
         
+        # Log all error attributes
+        if hasattr(e, 'message'):
+            logger.error(f"Error.message: {e.message}")
+        if hasattr(e, 'status_code'):
+            logger.error(f"Error.status_code: {e.status_code}")
+        if hasattr(e, 'code'):
+            logger.error(f"Error.code: {e.code}")
+        if hasattr(e, 'type'):
+            logger.error(f"Error.type: {e.type}")
+        if hasattr(e, 'response') and e.response is not None:
+            logger.error(f"Error.response.status: {e.response.status_code if hasattr(e.response, 'status_code') else 'N/A'}")
+            try:
+                error_body = e.response.text if hasattr(e.response, 'text') else str(e.response)
+                logger.error(f"Error.response.body: {error_body[:500]}")
+            except:
+                pass
+
         # Determine error type and return detailed message
-        if 'api_key' in error_msg.lower() or 'invalid_api_key' in error_msg.lower():
+        if 'api_key' in error_msg.lower() or 'invalid_api_key' in error_msg.lower() or 'authentication' in error_msg.lower():
             return (
                 "🔑 Ошибка авторизации: API-ключ недействителен или истёк.\n\n"
+                f"Детали ошибки: {error_msg}\n\n"
                 "Обратитесь к администратору для проверки настроек AI."
             )
         elif 'rate_limit' in error_msg.lower() or 'rate limit' in error_msg.lower():

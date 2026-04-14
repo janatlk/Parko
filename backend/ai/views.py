@@ -4,12 +4,14 @@ from rest_framework.views import APIView
 from rest_framework import status
 
 from core.permissions import IsCompanyMember
-from ai.models import AIChatMessage, RoleChoices
+from ai.models import AIConversation, AIChatMessage, RoleChoices
 from ai.serializers import (
     AIChatRequestSerializer,
     AIChatResponseSerializer,
     AIChatMessageSerializer,
     AIExecuteRequestSerializer,
+    AIConversationListSerializer,
+    AIConversationDetailSerializer,
 )
 from ai.services import ask_ai, ask_ai_with_action
 from ai.tools import TOOL_REGISTRY
@@ -27,11 +29,33 @@ class AIChatView(APIView):
         serializer.is_valid(raise_exception=True)
 
         message_text = serializer.validated_data['message']
+        conversation_id = serializer.validated_data.get('conversation_id')
         user = request.user
         company = user.company
 
+        # Get or create conversation
+        if conversation_id:
+            conversation = AIConversation.objects.filter(
+                id=conversation_id,
+                company=company,
+                user=user,
+            ).first()
+            if not conversation:
+                return Response(
+                    {'error': 'Conversation not found'},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+        else:
+            # Create new conversation
+            conversation = AIConversation.objects.create(
+                company=company,
+                user=user,
+                title=message_text[:100] if len(message_text) > 100 else message_text,
+            )
+
         # Save user message
         AIChatMessage.objects.create(
+            conversation=conversation,
             company=company,
             user=user,
             role=RoleChoices.USER,
@@ -39,65 +63,110 @@ class AIChatView(APIView):
         )
 
         # Get AI response
-        response_text = ask_ai(user, message_text)
+        response_text = ask_ai(user, message_text, conversation=conversation)
 
-        # Save assistant message
+        # Save AI response
         AIChatMessage.objects.create(
+            conversation=conversation,
             company=company,
             user=user,
             role=RoleChoices.ASSISTANT,
             content=response_text,
         )
 
-        # Get recent conversation history
-        conversation = AIChatMessage.objects.filter(
-            company=company,
-            user=user,
+        # Update conversation title if it's still "New Chat"
+        if conversation.title == 'New Chat':
+            conversation.title = message_text[:100] if len(message_text) > 100 else message_text
+            conversation.save(update_fields=['title', 'updated_at'])
+        else:
+            # Just update the updated_at
+            conversation.save(update_fields=['updated_at'])
+
+        # Get conversation history (last 20 messages)
+        messages = AIChatMessage.objects.filter(
+            conversation=conversation,
         ).order_by('-created_at')[:20]
 
-        conversation_serializer = AIChatMessageSerializer(
-            list(reversed(conversation)),
-            many=True,
-        )
-
-        return Response({
-            'response': response_text,
-            'conversation': conversation_serializer.data,
-        }, status=status.HTTP_200_OK)
-
-
-class AIConversationView(APIView):
-    """
-    Получить историю переписки пользователя с AI.
-    GET /api/v1/ai/conversation/?limit=20
-    """
-    permission_classes = [IsAuthenticated, IsCompanyMember]
-
-    def get(self, request):
-        user = request.user
-        company = user.company
-        limit = int(request.query_params.get('limit', 20))
-
-        messages = AIChatMessage.objects.filter(
-            company=company,
-            user=user,
-        ).order_by('-created_at')[:limit]
-
-        serializer = AIChatMessageSerializer(
+        message_serializer = AIChatMessageSerializer(
             list(reversed(messages)),
             many=True,
         )
 
         return Response({
-            'conversation': serializer.data,
+            'response': response_text,
+            'conversation': message_serializer.data,
+            'conversation_id': conversation.id,
+            'conversation_title': conversation.title,
         }, status=status.HTTP_200_OK)
+
+
+class AIConversationView(APIView):
+    """
+    Получить список сессий (разговоров) пользователя.
+    GET /api/v1/ai/conversations/ — список всех разговоров
+    GET /api/v1/ai/conversations/{id}/ — конкретный разговор с сообщениями
+    """
+    permission_classes = [IsAuthenticated, IsCompanyMember]
+
+    def get(self, request, conversation_id=None):
+        user = request.user
+        company = user.company
+
+        if conversation_id:
+            # Get specific conversation with messages
+            conversation = AIConversation.objects.filter(
+                id=conversation_id,
+                company=company,
+                user=user,
+            ).first()
+
+            if not conversation:
+                return Response(
+                    {'error': 'Conversation not found'},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+
+            messages = AIChatMessage.objects.filter(
+                conversation=conversation,
+            ).order_by('created_at')
+
+            message_serializer = AIChatMessageSerializer(messages, many=True)
+
+            return Response({
+                'id': conversation.id,
+                'title': conversation.title,
+                'created_at': conversation.created_at,
+                'updated_at': conversation.updated_at,
+                'messages': message_serializer.data,
+            })
+        else:
+            # List all conversations
+            conversations = AIConversation.objects.filter(
+                company=company,
+                user=user,
+            ).order_by('-updated_at')
+
+            conversation_list = []
+            for conv in conversations:
+                message_count = AIChatMessage.objects.filter(conversation=conv).count()
+                conversation_list.append({
+                    'id': conv.id,
+                    'title': conv.title,
+                    'created_at': conv.created_at,
+                    'updated_at': conv.updated_at,
+                    'message_count': message_count,
+                })
+
+            return Response({
+                'conversations': conversation_list,
+            })
 
 
 class AIExecuteView(APIView):
     """
     Execute an AI-suggested action after user confirmation.
     POST /api/v1/ai/execute/
-    Body: {"action": "tool_add_car", "params": {"brand": "BMW", ...}, "description": "..."}
+    Body: {"action": "tool_add_car", "params": {...}, "conversation_id": 123}
     """
     permission_classes = [IsAuthenticated, IsCompanyMember]
 
@@ -107,9 +176,22 @@ class AIExecuteView(APIView):
 
         action_name = serializer.validated_data['action']
         action_params = serializer.validated_data['params']
-        description = request.data.get('description', '')
+        conversation_id = serializer.validated_data['conversation_id']
         user = request.user
         company = user.company
+
+        # Get conversation
+        conversation = AIConversation.objects.filter(
+            id=conversation_id,
+            company=company,
+            user=user,
+        ).first()
+
+        if not conversation:
+            return Response(
+                {'error': 'Conversation not found'},
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
         # Validate that the action is a known tool
         if action_name not in TOOL_REGISTRY:
@@ -118,44 +200,93 @@ class AIExecuteView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # Save user's confirmation as a message
-        if description:
-            AIChatMessage.objects.create(
-                company=company,
-                user=user,
-                role=RoleChoices.USER,
-                content=f"[Action confirmed] {description}",
-            )
-
         # Execute the action
         result_text = ask_ai_with_action(user, '', action_name, action_params)
 
-        # Save assistant message with the result
+        # Save the result as an assistant message in the conversation
         AIChatMessage.objects.create(
+            conversation=conversation,
             company=company,
             user=user,
             role=RoleChoices.ASSISTANT,
             content=result_text,
         )
 
+        # Update conversation timestamp
+        conversation.save(update_fields=['updated_at'])
+
         return Response({
             'success': True,
             'action': action_name,
             'result': result_text,
+            'conversation_id': conversation.id,
         }, status=status.HTTP_200_OK)
 
 
 class AIClearChatView(APIView):
     """
-    Clear AI chat history for the current user.
-    DELETE /api/v1/ai/messages/
+    Clear AI chat history.
+    DELETE /api/v1/ai/messages/?conversation_id=123 — clear specific conversation
+    DELETE /api/v1/ai/messages/ — clear all conversations for user
     """
     permission_classes = [IsAuthenticated, IsCompanyMember]
 
     def delete(self, request):
         user = request.user
         company = user.company
+        conversation_id = request.query_params.get('conversation_id')
 
-        AIChatMessage.objects.filter(company=company, user=user).delete()
+        if conversation_id:
+            # Clear specific conversation
+            conversation = AIConversation.objects.filter(
+                id=conversation_id,
+                company=company,
+                user=user,
+            ).first()
+
+            if not conversation:
+                return Response(
+                    {'error': 'Conversation not found'},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+
+            # Delete messages and conversation
+            AIChatMessage.objects.filter(conversation=conversation).delete()
+            conversation.delete()
+        else:
+            # Clear all conversations and messages for user
+            conversations = AIConversation.objects.filter(company=company, user=user)
+            AIChatMessage.objects.filter(company=company, user=user).delete()
+            conversations.delete()
+
+        return Response({'success': True}, status=status.HTTP_200_OK)
+
+
+class AIDeleteConversationView(APIView):
+    """
+    Delete a specific conversation.
+    DELETE /api/v1/ai/conversations/{id}/
+    """
+    permission_classes = [IsAuthenticated, IsCompanyMember]
+
+    def delete(self, request, conversation_id):
+        user = request.user
+        company = user.company
+
+        conversation = AIConversation.objects.filter(
+            id=conversation_id,
+            company=company,
+            user=user,
+        ).first()
+
+        if not conversation:
+            return Response(
+                {'error': 'Conversation not found'},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        # Delete messages and conversation
+        AIChatMessage.objects.filter(conversation=conversation).delete()
+        conversation.delete()
 
         return Response({'success': True}, status=status.HTTP_200_OK)

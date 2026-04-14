@@ -16,6 +16,8 @@ import {
   Tooltip,
   Divider,
   rem,
+  Menu,
+  Modal,
 } from '@mantine/core'
 import {
   IconBrain,
@@ -26,17 +28,20 @@ import {
   IconX,
   IconTrash,
   IconPlus,
-  IconHistory,
   IconUser,
   IconSparkles,
+  IconDotsVertical,
 } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
 
-import { useAuth } from '@features/auth/hooks/useAuth'
-import { useAIConversation, useSendAIMessage, useExecuteAIAction } from '@features/ai/hooks/useAI'
+import {
+  useAIConversations,
+  useSendAIMessage,
+  useExecuteAIAction,
+  useDeleteConversation,
+} from '@features/ai/hooks/useAI'
 import { MarkdownText } from '@features/ai/ui/MarkdownText'
 import { parseActionsFromContent } from '@features/ai/ui/parseAction'
-import { http } from '@shared/api/http'
 
 type ActionPayload = {
   action: string
@@ -52,68 +57,11 @@ type MessageWithAction = {
   timestamp: string
 }
 
-type ChatSession = {
-  id: string
-  title: string
-  messages: MessageWithAction[]
-  createdAt: string
-}
-
 type ExecutionResult = {
   messageId: number
   actionIndex: number
   success: boolean
   response: string
-}
-
-const getSessionsKey = (companyId: number) => `parko_ai_sessions_${companyId}`
-const getCurrentKey = (companyId: number) => `parko_ai_current_session_${companyId}`
-const getInputKey = (companyId: number) => `parko_ai_draft_${companyId}`
-
-function getSessions(companyId: number): ChatSession[] {
-  try {
-    const stored = localStorage.getItem(getSessionsKey(companyId))
-    return stored ? JSON.parse(stored) : []
-  } catch {
-    return []
-  }
-}
-
-function saveSessions(companyId: number, sessions: ChatSession[]) {
-  localStorage.setItem(getSessionsKey(companyId), JSON.stringify(sessions))
-}
-
-function getCurrentSessionId(companyId: number): string | null {
-  return localStorage.getItem(getCurrentKey(companyId))
-}
-
-function setCurrentSessionId(companyId: number, id: string | null) {
-  if (id) {
-    localStorage.setItem(getCurrentKey(companyId), id)
-  } else {
-    localStorage.removeItem(getCurrentKey(companyId))
-  }
-}
-
-function getInputValue(companyId: number): string {
-  return localStorage.getItem(getInputKey(companyId)) || ''
-}
-
-function setInputValue(companyId: number, value: string) {
-  if (value) {
-    localStorage.setItem(getInputKey(companyId), value)
-  } else {
-    localStorage.removeItem(getInputKey(companyId))
-  }
-}
-
-function getSessionTitle(messages: MessageWithAction[]): string {
-  const firstUser = messages.find((m) => m.role === 'user')
-  if (firstUser) {
-    const text = firstUser.content
-    return text.length > 40 ? text.slice(0, 40) + '...' : text
-  }
-  return 'New chat'
 }
 
 function formatTime(iso: string): string {
@@ -125,131 +73,78 @@ function formatTime(iso: string): string {
   }
 }
 
+function formatDate(iso: string): string {
+  try {
+    const d = new Date(iso)
+    return d.toLocaleDateString()
+  } catch {
+    return ''
+  }
+}
+
 export function AIPage() {
   const { t } = useTranslation()
-  const { user } = useAuth()
-  const companyId = user?.company ?? 0
 
-  // Restore draft input (company-scoped)
-  const [input, setInput] = useState(() => getInputValue(companyId))
-
-  // Save draft input (company-scoped)
-  useEffect(() => {
-    setInputValue(companyId, input)
-  }, [input, companyId])
-
+  const [input, setInput] = useState('')
   const [localMessages, setLocalMessages] = useState<MessageWithAction[]>([])
   const [error, setError] = useState<string | null>(null)
   const [executions, setExecutions] = useState<ExecutionResult[]>([])
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [currentConversationId, setCurrentConversationId] = useState<number | null>(null)
+  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [conversationToDelete, setConversationToDelete] = useState<number | null>(null)
+  
   const scrollRef = useRef<HTMLDivElement>(null)
   const viewportRef = useRef<HTMLDivElement>(null)
   const messageIdCounter = useRef(0)
-  const [sessions, setSessions] = useState<ChatSession[]>([])
-  const currentSessionIdRef = useRef<string | null>(null)
-  const [sidebarCurrentId, setSidebarCurrentId] = useState<string | null>(null)
-  const [initialized, setInitialized] = useState(false)
 
-  const { data: conversation, isLoading: isFetching } = useAIConversation()
+  const { data: conversations = [], isLoading: isLoadingConversations } = useAIConversations()
   const { mutate: sendMessage, isPending } = useSendAIMessage()
   const { mutate: executeAction, isPending: isExecuting } = useExecuteAIAction()
+  const { mutate: deleteConversation } = useDeleteConversation()
 
-  // Reset everything when company changes
-  useEffect(() => {
-    if (companyId === 0) return
+  // Load conversation on mount or when selected
+  const loadConversation = useCallback(
+    (conversationId: number) => {
+      setCurrentConversationId(conversationId)
+      setLocalMessages([])
+      setExecutions([])
+      messageIdCounter.current = 0
+      
+      // Fetch from API
+      fetch(`/api/v1/ai/conversations/${conversationId}/`)
+        .then((res) => res.json())
+        .then((data: { messages: Array<{ role: string; content: string; created_at: string }> }) => {
+          const formatted = data.messages.map((msg, idx) => {
+            const parsed = parseActionsFromContent(msg.content)
+            return {
+              role: msg.role as 'user' | 'assistant',
+              content: parsed.text,
+              actions: parsed.actions,
+              id: idx + 1,
+              timestamp: msg.created_at || new Date().toISOString(),
+            }
+          })
+          setLocalMessages(formatted)
+          messageIdCounter.current = data.messages.length
+        })
+        .catch(() => {
+          setError('Failed to load conversation')
+        })
+    },
+    [],
+  )
 
-    // Clear local messages and state for new company
+  // Start new chat
+  const handleNewChat = useCallback(() => {
+    setCurrentConversationId(null)
     setLocalMessages([])
     setExecutions([])
-    setInitialized(false)
     messageIdCounter.current = 0
+    setInput('')
+  }, [])
 
-    setSessions(getSessions(companyId))
-    const storedId = getCurrentSessionId(companyId)
-    setSidebarCurrentId(storedId)
-    currentSessionIdRef.current = storedId
-
-    // Try to restore from localStorage first
-    if (storedId) {
-      const stored = getSessions(companyId)
-      const session = stored.find((s) => s.id === storedId)
-      if (session) {
-        setLocalMessages(session.messages)
-        messageIdCounter.current = session.messages.reduce((max, m) => Math.max(max, m.id || 0), 0)
-        setInitialized(true)
-        return
-      }
-    }
-
-    setInitialized(true)
-  }, [companyId])
-
-  // Fallback: load from server if localStorage is empty
-  useEffect(() => {
-    if (initialized) return // already loaded from localStorage
-    if (!conversation || conversation.length === 0) return
-
-    const formatted = conversation.map((msg) => {
-      const parsed = parseActionsFromContent(msg.content)
-      const id = ++messageIdCounter.current
-      return {
-        role: msg.role as 'user' | 'assistant',
-        content: parsed.text,
-        actions: parsed.actions,
-        id,
-        timestamp: msg.created_at || msg.timestamp || new Date().toISOString(),
-      }
-    })
-    setLocalMessages(formatted)
-    setInitialized(true)
-  }, [conversation, initialized])
-
-  // Save session — debounced, company-scoped
-  const saveCurrentSession = useCallback(() => {
-    if (localMessages.length === 0 || companyId === 0) return
-
-    const currentId = getCurrentSessionId(companyId)
-    const sessions = getSessions(companyId)
-    let session = sessions.find((s) => s.id === currentId)
-
-    if (!session) {
-      session = {
-        id: Date.now().toString(),
-        title: getSessionTitle(localMessages),
-        messages: localMessages,
-        createdAt: new Date().toISOString(),
-      }
-      sessions.unshift(session)
-    } else {
-      session.messages = localMessages
-      session.title = getSessionTitle(localMessages)
-    }
-
-    saveSessions(companyId, sessions)
-    setSessions(sessions)
-    if (currentId) {
-      currentSessionIdRef.current = currentId
-      setSidebarCurrentId(currentId)
-    }
-  }, [localMessages, companyId])
-
-  // Only persist session periodically (debounced), not on every render
-  const saveTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
-  useEffect(() => {
-    if (localMessages.length === 0) return
-    clearTimeout(saveTimerRef.current)
-    saveTimerRef.current = setTimeout(() => {
-      saveCurrentSession()
-    }, 1000)
-    return () => clearTimeout(saveTimerRef.current)
-  }, [localMessages, saveCurrentSession, companyId])
-
-  useEffect(() => {
-    if (viewportRef.current) {
-      viewportRef.current.scrollTo({ top: viewportRef.current.scrollHeight, behavior: 'smooth' })
-    }
-  }, [localMessages, isPending])
-
+  // Send message
   const handleSend = useCallback(() => {
     const trimmed = input.trim()
     if (!trimmed || isPending) return
@@ -261,189 +156,270 @@ export function AIPage() {
     ])
     setInput('')
 
-    sendMessage(trimmed, {
-      onSuccess: (data) => {
-        const parsed = parseActionsFromContent(data.response)
-        const id = ++messageIdCounter.current
-        setLocalMessages((prev) => [
-          ...prev,
-          {
-            role: 'assistant' as const,
-            content: parsed.text,
-            actions: parsed.actions,
-            id,
-            timestamp: new Date().toISOString(),
-          },
-        ])
-      },
-      onError: (err: unknown) => {
-        const apiError = err as { response?: { data?: { error?: string; detail?: string } } }
-        const errorDetail = apiError.response?.data?.detail || apiError.response?.data?.error
-        
-        let errorType = 'failed'
-        if (errorDetail?.includes('API') || errorDetail?.includes('api')) {
-          errorType = 'no_api_key'
-        } else if (errorDetail?.includes('refused') || errorDetail?.includes('refusal')) {
-          errorType = 'refused'
-        }
-        
-        setError(errorType)
-        
-        // Add error message to chat
-        const id = ++messageIdCounter.current
-        let errorMessage = '❌ Произошла ошибка при обработке запроса.'
-        if (errorDetail) {
-          errorMessage += `\n\n📋 Детали: ${errorDetail}`
-        }
-        if (errorType === 'no_api_key') {
-          errorMessage = '🔑 AI-ассистент временно недоступен: API-ключ не настроен.\n\nОбратитесь к администратору системы для настройки интеграции с Groq AI.'
-        } else if (errorType === 'refused') {
-          errorMessage = '⚠️ AI-ассистент отказался выполнять запрос.\n\nВозможно, запрос не соответствует тематике системы управления автопарком.'
-        }
-        errorMessage += '\n\n💡 Попробуйте переформулировать запрос или повторите попытку.'
-        
-        setLocalMessages((prev) => [
-          ...prev,
-          {
-            role: 'assistant' as const,
-            content: errorMessage,
-            actions: [],
-            id,
-            timestamp: new Date().toISOString(),
-          },
-        ])
-        
-        // Remove the user message that caused the error
-        setLocalMessages((prev) => prev.filter((m) => m.content !== trimmed || m.role !== 'user'))
-      },
-    })
-  }, [input, isPending, sendMessage])
+    sendMessage(
+      { message: trimmed, conversationId: currentConversationId },
+      {
+        onSuccess: (data) => {
+          // Update conversation ID if this is a new conversation
+          if (data.conversation_id && !currentConversationId) {
+            setCurrentConversationId(data.conversation_id)
+          }
 
+          const parsed = parseActionsFromContent(data.response)
+          const id = ++messageIdCounter.current
+          setLocalMessages((prev) => [
+            ...prev,
+            {
+              role: 'assistant' as const,
+              content: parsed.text,
+              actions: parsed.actions,
+              id,
+              timestamp: new Date().toISOString(),
+            },
+          ])
+        },
+        onError: (err: unknown) => {
+          const apiError = err as { response?: { data?: { error?: string; detail?: string } } }
+          const errorDetail = apiError.response?.data?.detail || apiError.response?.data?.error
+
+          let errorType = 'failed'
+          if (errorDetail?.includes('API') || errorDetail?.includes('api')) {
+            errorType = 'no_api_key'
+          } else if (errorDetail?.includes('refused') || errorDetail?.includes('refusal')) {
+            errorType = 'refused'
+          }
+
+          setError(errorType)
+
+          const id = ++messageIdCounter.current
+          let errorMessage = '❌ Произошла ошибка при обработке запроса.'
+          if (errorDetail) {
+            errorMessage += `\n\n📋 Детали: ${errorDetail}`
+          }
+          if (errorType === 'no_api_key') {
+            errorMessage =
+              '🔑 AI-ассистент временно недоступен: API-ключ не настроен.\n\nОбратитесь к администратору системы для настройки интеграции с Groq AI.'
+          } else if (errorType === 'refused') {
+            errorMessage =
+              '⚠️ AI-ассистент отказался выполнять запрос.\n\nВозможно, запрос не соответствует тематике системы управления автопарком.'
+          }
+          errorMessage += '\n\n💡 Попробуйте переформулировать запрос или повторите попытку.'
+
+          setLocalMessages((prev) => [
+            ...prev,
+            {
+              role: 'assistant' as const,
+              content: errorMessage,
+              actions: [],
+              id,
+              timestamp: new Date().toISOString(),
+            },
+          ])
+
+          // Remove the user message that caused the error
+          setLocalMessages((prev) =>
+            prev.filter((m) => m.content !== trimmed || m.role !== 'user'),
+          )
+        },
+      },
+    )
+  }, [input, isPending, sendMessage, currentConversationId])
+
+  // Action handlers
   const handleConfirmAction = useCallback(
     (messageId: number, actionIndex: number, action: string, params: Record<string, unknown>) => {
-      executeAction({ action, params }, {
-        onSuccess: (data) => {
-          setExecutions((prev) => [...prev, { messageId, actionIndex, success: data.success, response: data.result || data.response }])
-          const id = ++messageIdCounter.current
-          setLocalMessages((prev) => [
-            ...prev,
-            { role: 'assistant' as const, content: data.result || data.response || 'Действие выполнено.', actions: [], id, timestamp: new Date().toISOString() },
-          ])
+      if (!currentConversationId) return
+
+      executeAction(
+        { action, params, conversationId: currentConversationId },
+        {
+          onSuccess: (data) => {
+            setExecutions((prev) => [
+              ...prev,
+              { messageId, actionIndex, success: data.success, response: data.result || data.response },
+            ])
+            const id = ++messageIdCounter.current
+            setLocalMessages((prev) => [
+              ...prev,
+              {
+                role: 'assistant' as const,
+                content: data.result || data.response || 'Действие выполнено.',
+                actions: [],
+                id,
+                timestamp: new Date().toISOString(),
+              },
+            ])
+          },
+          onError: () => {
+            setExecutions((prev) => [
+              ...prev,
+              { messageId, actionIndex, success: false, response: '' },
+            ])
+            const id = ++messageIdCounter.current
+            setLocalMessages((prev) => [
+              ...prev,
+              {
+                role: 'assistant' as const,
+                content: t('ai.action_failed'),
+                actions: [],
+                id,
+                timestamp: new Date().toISOString(),
+              },
+            ])
+          },
         },
-        onError: () => {
-          setExecutions((prev) => [...prev, { messageId, actionIndex, success: false, response: '' }])
-          const id = ++messageIdCounter.current
-          setLocalMessages((prev) => [
-            ...prev,
-            { role: 'assistant' as const, content: t('ai.action_failed'), actions: [], id, timestamp: new Date().toISOString() },
-          ])
-        },
-      })
+      )
     },
-    [executeAction, t],
+    [executeAction, t, currentConversationId],
   )
 
   const handleCancelAction = useCallback((messageId: number, actionIndex: number) => {
-    setExecutions((prev) => [...prev, { messageId, actionIndex, success: false, response: '' }])
+    setExecutions((prev) => [
+      ...prev,
+      { messageId, actionIndex, success: false, response: '' },
+    ])
   }, [])
 
-  const handleConfirmAllActions = useCallback((messageId: number, actions: ActionPayload[]) => {
-    // Execute all actions sequentially
-    actions.forEach((act, idx) => {
-      const alreadyExecuted = executions.some((e) => e.messageId === messageId && e.actionIndex === idx)
-      if (alreadyExecuted) return
+  // Delete conversation
+  const handleDeleteConversation = useCallback(() => {
+    if (!conversationToDelete) return
 
-      executeAction({ action: act.action, params: act.params }, {
-        onSuccess: (data) => {
-          setExecutions((prev) => [...prev, { messageId, actionIndex: idx, success: data.success, response: data.result || data.response }])
-        },
-        onError: () => {
-          setExecutions((prev) => [...prev, { messageId, actionIndex: idx, success: false, response: '' }])
-        },
-      })
+    deleteConversation(conversationToDelete, {
+      onSuccess: () => {
+        // If we deleted the current conversation, start new chat
+        if (currentConversationId === conversationToDelete) {
+          handleNewChat()
+        }
+        setDeleteModalOpen(false)
+        setConversationToDelete(null)
+      },
     })
-  }, [executeAction, executions])
+  }, [conversationToDelete, currentConversationId, deleteConversation, handleNewChat])
 
-  const handleCancelAllActions = useCallback((messageId: number, actions: ActionPayload[]) => {
-    actions.forEach((_, idx) => {
-      setExecutions((prev) => [...prev, { messageId, actionIndex: idx, success: false, response: '' }])
-    })
-  }, [])
-
-  const handleNewChat = useCallback(() => {
-    if (localMessages.length > 0) {
-      saveCurrentSession()
+  // Auto-scroll to bottom
+  useEffect(() => {
+    if (viewportRef.current) {
+      viewportRef.current.scrollTo({ top: viewportRef.current.scrollHeight, behavior: 'smooth' })
     }
-    setLocalMessages([])
-    setExecutions([])
-    currentSessionIdRef.current = null
-    setCurrentSessionId(companyId, null)
-    setSidebarCurrentId(null)
-    setSidebarOpen(false)
-    messageIdCounter.current = 0
-  }, [localMessages, saveCurrentSession, companyId])
+  }, [localMessages, isPending])
 
-  const handleLoadSession = useCallback((session: ChatSession) => {
-    currentSessionIdRef.current = session.id
-    setCurrentSessionId(companyId, session.id)
-    setSidebarCurrentId(session.id)
-    setLocalMessages(session.messages)
-    setExecutions([])
-    messageIdCounter.current = session.messages.reduce((max, m) => Math.max(max, m.id || 0), 0)
-    setSidebarOpen(false)
-  }, [companyId])
-
-  const handleDeleteSession = useCallback((sessionId: string) => {
-    const sessions = getSessions(companyId).filter((s) => s.id !== sessionId)
-    saveSessions(companyId, sessions)
-    setSessions(sessions)
-    if (currentSessionIdRef.current === sessionId) {
-      setLocalMessages([])
-      currentSessionIdRef.current = null
-      setCurrentSessionId(companyId, null)
-      setSidebarCurrentId(null)
-    }
-  }, [companyId])
-
-  const handleClearChat = useCallback(async () => {
-    try {
-      if (localMessages.length > 0) {
-        saveCurrentSession()
-      }
-      await http.delete('ai/messages/')
-      handleNewChat()
-    } catch {
-      // ignore
-    }
-  }, [localMessages, saveCurrentSession, handleNewChat])
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      handleSend()
-    }
-  }
-
-  const isEmpty = localMessages.length === 0 && !isFetching
+  const isEmpty = localMessages.length === 0 && !isPending
 
   return (
-    <Box
-      style={{
-        height: 'calc(100vh - 140px)',
-        display: 'flex',
-        flexDirection: 'column',
-        position: 'relative',
-        overflow: 'hidden',
-      }}
-    >
-      {/* Header — fixed */}
-      <Box style={{ flexShrink: 0 }}>
-        <Paper p="sm" radius="md" withBorder>
+    <Box style={{ height: 'calc(100vh - 140px)', display: 'flex', gap: 0 }}>
+      {/* Sidebar - GPT style */}
+      {sidebarOpen && (
+        <Box
+          style={{
+            width: 260,
+            flexShrink: 0,
+            background: 'var(--mantine-color-gray-0)',
+            borderRight: '1px solid var(--mantine-color-gray-3)',
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+          {/* New Chat Button */}
+          <Box p="md" style={{ borderBottom: '1px solid var(--mantine-color-gray-3)' }}>
+            <Button
+              fullWidth
+              leftSection={<IconPlus size={18} />}
+              onClick={handleNewChat}
+              variant="light"
+              size="md"
+            >
+              Новый чат
+            </Button>
+          </Box>
+
+          {/* Conversations List */}
+          <ScrollArea style={{ flex: 1 }}>
+            <Stack gap={2} p="xs">
+              {isLoadingConversations ? (
+                <Group justify="center" p="xl">
+                  <Loader size="sm" />
+                </Group>
+              ) : conversations.length === 0 ? (
+                <Box p="xl" ta="center">
+                  <IconMessage size={32} stroke={1.5} opacity={0.3} />
+                  <Text size="sm" c="dimmed" mt="sm">
+                    Нет истории чатов
+                  </Text>
+                </Box>
+              ) : (
+                conversations.map((conv) => (
+                  <Group
+                    key={conv.id}
+                    gap="xs"
+                    p="xs"
+                    style={{
+                      borderRadius: 'var(--mantine-radius-md)',
+                      cursor: 'pointer',
+                      background:
+                        currentConversationId === conv.id
+                          ? 'var(--mantine-color-gray-2)'
+                          : 'transparent',
+                      transition: 'all 0.15s ease',
+                    }}
+                    onClick={() => loadConversation(conv.id)}
+                  >
+                    <Avatar size={32} radius="md" color="blue" variant="light">
+                      <IconMessage size={16} />
+                    </Avatar>
+                    <Box style={{ flex: 1, minWidth: 0 }}>
+                      <Text size="sm" fw={500} truncate>
+                        {conv.title}
+                      </Text>
+                      <Text size="xs" c="dimmed">
+                        {formatDate(conv.updated_at)}
+                      </Text>
+                    </Box>
+                    <Menu position="right-start" width={150}>
+                      <Menu.Target>
+                        <ActionIcon
+                          variant="subtle"
+                          size="sm"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <IconDotsVertical size={14} />
+                        </ActionIcon>
+                      </Menu.Target>
+                      <Menu.Dropdown>
+                        <Menu.Item
+                          color="red"
+                          leftSection={<IconTrash size={14} />}
+                          onClick={() => {
+                            setConversationToDelete(conv.id)
+                            setDeleteModalOpen(true)
+                          }}
+                        >
+                          Удалить
+                        </Menu.Item>
+                      </Menu.Dropdown>
+                    </Menu>
+                  </Group>
+                ))
+              )}
+            </Stack>
+          </ScrollArea>
+        </Box>
+      )}
+
+      {/* Main Chat Area */}
+      <Box style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+        {/* Header */}
+        <Box
+          p="sm"
+          style={{
+            borderBottom: '1px solid var(--mantine-color-gray-3)',
+            background: 'var(--mantine-color-body)',
+          }}
+        >
           <Group justify="space-between">
             <Group gap="sm">
-              <Tooltip label={t('ai.history') || 'Chat history'}>
+              <Tooltip label="Показать/скрыть историю">
                 <ActionIcon variant="subtle" size="md" onClick={() => setSidebarOpen(!sidebarOpen)}>
-                  <IconHistory size={18} />
+                  <IconMessage size={18} />
                 </ActionIcon>
               </Tooltip>
               <IconBrain size={28} stroke={1.5} />
@@ -452,276 +428,223 @@ export function AIPage() {
                   {t('ai.title')}
                 </Text>
                 <Text size="xs" c="dimmed">
-                  {t('ai.subtitle')}
+                  {currentConversationId
+                    ? conversations.find((c) => c.id === currentConversationId)?.title
+                    : 'Новый разговор'}
                 </Text>
               </div>
             </Group>
-            <Group gap="xs">
-              {!isEmpty && (
-                <Tooltip label={t('ai.new_chat') || 'New chat'}>
-                  <ActionIcon variant="subtle" size="md" onClick={handleNewChat}>
-                    <IconPlus size={18} />
-                  </ActionIcon>
-                </Tooltip>
-              )}
-              {!isEmpty && (
-                <Tooltip label={t('ai.clear_chat') || 'Clear chat'}>
-                  <ActionIcon variant="subtle" color="red" size="md" onClick={handleClearChat}>
-                    <IconTrash size={18} />
-                  </ActionIcon>
-                </Tooltip>
-              )}
-            </Group>
           </Group>
-        </Paper>
-      </Box>
+        </Box>
 
-      {/* Error Alert — fixed */}
-      {error && (
-        <Box style={{ flexShrink: 0 }}>
+        {/* Error Alert */}
+        {error && (
           <Alert
             icon={<IconAlertTriangle size={18} />}
             title={t('common.error')}
             color="orange"
             withCloseButton
             onClose={() => setError(null)}
+            m="sm"
           >
             <Text size="sm">{t(`ai.error_${error}`)}</Text>
           </Alert>
-        </Box>
-      )}
-
-      {/* Messages Area — scrollable, takes remaining space */}
-      <Box style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-        {isEmpty ? (
-          <Stack align="center" justify="center" h="100%" gap="xl" p="xl">
-            <Box
-              style={{
-                width: 80,
-                height: 80,
-                borderRadius: '50%',
-                background: 'var(--mantine-color-blue-light)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <IconSparkles size={40} color="var(--mantine-color-blue-6)" />
-            </Box>
-            <Text size="xl" fw={700} ta="center">
-              {t('ai.welcome_title')}
-            </Text>
-            <Text size="sm" c="dimmed" ta="center" maw={400} lh={1.6}>
-              {t('ai.welcome_subtitle')}
-            </Text>
-            <Stack gap="xs" mt="md" maw={400}>
-              {['Какие машины в автопарке?', 'Добавь топливо для машины #1', 'Покажи расходы на запчасти'].map((suggestion) => (
-                <Button
-                  key={suggestion}
-                  variant="light"
-                  size="xs"
-                  radius="xl"
-                  fullWidth
-                  onClick={() => setInput(suggestion)}
-                >
-                  {suggestion}
-                </Button>
-              ))}
-            </Stack>
-          </Stack>
-        ) : (
-          <ScrollArea style={{ flex: 1 }} viewportRef={viewportRef as React.RefObject<HTMLDivElement>} ref={scrollRef}>
-            <Stack p="md" gap="lg">
-              {localMessages.map((msg) => {
-                const isUser = msg.role === 'user'
-
-                return (
-                  <Group
-                    key={msg.id}
-                    gap="xs"
-                    wrap="nowrap"
-                    style={{
-                      flexDirection: isUser ? 'row-reverse' : 'row',
-                      alignItems: 'flex-start',
-                    }}
-                  >
-                    <Avatar
-                      size={32}
-                      radius="xl"
-                      color={isUser ? 'blue' : undefined}
-                      variant={isUser ? 'filled' : 'light'}
-                    >
-                      {isUser ? <IconUser size={18} /> : <IconBrain size={18} />}
-                    </Avatar>
-                    <Stack gap={2} style={{ maxWidth: '70%' }}>
-                      <Paper
-                        p="sm"
-                        style={{
-                          borderRadius: isUser
-                            ? 'var(--mantine-radius-md) var(--mantine-radius-md) 4px var(--mantine-radius-md)'
-                            : 'var(--mantine-radius-md) var(--mantine-radius-md) var(--mantine-radius-md) 4px',
-                          background: isUser ? 'var(--mantine-color-blue-filled)' : 'var(--mantine-color-gray-0)',
-                          color: isUser ? '#ffffff' : undefined,
-                        }}
-                      >
-                        {isUser ? (
-                          <Text size="sm" style={{ whiteSpace: 'pre-wrap', lineHeight: 1.5 }}>
-                            {msg.content}
-                          </Text>
-                        ) : (
-                          <MarkdownText content={msg.content} />
-                        )}
-
-                        {/* Action buttons INSIDE bubble — supports multiple actions */}
-                        {msg.actions.length > 0 && (
-                          <>
-                            <Divider my="sm" />
-                            {msg.actions.map((act, idx) => {
-                              const actionExecution = executions.find(
-                                (e) => e.messageId === msg.id && e.actionIndex === idx
-                              )
-                              const isActionExecuted = !!actionExecution
-
-                              // Skip rendering if this action was already executed/cancelled
-                              if (isActionExecuted) {
-                                return null
-                              }
-
-                              return (
-                                <Box key={`${msg.id}-${idx}`} mb="xs">
-                                  <Text size="xs" fw={600} c="orange.7" mb={4}>
-                                    ⚙️ {t('ai.action_pending') || 'Запланированное действие:'} {idx + 1}/{msg.actions.length}
-                                  </Text>
-                                  <Text size="xs" c="dimmed" mb="xs" style={{ whiteSpace: 'pre-wrap' }}>
-                                    {act.description || `${act.action} — ${JSON.stringify(act.params)}`}
-                                  </Text>
-                                  <Group gap="xs">
-                                    <Button
-                                      size="xs"
-                                      color="green"
-                                      variant="light"
-                                      leftSection={<IconCheck size={14} />}
-                                      onClick={() => handleConfirmAction(msg.id!, idx, act.action, act.params)}
-                                      loading={isExecuting}
-                                      disabled={isExecuting}
-                                    >
-                                      {t('ai.confirm')}
-                                    </Button>
-                                    <Button
-                                      size="xs"
-                                      color="red"
-                                      variant="light"
-                                      leftSection={<IconX size={14} />}
-                                      onClick={() => handleCancelAction(msg.id!, idx)}
-                                      disabled={isExecuting}
-                                    >
-                                      {t('ai.cancel')}
-                                    </Button>
-                                  </Group>
-                                </Box>
-                              )
-                            })}
-                            {/* Bulk action buttons when multiple actions pending */}
-                            {msg.actions.length > 1 && (
-                              <>
-                                <Divider my="xs" />
-                                <Group gap="xs">
-                                  <Button
-                                    size="xs"
-                                    color="green"
-                                    variant="filled"
-                                    leftSection={<IconCheck size={14} />}
-                                    onClick={() => handleConfirmAllActions(msg.id!, msg.actions)}
-                                    loading={isExecuting}
-                                    disabled={isExecuting}
-                                  >
-                                    {t('ai.confirm_all') || 'Подтвердить все'}
-                                  </Button>
-                                  <Button
-                                    size="xs"
-                                    color="red"
-                                    variant="filled"
-                                    leftSection={<IconX size={14} />}
-                                    onClick={() => handleCancelAllActions(msg.id!, msg.actions)}
-                                    disabled={isExecuting}
-                                  >
-                                    {t('ai.cancel_all') || 'Отменить все'}
-                                  </Button>
-                                </Group>
-                              </>
-                            )}
-                          </>
-                        )}
-                        {/* Show executed actions */}
-                        {msg.actions.length > 0 && executions.some((e) => e.messageId === msg.id) && (
-                          <>
-                            <Divider my="sm" />
-                            <Stack gap="xs">
-                              {executions
-                                .filter((e) => e.messageId === msg.id)
-                                .map((execution, idx) => (
-                                  <Group key={idx} gap="xs">
-                                    {execution.success ? (
-                                      <>
-                                        <IconCheck size={16} color="green" />
-                                        <Text size="xs" c="green">{t('ai.action_success')} ({idx + 1})</Text>
-                                      </>
-                                    ) : (
-                                      <>
-                                        <IconX size={16} color="red" />
-                                        <Text size="xs" c="red">{t('ai.action_failed')} ({idx + 1})</Text>
-                                      </>
-                                    )}
-                                  </Group>
-                                ))}
-                            </Stack>
-                          </>
-                        )}
-                        {msg.actions.length > 0 && isExecuting && (
-                          <>
-                            <Divider my="sm" />
-                            <Group gap="xs">
-                              <Loader size="xs" />
-                              <Text size="xs" c="dimmed">{t('ai.executing')}</Text>
-                            </Group>
-                          </>
-                        )}
-                      </Paper>
-                      <Text size="xs" c="dimmed" style={{ textAlign: isUser ? 'right' : 'left' }}>
-                        {formatTime(msg.timestamp)}
-                      </Text>
-                    </Stack>
-                  </Group>
-                )
-              })}
-              {isPending && (
-                <Group gap="xs" wrap="nowrap" style={{ alignItems: 'flex-start' }}>
-                  <Avatar size={32} radius="xl" variant="light" color="blue">
-                    <IconBrain size={18} />
-                  </Avatar>
-                  <Paper p="sm" radius="md" bg="var(--mantine-color-gray-0)">
-                    <Group gap="xs">
-                      <Loader size="xs" />
-                      <Text size="sm" c="dimmed">{t('ai.typing')}</Text>
-                    </Group>
-                  </Paper>
-                </Group>
-              )}
-            </Stack>
-          </ScrollArea>
         )}
 
-        {/* Input Area — fixed at bottom */}
-        <Box style={{ flexShrink: 0 }}>
-          <Divider />
-          <Box p="md">
+        {/* Messages Area */}
+        <Box style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+          {isEmpty ? (
+            <Stack align="center" justify="center" h="100%" gap="xl" p="xl">
+              <Box
+                style={{
+                  width: 80,
+                  height: 80,
+                  borderRadius: '50%',
+                  background: 'var(--mantine-color-blue-light)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <IconSparkles size={40} color="var(--mantine-color-blue-6)" />
+              </Box>
+              <Text size="xl" fw={700} ta="center">
+                {t('ai.welcome_title')}
+              </Text>
+              <Text size="sm" c="dimmed" ta="center" maw={400} lh={1.6}>
+                {t('ai.welcome_subtitle')}
+              </Text>
+              <Stack gap="xs" mt="md" maw={400}>
+                {[
+                  'Какие машины в автопарке?',
+                  'Добавь топливо для машины #1',
+                  'Покажи расходы на запчасти',
+                ].map((suggestion) => (
+                  <Button
+                    key={suggestion}
+                    variant="light"
+                    size="xs"
+                    radius="xl"
+                    fullWidth
+                    onClick={() => setInput(suggestion)}
+                  >
+                    {suggestion}
+                  </Button>
+                ))}
+              </Stack>
+            </Stack>
+          ) : (
+            <ScrollArea style={{ flex: 1 }} viewportRef={viewportRef} ref={scrollRef}>
+              <Stack p="md" gap="lg">
+                {localMessages.map((msg) => {
+                  const isUser = msg.role === 'user'
+
+                  return (
+                    <Group
+                      key={msg.id}
+                      gap="xs"
+                      wrap="nowrap"
+                      style={{
+                        flexDirection: isUser ? 'row-reverse' : 'row',
+                        alignItems: 'flex-start',
+                      }}
+                    >
+                      <Avatar
+                        size={32}
+                        radius="xl"
+                        color={isUser ? 'blue' : undefined}
+                        variant={isUser ? 'filled' : 'light'}
+                      >
+                        {isUser ? <IconUser size={18} /> : <IconBrain size={18} />}
+                      </Avatar>
+                      <Stack gap={2} style={{ maxWidth: '70%' }}>
+                        <Paper
+                          p="sm"
+                          style={{
+                            borderRadius: isUser
+                              ? 'var(--mantine-radius-md) var(--mantine-radius-md) 4px var(--mantine-radius-md)'
+                              : 'var(--mantine-radius-md) var(--mantine-radius-md) var(--mantine-radius-md) 4px',
+                            background: isUser
+                              ? 'var(--mantine-color-blue-filled)'
+                              : 'var(--mantine-color-gray-0)',
+                            color: isUser ? '#ffffff' : undefined,
+                          }}
+                        >
+                          {isUser ? (
+                            <Text size="sm" style={{ whiteSpace: 'pre-wrap', lineHeight: 1.5 }}>
+                              {msg.content}
+                            </Text>
+                          ) : (
+                            <MarkdownText content={msg.content} />
+                          )}
+
+                          {/* Action buttons */}
+                          {msg.actions.length > 0 && (
+                            <>
+                              <Divider my="sm" />
+                              {msg.actions.map((act, idx) => {
+                                const actionExecution = executions.find(
+                                  (e) => e.messageId === msg.id && e.actionIndex === idx,
+                                )
+                                const isActionExecuted = !!actionExecution
+
+                                if (isActionExecuted) return null
+
+                                return (
+                                  <Box key={`${msg.id}-${idx}`} mb="xs">
+                                    <Text size="xs" fw={600} c="orange.7" mb={4}>
+                                      ⚙️ Запланированное действие: {idx + 1}/{msg.actions.length}
+                                    </Text>
+                                    <Text
+                                      size="xs"
+                                      c="dimmed"
+                                      mb="xs"
+                                      style={{ whiteSpace: 'pre-wrap' }}
+                                    >
+                                      {act.description ||
+                                        `${act.action} — ${JSON.stringify(act.params)}`}
+                                    </Text>
+                                    <Group gap="xs">
+                                      <Button
+                                        size="xs"
+                                        color="green"
+                                        variant="light"
+                                        leftSection={<IconCheck size={14} />}
+                                        onClick={() =>
+                                          handleConfirmAction(msg.id!, idx, act.action, act.params)
+                                        }
+                                        loading={isExecuting}
+                                        disabled={isExecuting}
+                                      >
+                                        Подтвердить
+                                      </Button>
+                                      <Button
+                                        size="xs"
+                                        color="red"
+                                        variant="light"
+                                        leftSection={<IconX size={14} />}
+                                        onClick={() => handleCancelAction(msg.id!, idx)}
+                                        disabled={isExecuting}
+                                      >
+                                        Отменить
+                                      </Button>
+                                    </Group>
+                                  </Box>
+                                )
+                              })}
+                            </>
+                          )}
+                        </Paper>
+                        <Text
+                          size="xs"
+                          c="dimmed"
+                          style={{ textAlign: isUser ? 'right' : 'left' }}
+                        >
+                          {formatTime(msg.timestamp)}
+                        </Text>
+                      </Stack>
+                    </Group>
+                  )
+                })}
+                {isPending && (
+                  <Group gap="xs" wrap="nowrap" style={{ alignItems: 'flex-start' }}>
+                    <Avatar size={32} radius="xl" variant="light" color="blue">
+                      <IconBrain size={18} />
+                    </Avatar>
+                    <Paper p="sm" radius="md" bg="var(--mantine-color-gray-0)">
+                      <Group gap="xs">
+                        <Loader size="xs" />
+                        <Text size="sm" c="dimmed">
+                          {t('ai.typing')}
+                        </Text>
+                      </Group>
+                    </Paper>
+                  </Group>
+                )}
+              </Stack>
+            </ScrollArea>
+          )}
+
+          {/* Input Area */}
+          <Box
+            p="md"
+            style={{
+              borderTop: '1px solid var(--mantine-color-gray-3)',
+              background: 'var(--mantine-color-body)',
+            }}
+          >
             <Group gap="xs" style={{ position: 'relative' }}>
               <Textarea
                 flex={1}
                 placeholder={t('ai.placeholder')}
                 value={input}
                 onChange={(e) => setInput(e.currentTarget.value)}
-                onKeyDown={handleKeyDown}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault()
+                    handleSend()
+                  }
+                }}
                 disabled={isPending}
                 size="md"
                 autosize
@@ -731,15 +654,7 @@ export function AIPage() {
                 styles={{
                   input: {
                     paddingRight: rem(50),
-                    border: '2px solid var(--mantine-color-gray-3)',
-                    transition: 'border-color 0.15s ease',
                   },
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--mantine-color-blue-5)'
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--mantine-color-gray-3)'
                 }}
                 rightSectionWidth={42}
                 rightSection={
@@ -748,10 +663,10 @@ export function AIPage() {
                     radius="xl"
                     color="blue"
                     onClick={handleSend}
-                    loading={isPending || isFetching}
+                    loading={isPending}
                     disabled={!input.trim()}
                   >
-                    <IconSend2 size={18} color="#ffffff" />
+                    <IconSend2 size={18} />
                   </ActionIcon>
                 }
               />
@@ -763,93 +678,25 @@ export function AIPage() {
         </Box>
       </Box>
 
-      {/* Sidebar Overlay */}
-      {sidebarOpen && (
-        <Box
-          onClick={() => setSidebarOpen(false)}
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(0,0,0,0.3)',
-            zIndex: 99,
-          }}
-        />
-      )}
-
-      {/* Sidebar */}
-      {sidebarOpen && (
-        <Paper
-          shadow="xl"
-          p={0}
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: 300,
-            height: '100%',
-            zIndex: 100,
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden',
-          }}
-        >
-          <Box p="md" style={{ background: 'var(--mantine-color-gray-0)' }}>
-            <Group justify="space-between">
-              <Text fw={700} size="sm">
-                {t('ai.history') || 'Chat history'}
-              </Text>
-              <ActionIcon variant="subtle" size="sm" onClick={handleNewChat}>
-                <IconPlus size={14} />
-              </ActionIcon>
-            </Group>
-          </Box>
-          <Divider />
-          <ScrollArea style={{ flex: 1 }} p="xs">
-            {sessions.length === 0 ? (
-              <Stack align="center" justify="center" h="100%" gap="xs" p="xl">
-                <IconHistory size={32} stroke={1.5} opacity={0.3} />
-                <Text size="sm" c="dimmed" ta="center">{t('ai.no_history') || 'No chat history'}</Text>
-              </Stack>
-            ) : (
-              <Stack gap={2} p="xs">
-                {sessions.map((session) => (
-                  <Group
-                    key={session.id}
-                    gap="xs"
-                    p="xs"
-                    style={{
-                      borderRadius: 'var(--mantine-radius-md)',
-                      cursor: 'pointer',
-                      background: sidebarCurrentId === session.id ? 'var(--mantine-color-blue-light)' : 'transparent',
-                      transition: 'all 0.15s ease',
-                    }}
-                    onClick={() => handleLoadSession(session)}
-                  >
-                    <Avatar size={32} radius="md" color="blue" variant="light">
-                      <IconMessage size={16} />
-                    </Avatar>
-                    <Box style={{ flex: 1, minWidth: 0 }}>
-                      <Text size="sm" fw={500} truncate>{session.title}</Text>
-                      <Text size="xs" c="dimmed">{new Date(session.createdAt).toLocaleDateString()}</Text>
-                    </Box>
-                    <ActionIcon
-                      variant="subtle"
-                      color="red"
-                      size="xs"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleDeleteSession(session.id)
-                      }}
-                    >
-                      <IconTrash size={14} />
-                    </ActionIcon>
-                  </Group>
-                ))}
-              </Stack>
-            )}
-          </ScrollArea>
-        </Paper>
-      )}
+      {/* Delete Confirmation Modal */}
+      <Modal
+        opened={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        title="Удалить чат"
+        centered
+      >
+        <Text size="sm" mb="md">
+          Вы уверены, что хотите удалить этот чат? Все сообщения будут удаллены безвозвратно.
+        </Text>
+        <Group justify="flex-end">
+          <Button variant="subtle" onClick={() => setDeleteModalOpen(false)}>
+            Отмена
+          </Button>
+          <Button color="red" onClick={handleDeleteConversation}>
+            Удалить
+          </Button>
+        </Group>
+      </Modal>
     </Box>
   )
 }
