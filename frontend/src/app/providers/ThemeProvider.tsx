@@ -1,11 +1,11 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 
-type Theme = 'light' | 'dark' | 'system'
+export type ThemeMode = 'light' | 'dark' | 'system'
 type ResolvedTheme = 'light' | 'dark'
 
 interface ThemeContextType {
-  theme: Theme
-  setTheme: (theme: Theme) => void
+  theme: ThemeMode
+  setTheme: (theme: ThemeMode) => void
   resolvedTheme: ResolvedTheme
   toggleTheme: () => void
 }
@@ -17,31 +17,21 @@ function getSystemTheme(): ResolvedTheme {
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
 }
 
-function getResolvedTheme(theme: Theme): ResolvedTheme {
-  if (theme === 'system') {
-    return getSystemTheme()
-  }
-  return theme
-}
-
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>(() => {
+  const [theme, setTheme] = useState<ThemeMode>(() => {
     if (typeof window === 'undefined') return 'system'
-    return (localStorage.getItem('parko-theme') as Theme) || 'system'
+    return (localStorage.getItem('parko-theme') as ThemeMode) || 'system'
   })
-
-  const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>(() => getResolvedTheme(theme))
+  const [systemTheme, setSystemTheme] = useState<ResolvedTheme>(() => getSystemTheme())
+  const resolvedTheme = theme === 'system' ? systemTheme : theme
 
   useEffect(() => {
-    const resolved = getResolvedTheme(theme)
-    setResolvedTheme(resolved)
-
     // Update HTML attribute for Mantine
-    document.documentElement.setAttribute('data-mantine-color-scheme', resolved)
-    
+    document.documentElement.setAttribute('data-mantine-color-scheme', resolvedTheme)
+
     // Save to localStorage
     localStorage.setItem('parko-theme', theme)
-  }, [theme])
+  }, [resolvedTheme, theme])
 
   useEffect(() => {
     // Listen to system theme changes when in 'system' mode
@@ -49,8 +39,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
     const handleChange = () => {
-      setResolvedTheme(mediaQuery.matches ? 'dark' : 'light')
-      document.documentElement.setAttribute('data-mantine-color-scheme', mediaQuery.matches ? 'dark' : 'light')
+      setSystemTheme(mediaQuery.matches ? 'dark' : 'light')
     }
 
     mediaQuery.addEventListener('change', handleChange)

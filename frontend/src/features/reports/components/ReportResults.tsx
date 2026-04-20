@@ -47,7 +47,6 @@ const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'
  * Render different chart types based on data
  */
 function ChartRenderer({ chart }: { chart: ChartData }) {
-  const { t } = useTranslation()
   const { user } = useAuth()
   const currency = user?.currency || 'KGS'
   const { type, title, data } = chart

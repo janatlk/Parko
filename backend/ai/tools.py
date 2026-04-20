@@ -7,7 +7,6 @@ import logging
 import re
 
 from django.db import models
-from django.utils import timezone
 
 from accounts.models import UserRole
 from fleet.models import Car, Fuel, Spare, Insurance, Inspection, CarStatus
@@ -45,6 +44,20 @@ def _check_admin(user):
         raise PermissionError("User has no company assigned.")
     if user.role != UserRole.COMPANY_ADMIN:
         raise PermissionError("User does not have admin permissions.")
+
+
+def _get_company_car(company, car_id):
+    try:
+        return Car.objects.get(id=car_id, company=company)
+    except Car.DoesNotExist:
+        return None
+
+
+def _get_company_record(model, company, record_id):
+    try:
+        return model.objects.get(id=record_id, car__company=company)
+    except model.DoesNotExist:
+        return None
 
 
 def tool_list_cars(user, company, filters=None):
@@ -207,9 +220,8 @@ def tool_add_fuel(user, company, data):
     if not isinstance(car_id, int):
         return {'success': False, 'error': f"Invalid car_id format: {data['car_id']}. Must be an integer."}
 
-    try:
-        car = Car.objects.get(id=car_id, company=company)
-    except Car.DoesNotExist:
+    car = _get_company_car(company, car_id)
+    if not car:
         return {'success': False, 'error': f"Vehicle with ID {car_id} not found."}
 
     try:
@@ -253,9 +265,8 @@ def tool_add_spare(user, company, data):
     if not isinstance(car_id, int):
         return {'success': False, 'error': f"Invalid car_id format: {data['car_id']}. Must be an integer."}
 
-    try:
-        car = Car.objects.get(id=car_id, company=company)
-    except Car.DoesNotExist:
+    car = _get_company_car(company, car_id)
+    if not car:
         return {'success': False, 'error': f"Vehicle with ID {car_id} not found."}
 
     try:
@@ -301,9 +312,8 @@ def tool_add_insurance(user, company, data):
     if not isinstance(car_id, int):
         return {'success': False, 'error': f"Invalid car_id format: {data['car_id']}. Must be an integer."}
 
-    try:
-        car = Car.objects.get(id=car_id, company=company)
-    except Car.DoesNotExist:
+    car = _get_company_car(company, car_id)
+    if not car:
         return {'success': False, 'error': f"Vehicle with ID {car_id} not found."}
 
     try:
@@ -347,9 +357,8 @@ def tool_add_inspection(user, company, data):
     if not isinstance(car_id, int):
         return {'success': False, 'error': f"Invalid car_id format: {data['car_id']}. Must be an integer."}
 
-    try:
-        car = Car.objects.get(id=car_id, company=company)
-    except Car.DoesNotExist:
+    car = _get_company_car(company, car_id)
+    if not car:
         return {'success': False, 'error': f"Vehicle with ID {car_id} not found."}
 
     try:
@@ -393,17 +402,195 @@ def tool_delete_record(user, company, model_name, record_id):
             'error': f"Unknown model: {model_name}. Supported: fuel, spare, insurance, inspection.",
         }
 
+    record = _get_company_record(model, company, record_id)
+    if not record:
+        return {'success': False, 'error': f"{model_name} record #{record_id} not found."}
     try:
-        record = model.objects.get(id=record_id, car__company=company)
         record.delete()
         return {
             'success': True,
             'message': f"{model_name.capitalize()} record #{record_id} deleted successfully.",
         }
-    except model.DoesNotExist:
-        return {'success': False, 'error': f"{model_name} record #{record_id} not found."}
     except Exception as e:
         logger.error(f"Error deleting {model_name} #{record_id} for user {user.id}: {e}")
+        return {'success': False, 'error': str(e)}
+
+
+def tool_update_fuel(user, company, record_id, data):
+    """Update fuel record fields."""
+    _check_admin(user)
+
+    record = _get_company_record(Fuel, company, record_id)
+    if not record:
+        return {'success': False, 'error': f"Fuel record #{record_id} not found."}
+
+    if 'car_id' in data:
+        car_id = _parse_car_id(data['car_id'])
+        if not isinstance(car_id, int):
+            return {'success': False, 'error': f"Invalid car_id format: {data['car_id']}. Must be an integer."}
+        car = _get_company_car(company, car_id)
+        if not car:
+            return {'success': False, 'error': f"Vehicle with ID {car_id} not found."}
+        record.car = car
+
+    numeric_fields = ['year', 'month', 'liters', 'total_cost', 'monthly_mileage']
+    for field in numeric_fields:
+        if field in data and data[field] is not None:
+            setattr(record, field, int(data[field]))
+
+    try:
+        record.save()
+        return {
+            'success': True,
+            'data': {
+                'id': record.id,
+                'car': str(record.car),
+                'year': record.year,
+                'month': record.month,
+                'liters': record.liters,
+                'total_cost': record.total_cost,
+                'monthly_mileage': record.monthly_mileage,
+                'consumption': str(record.consumption),
+            },
+            'message': f"Fuel record #{record.id} updated successfully.",
+        }
+    except Exception as e:
+        logger.error(f"Error updating fuel #{record_id} for user {user.id}: {e}")
+        return {'success': False, 'error': str(e)}
+
+
+def tool_update_spare(user, company, record_id, data):
+    """Update spare part record fields."""
+    _check_admin(user)
+
+    record = _get_company_record(Spare, company, record_id)
+    if not record:
+        return {'success': False, 'error': f"Spare record #{record_id} not found."}
+
+    if 'car_id' in data:
+        car_id = _parse_car_id(data['car_id'])
+        if not isinstance(car_id, int):
+            return {'success': False, 'error': f"Invalid car_id format: {data['car_id']}. Must be an integer."}
+        car = _get_company_car(company, car_id)
+        if not car:
+            return {'success': False, 'error': f"Vehicle with ID {car_id} not found."}
+        record.car = car
+
+    direct_fields = ['title', 'description', 'job_description', 'installed_at']
+    numeric_fields = ['part_price', 'job_price']
+
+    for field in direct_fields:
+        if field in data and data[field] is not None:
+            setattr(record, field, data[field])
+
+    for field in numeric_fields:
+        if field in data and data[field] is not None:
+            setattr(record, field, int(data[field]))
+
+    try:
+        record.save()
+        return {
+            'success': True,
+            'data': {
+                'id': record.id,
+                'car': str(record.car),
+                'title': record.title,
+                'part_price': record.part_price,
+                'job_price': record.job_price,
+                'installed_at': str(record.installed_at),
+            },
+            'message': f"Spare record #{record.id} updated successfully.",
+        }
+    except Exception as e:
+        logger.error(f"Error updating spare #{record_id} for user {user.id}: {e}")
+        return {'success': False, 'error': str(e)}
+
+
+def tool_update_insurance(user, company, record_id, data):
+    """Update insurance record fields."""
+    _check_admin(user)
+
+    record = _get_company_record(Insurance, company, record_id)
+    if not record:
+        return {'success': False, 'error': f"Insurance record #{record_id} not found."}
+
+    if 'car_id' in data:
+        car_id = _parse_car_id(data['car_id'])
+        if not isinstance(car_id, int):
+            return {'success': False, 'error': f"Invalid car_id format: {data['car_id']}. Must be an integer."}
+        car = _get_company_car(company, car_id)
+        if not car:
+            return {'success': False, 'error': f"Vehicle with ID {car_id} not found."}
+        record.car = car
+
+    direct_fields = ['insurance_type', 'number', 'start_date', 'end_date']
+    for field in direct_fields:
+        if field in data and data[field] is not None:
+            setattr(record, field, data[field])
+
+    if 'cost' in data and data['cost'] is not None:
+        record.cost = int(data['cost'])
+
+    try:
+        record.save()
+        return {
+            'success': True,
+            'data': {
+                'id': record.id,
+                'car': str(record.car),
+                'insurance_type': record.insurance_type,
+                'number': record.number,
+                'start_date': str(record.start_date),
+                'end_date': str(record.end_date),
+                'cost': record.cost,
+            },
+            'message': f"Insurance record #{record.id} updated successfully.",
+        }
+    except Exception as e:
+        logger.error(f"Error updating insurance #{record_id} for user {user.id}: {e}")
+        return {'success': False, 'error': str(e)}
+
+
+def tool_update_inspection(user, company, record_id, data):
+    """Update inspection record fields."""
+    _check_admin(user)
+
+    record = _get_company_record(Inspection, company, record_id)
+    if not record:
+        return {'success': False, 'error': f"Inspection record #{record_id} not found."}
+
+    if 'car_id' in data:
+        car_id = _parse_car_id(data['car_id'])
+        if not isinstance(car_id, int):
+            return {'success': False, 'error': f"Invalid car_id format: {data['car_id']}. Must be an integer."}
+        car = _get_company_car(company, car_id)
+        if not car:
+            return {'success': False, 'error': f"Vehicle with ID {car_id} not found."}
+        record.car = car
+
+    direct_fields = ['number', 'inspected_at']
+    for field in direct_fields:
+        if field in data and data[field] is not None:
+            setattr(record, field, data[field])
+
+    if 'cost' in data and data['cost'] is not None:
+        record.cost = int(data['cost'])
+
+    try:
+        record.save()
+        return {
+            'success': True,
+            'data': {
+                'id': record.id,
+                'car': str(record.car),
+                'number': record.number,
+                'inspected_at': str(record.inspected_at),
+                'cost': record.cost,
+            },
+            'message': f"Inspection record #{record.id} updated successfully.",
+        }
+    except Exception as e:
+        logger.error(f"Error updating inspection #{record_id} for user {user.id}: {e}")
         return {'success': False, 'error': str(e)}
 
 
@@ -414,8 +601,12 @@ TOOL_REGISTRY = {
     'tool_update_car': tool_update_car,
     'tool_delete_car': tool_delete_car,
     'tool_add_fuel': tool_add_fuel,
+    'tool_update_fuel': tool_update_fuel,
     'tool_add_spare': tool_add_spare,
+    'tool_update_spare': tool_update_spare,
     'tool_add_insurance': tool_add_insurance,
+    'tool_update_insurance': tool_update_insurance,
     'tool_add_inspection': tool_add_inspection,
+    'tool_update_inspection': tool_update_inspection,
     'tool_delete_record': tool_delete_record,
 }

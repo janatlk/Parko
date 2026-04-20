@@ -8,14 +8,17 @@ export function parseActionsFromContent(content: string): { text: string; action
   const actions: ActionPayload[] = []
   let text = content
 
-  // 1. Try to find ```json ... ``` code blocks
+  // 1. Parse JSON code blocks and extract only action payloads.
   const codeBlockRegex = /```json\s*([\s\S]*?)\s*```/g
+  const actionBlocks = new Set<string>()
   let match
   while ((match = codeBlockRegex.exec(content)) !== null) {
+    const fullMatch = match[0]
     try {
       const parsed = JSON.parse(match[1])
       if (parsed.action && parsed.params) {
         actions.push(parsed)
+        actionBlocks.add(fullMatch)
       }
     } catch {
       // not valid JSON, skip
@@ -49,9 +52,12 @@ export function parseActionsFromContent(content: string): { text: string; action
     }
   }
 
-  // 3. Remove code block markers from text
-  if (actions.length > 0) {
-    text = text.replace(/```json\s*[\s\S]*?\s*```/g, '').trim()
+  // 3. Remove only action code blocks from the displayed text.
+  if (actionBlocks.size > 0) {
+    text = Array.from(actionBlocks).reduce(
+      (currentText, block) => currentText.replace(block, '').trim(),
+      text,
+    )
   }
 
   return { text: text || actions[0]?.description || '', actions }

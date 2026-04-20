@@ -53,7 +53,7 @@ type MessageWithAction = {
   role: 'user' | 'assistant'
   content: string
   actions: ActionPayload[]
-  id?: number
+  id: number
   timestamp: string
 }
 
@@ -103,6 +103,11 @@ export function AIPage() {
   const { mutate: executeAction, isPending: isExecuting } = useExecuteAIAction()
   const { mutate: deleteConversation } = useDeleteConversation()
 
+  const nextMessageId = useCallback(() => {
+    messageIdCounter.current += 1
+    return messageIdCounter.current
+  }, [])
+
   // Load conversation on mount or when selected
   const loadConversation = useCallback(
     (conversationId: number) => {
@@ -150,9 +155,16 @@ export function AIPage() {
     if (!trimmed || isPending) return
 
     setError(null)
+    const optimisticUserMessageId = nextMessageId()
     setLocalMessages((prev) => [
       ...prev,
-      { role: 'user' as const, content: trimmed, actions: [], timestamp: new Date().toISOString() },
+      {
+        role: 'user' as const,
+        content: trimmed,
+        actions: [],
+        id: optimisticUserMessageId,
+        timestamp: new Date().toISOString(),
+      },
     ])
     setInput('')
 
@@ -166,7 +178,7 @@ export function AIPage() {
           }
 
           const parsed = parseActionsFromContent(data.response)
-          const id = ++messageIdCounter.current
+          const id = nextMessageId()
           setLocalMessages((prev) => [
             ...prev,
             {
@@ -191,7 +203,7 @@ export function AIPage() {
 
           setError(errorType)
 
-          const id = ++messageIdCounter.current
+          const id = nextMessageId()
           let errorMessage = '❌ Произошла ошибка при обработке запроса.'
           if (errorDetail) {
             errorMessage += `\n\n📋 Детали: ${errorDetail}`
@@ -218,12 +230,12 @@ export function AIPage() {
 
           // Remove the user message that caused the error
           setLocalMessages((prev) =>
-            prev.filter((m) => m.content !== trimmed || m.role !== 'user'),
+            prev.filter((m) => m.id !== optimisticUserMessageId),
           )
         },
       },
     )
-  }, [input, isPending, sendMessage, currentConversationId])
+  }, [currentConversationId, input, isPending, nextMessageId, sendMessage])
 
   // Action handlers
   const handleConfirmAction = useCallback(
@@ -238,7 +250,7 @@ export function AIPage() {
               ...prev,
               { messageId, actionIndex, success: data.success, response: data.result || data.response },
             ])
-            const id = ++messageIdCounter.current
+            const id = nextMessageId()
             setLocalMessages((prev) => [
               ...prev,
               {
@@ -255,7 +267,7 @@ export function AIPage() {
               ...prev,
               { messageId, actionIndex, success: false, response: '' },
             ])
-            const id = ++messageIdCounter.current
+            const id = nextMessageId()
             setLocalMessages((prev) => [
               ...prev,
               {
@@ -270,7 +282,7 @@ export function AIPage() {
         },
       )
     },
-    [executeAction, t, currentConversationId],
+    [currentConversationId, executeAction, nextMessageId, t],
   )
 
   const handleCancelAction = useCallback((messageId: number, actionIndex: number) => {
@@ -517,7 +529,7 @@ export function AIPage() {
                       >
                         {isUser ? <IconUser size={18} /> : <IconBrain size={18} />}
                       </Avatar>
-                      <Stack gap={2} style={{ maxWidth: '70%' }}>
+                      <Stack gap={2} style={{ maxWidth: isUser ? '70%' : '88%' }}>
                         <Paper
                           p="sm"
                           style={{
@@ -571,7 +583,7 @@ export function AIPage() {
                                         variant="light"
                                         leftSection={<IconCheck size={14} />}
                                         onClick={() =>
-                                          handleConfirmAction(msg.id!, idx, act.action, act.params)
+                                          handleConfirmAction(msg.id, idx, act.action, act.params)
                                         }
                                         loading={isExecuting}
                                         disabled={isExecuting}
@@ -583,7 +595,7 @@ export function AIPage() {
                                         color="red"
                                         variant="light"
                                         leftSection={<IconX size={14} />}
-                                        onClick={() => handleCancelAction(msg.id!, idx)}
+                                        onClick={() => handleCancelAction(msg.id, idx)}
                                         disabled={isExecuting}
                                       >
                                         Отменить
