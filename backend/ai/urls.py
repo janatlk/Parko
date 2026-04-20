@@ -6,6 +6,7 @@ from ai.views import (
     AIExecuteView,
     AIClearChatView,
     AIDeleteConversationView,
+    AISuggestionsView,
 )
 
 urlpatterns = [
@@ -15,4 +16,5 @@ urlpatterns = [
     path('execute/', AIExecuteView.as_view(), name='ai-execute'),
     path('messages/', AIClearChatView.as_view(), name='ai-clear'),
     path('conversations/<int:conversation_id>/delete/', AIDeleteConversationView.as_view(), name='ai-delete-conversation'),
+    path('suggestions/', AISuggestionsView.as_view(), name='ai-suggestions'),
 ]

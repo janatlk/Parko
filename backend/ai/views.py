@@ -1,3 +1,9 @@
+import random
+
+from django.db.models import Sum
+from django.utils import timezone
+from datetime import timedelta
+
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -290,3 +296,103 @@ class AIDeleteConversationView(APIView):
         conversation.delete()
 
         return Response({'success': True}, status=status.HTTP_200_OK)
+
+
+class AISuggestionsView(APIView):
+    """
+    Generate dynamic chat suggestions based on the user's company data.
+    GET /api/v1/ai/suggestions/
+    """
+    permission_classes = [IsAuthenticated, IsCompanyMember]
+
+    def get(self, request):
+        from fleet.models import Car, Fuel, Insurance, Inspection, Spare
+
+        company = request.user.company
+        now = timezone.now()
+        suggestions = []
+
+        # --- Data-driven suggestions ---
+        cars = list(Car.objects.filter(company=company).values('id', 'brand', 'title', 'numplate', 'status')[:20])
+        total_cars = len(cars)
+
+        # 1. Fleet overview
+        if total_cars > 0:
+            suggestions.append({
+                'text': f'Покажи все {total_cars} автомобилей',
+                'icon': '🚗',
+                'category': 'fleet',
+            })
+
+        # 2. Fuel suggestion for a specific car
+        if cars:
+            car = random.choice(cars)
+            suggestions.append({
+                'text': f'Покажи расход топлива для {car["brand"]} {car["title"]} `{car["numplate"]}`',
+                'icon': '⛽',
+                'category': 'fuel',
+            })
+
+        # 3. Expiring insurance check
+        expiring_soon = Insurance.objects.filter(
+            car__company=company,
+            end_date__gte=now.date(),
+            end_date__lte=now.date() + timedelta(days=30),
+        ).count()
+        if expiring_soon > 0:
+            suggestions.append({
+                'text': f'Какие страховки истекают в ближайший месяц? ({expiring_soon} шт.)',
+                'icon': '📋',
+                'category': 'insurance',
+            })
+        else:
+            suggestions.append({
+                'text': 'Покажи статус страховок',
+                'icon': '📋',
+                'category': 'insurance',
+            })
+
+        # 4. Fuel analytics
+        current_month = now.month
+        current_year = now.year
+        fuel_this_month = Fuel.objects.filter(
+            car__company=company,
+            month=current_month,
+            year=current_year,
+        ).aggregate(total=Sum('liters'))['total']
+        if fuel_this_month:
+            suggestions.append({
+                'text': f'Анализ расходов на топливо за {now.strftime("%B %Y")}',
+                'icon': '📊',
+                'category': 'analytics',
+            })
+        else:
+            suggestions.append({
+                'text': 'Покажи расходы на топливо за последние месяцы',
+                'icon': '📊',
+                'category': 'analytics',
+            })
+
+        # 5. Add fuel for a specific car
+        if cars:
+            car = random.choice(cars)
+            suggestions.append({
+                'text': f'Добавь топливо для {car["brand"]} {car["title"]} `{car["numplate"]}`',
+                'icon': '➕',
+                'category': 'action',
+            })
+
+        # 6. Maintenance
+        maintenance_count = Spare.objects.filter(car__company=company).count()
+        if maintenance_count > 0:
+            suggestions.append({
+                'text': 'Покажи все расходы на ТО и запчасти',
+                'icon': '🔧',
+                'category': 'maintenance',
+            })
+
+        # Shuffle and pick top 4
+        random.shuffle(suggestions)
+        suggestions = suggestions[:4]
+
+        return Response({'suggestions': suggestions})

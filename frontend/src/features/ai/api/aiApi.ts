@@ -79,3 +79,14 @@ export async function executeAIAction(
   })
   return data
 }
+
+export type AISuggestion = {
+  text: string
+  icon: string
+  category: string
+}
+
+export async function getAISuggestions(): Promise<AISuggestion[]> {
+  const { data } = await http.get<{ suggestions: AISuggestion[] }>('ai/suggestions/')
+  return data.suggestions || []
+}

@@ -11,92 +11,92 @@ from ai.tools import TOOL_REGISTRY
 
 logger = logging.getLogger(__name__)
 
-MAX_CONTEXT_LINES = 70
+MAX_CONTEXT_LINES = 80
 MAX_HISTORY_MESSAGES = 6
 
 SYSTEM_PROMPT = """\
-You are Parko AI Assistant — a specialized AI assistant for the Parko fleet management system.
+You are **Parko AI Assistant** — a helpful, concise assistant for the Parko fleet management system.
+
+GOLDEN RULES:
+1. Be CONCISE. Answer in 2-5 sentences for simple questions. Only use tables/charts for data listings or analytics.
+2. NEVER dump raw context, IDs, or internal data the user didn't ask for.
+3. NEVER ask "Do you want me to do it?" or "Should I proceed?" — just generate the action JSON block. The UI has confirm/cancel buttons.
+4. Answer in the SAME LANGUAGE the user writes in (Russian, English, or Kyrgyz).
+5. You ONLY answer questions about fleet management. Politely decline off-topic questions.
+6. You identify yourself as "Parko AI Assistant".
 
 ABOUT PARKO:
-Parko is a multi-tenant SaaS platform for enterprise fleet management. Companies use it to track and manage their vehicle fleets, including:
-- Vehicle management (cars, trucks, etc.) with details like brand, model, VIN, license plates, assigned drivers
-- Fuel consumption tracking with monthly reports and automatic L/100km calculation
-- Maintenance records (spare parts, repairs, job costs)
+Parko is a multi-tenant SaaS fleet management platform. Companies track:
+- Vehicles (cars, trucks) with brand, model, VIN, license plates, drivers
+- Fuel consumption with monthly reports and L/100km calculation
+- Maintenance records (spare parts, repairs, labor costs)
 - Tire and accumulator tracking
-- Insurance policy management with validity dates
-- Technical inspection records
-- Dashboard analytics and reports (fuel consumption, maintenance costs, insurance status)
-- Multi-company (multi-tenant) architecture where each company's data is isolated
+- Insurance policies with validity dates
+- Technical inspections
+- Dashboard analytics and reports
 
-YOUR ROLE:
-- You ONLY answer questions about Parko fleet management system (cars, fuel, maintenance, insurance, inspections, reports, dashboards)
-- You refuse to answer questions unrelated to Parko
-- You never share data between companies — each company's data is strictly isolated
-- You identify yourself as "Parko AI Assistant"
-- You answer in the same language the user writes in (Russian, English, or Kyrgyz)
+RESPONSE STYLE:
+- For simple questions ("how many cars?") → answer in 1-2 sentences with key numbers bolded.
+- For data listings ("show all cars") → use a JSON table block (see format below).
+- For analytics/trends ("fuel expenses this year") → use JSON table + chart blocks, then 1 conclusion sentence.
+- For actions ("add fuel 100L to car #5") → describe what you'll do in 1 sentence, then output the action JSON block. NO confirmation needed.
+- For missing info ("add fuel") → ask ONLY for the missing fields, nothing else.
 
-COLOR TEXT USAGE:
-- You can use colored text to highlight important information when displaying large amounts of data
-- Use HTML span tags with inline styles: <span style="color: #FF0000">red text</span>, <span style="color: #00FF00">green text</span>, etc.
-- Available colors and their purposes:
-  - <span style="color: #FF0000">Red (#FF0000)</span> — critical alerts, errors, expired items, high costs
-  - <span style="color: #FFA500">Orange (#FFA500)</span> — warnings, expiring soon, attention needed
-  - <span style="color: #FFD700">Gold (#FFD700)</span> — important notices, key metrics
-  - <span style="color: #00AA00">Green (#00AA00)</span> — success, active status, good metrics
-  - <span style="color: #0066FF">Blue (#0066FF)</span> — informational, links, references
-  - <span style="color: #9933FF">Purple (#9933FF)</span> — special highlights, categories
-  - <span style="color: #FF1493">Pink (#FF1493)</span> — highlights, emphasis
-- Use colors sparing — only for key data points, costs, dates, or status indicators
-- Do NOT color entire paragraphs — only highlight specific values, numbers, or key terms
-- Example: "Vehicle `O143O` status: <span style="color: #00AA00">ACTIVE</span>, fuel: <span style="color: #FF0000">150 liters</span> used this month"
-- When user asks you to "use colors" or "highlight", apply appropriate colors to important data
+FORMATTING (Markdown):
+- **bold** for key values, numbers, statuses
+- `code` for license plates, IDs, field names
+- Use bullet points sparingly
+- Do NOT use markdown tables — use JSON table blocks instead
 
-FORMATTING RULES — ALWAYS USE MARKDOWN:
-- Use **bold** for important values, numbers, and key terms
-- Use *italic* for emphasis and descriptions
-- Use `inline code` for field names, IDs, technical terms, and license plates
-- Use bullet points (- item) for lists of items
-- Use numbered lists (1. item) for steps and sequences
-- Use ### headings for section titles when listing data
-- Use > blockquotes for tips or important notes
-- Use tables when comparing data
-- Make your responses clean, structured, and easy to read
-- Always highlight: car numbers, costs, dates, percentages in **bold**
-- License plates should be in `code` format like `O143O`
-- Vehicle IDs should be in `code` format like `ID: 5`
-- HTML color spans work alongside markdown — you can combine them: `**<span style="color: #FF0000">critical</span>**`
+JSON BLOCKS — place inside ```json ... ``` fences:
 
-CRITICAL RULE FOR JSON ACTIONS:
-- When generating JSON action blocks, car_id MUST be an INTEGER (e.g., 32), NOT a string
-- NEVER write "car_id=32" or "car_id=32" as a string — use just the number: 32
-- CORRECT: {"action": "tool_add_fuel", "params": {"car_id": 32, "year": 2026, "month": 4, "liters": 150}}
-- WRONG: {"action": "tool_add_fuel", "params": {"car_id": "car_id=32", ...}}
-- WRONG: {"action": "tool_add_fuel", "params": {"car_id": "32", ...}}
+TABLE:
+```json
+{"type":"table","title":"Fleet vehicles","headers":["ID","Vehicle","Plate","Status"],"rows":[[1,"Toyota Camry","O143O","Active"]],"filename":"fleet_vehicles"}
+```
 
-EXAMPLE RESPONSE STYLE:
-### 🚗 Автопарк
+CHART (bar, line, or pie):
+```json
+{"type":"chart","title":"Fuel by month","chart_type":"bar","x_label":"Month","y_label":"Liters","filename":"fuel_chart","series":[{"name":"Fuel","color":"#2563eb","points":[{"label":"Jan","value":120}]}]}
+```
 
-В компании **Demo Company** найдено **10** автомобилей:
+ACTION (add/update/delete data):
+```json
+{"action":"tool_add_fuel","params":{"car_id":32,"year":2026,"month":4,"liters":150},"description":"Add 150L fuel to car #32 for April 2026"}
+```
 
-| Номер | Марка | Статус |
-|-------|-------|--------|
-| `O143O` | Toyota Camry | <span style="color: #00AA00">Активна</span> |
-| `AA642401KG` | BMW X7 | <span style="color: #00AA00">Активна</span> |
+ACTION RULES:
+- Generate the action JSON IMMEDIATELY when you have all required fields. Do NOT ask for confirmation.
+- car_id and record_id must be INTEGERS, never strings.
+- If the user references a car by plate or name, find the matching ID from context.
+- If required fields are missing, ask for them in a short sentence. Do NOT generate the JSON.
+- For DELETE operations ONLY, briefly state what will be deleted before the JSON block.
 
-> 💡 Чтобы добавить топливо для машины, укажите номер машины, литры и месяц.
+AVAILABLE ACTIONS:
+- tool_add_car: brand, title, numplate, (vin, fueltype, type, year, driver, status, region, fuel_card, drivers_phone)
+- tool_update_car: car_id + fields to update
+- tool_delete_car: car_id
+- tool_add_fuel: car_id, year, month, liters, (total_cost, monthly_mileage)
+- tool_update_fuel: record_id, (car_id, year, month, liters, total_cost, monthly_mileage)
+- tool_add_spare: car_id, title, installed_at, (description, part_price, job_price, job_description)
+- tool_update_spare: record_id, (car_id, title, description, part_price, job_price, job_description, installed_at)
+- tool_add_insurance: car_id, number, start_date, end_date, (insurance_type, cost)
+- tool_update_insurance: record_id, (car_id, insurance_type, number, start_date, end_date, cost)
+- tool_add_inspection: car_id, number, inspected_at, (cost)
+- tool_update_inspection: record_id, (car_id, number, inspected_at, cost)
+- tool_delete_record: model_name in ["fuel","spare","insurance","inspection"], record_id
+- tool_list_cars: (status, brand, search)
 
-IMPORTANT: When the user asks about current data (how many cars, what vehicles exist, etc.), ALWAYS refer to the COMPANY CONTEXT section below — it contains the LIVE data from the database. The conversation history may be outdated if actions were performed.
+HOW TO PARSE USER INPUT FOR ADDING A CAR:
+"add car Toyota Camry O143O" → brand="Toyota", title="Camry", numplate="O143O"
+"добавь машину Volkswagen Passat AKO534" → brand="Volkswagen", title="Passat", numplate="AKO534"
 
-TOOL USAGE:
-- You have access to tools that can list, add, update, and delete fleet data (vehicles, fuel records, maintenance, insurance, inspections)
-- When a user asks you to add, update, or delete data, respond with a tool call to perform the action
-- The system will execute the tool and return the result to you
-- When a user asks you to perform an action (add, update, delete), first describe what you will do and ask for confirmation
-- After the user confirms, use the appropriate tool to execute the action
-- Always confirm the result of any action to the user
+IMPORTANT:
+- Use COMPANY CONTEXT below as the source of truth for current data.
+- Never invent data, IDs, or records that don't exist in context.
+- When the user says "car #1" or "first car", find the actual car ID from the vehicle list.
 
 COMPANY CONTEXT:
-The data you see below belongs ONLY to the user's company. Use this context to answer questions accurately.
 """
 
 # Keywords that suggest the question is related to Parko/fleet management
@@ -117,12 +117,14 @@ RELEVANT_KEYWORDS = [
     'how many', 'how much', 'what', 'when', 'where', 'which', 'who',
     'статистик', 'аналитик', 'сводк', 'итог',
     'statistic', 'analytic', 'summary', 'total',
+    # Greetings (allow so the bot can introduce itself)
+    'привет', 'здравствуй', 'hello', 'hi', 'салам',
 ]
 
 # Keywords that suggest the question is NOT related to Parko
 IRRELEVANT_KEYWORDS = [
-    'рецепт', 'рецепт', 'готовка', 'кулинар', 'еда', 'блюдо',
-    'рецепт', 'погода', 'прогноз', 'спорт', 'футбол', 'хоккей',
+    'рецепт', 'готовка', 'кулинар', 'еда', 'блюдо',
+    'погода', 'прогноз', 'спорт', 'футбол', 'хоккей',
     'политик', 'новости', 'кино', 'фильм', 'музык', 'песн',
     'программ', 'код', 'python', 'javascript', 'java', 'c++',
     'react', 'vue', 'angular', 'node', 'django', 'flask',
@@ -164,8 +166,7 @@ def _is_relevant_to_parko(question: str) -> bool:
         if entity.lower() in question_lower:
             return True
 
-    # Default: allow the question if it's a general query that could be about Parko
-    # This is permissive — we let the system prompt handle edge cases
+    # Default: allow the question (the system prompt handles edge cases)
     return True
 
 
@@ -195,10 +196,7 @@ def collect_company_context(user) -> str:
     current_year = now.year
 
     parts = []
-    parts.append(f"Company: {company.name}")
-    parts.append(f"Country: {company.country}")
-    parts.append(f"Default currency: {company.default_currency}")
-    parts.append("Use ONLY this company data. Never invent rows, totals, IDs, dates, tables, or chart points.")
+    parts.append(f"Company: {company.name} | Country: {company.country} | Currency: {company.default_currency}")
     parts.append("")
 
     # Car statistics
@@ -207,18 +205,17 @@ def collect_company_context(user) -> str:
     maintenance_cars = Car.objects.filter(company=company, status='MAINTENANCE').count()
     inactive_cars = Car.objects.filter(company=company, status='INACTIVE').count()
 
-    parts.append(f"Vehicles: {total_cars} total, {active_cars} active, {maintenance_cars} in maintenance, {inactive_cars} inactive")
+    parts.append(f"Vehicles: {total_cars} total ({active_cars} active, {maintenance_cars} maintenance, {inactive_cars} inactive)")
 
-    # List ALL cars with IDs — IMPORTANT: user may reference by ID
+    # List ALL cars with IDs
     all_cars = Car.objects.filter(company=company).order_by('id')
     if all_cars:
-        parts.append("All vehicles (use the ID number when adding fuel/spare/insurance/inspection):")
+        parts.append("Vehicle list:")
         for car in all_cars:
-            driver_info = f"Driver: {car.driver}" if car.driver and car.driver != '-' else "No driver"
-            fc = f"Fuel card: {car.fuel_card}" if car.fuel_card else "No fuel card"
+            driver_info = car.driver if car.driver and car.driver != '-' else "—"
             parts.append(
-                f"  ID: {car.id} | {car.brand} {car.title} | Numplate: {car.numplate} | "
-                f"Status: {car.status} | {driver_info} | {fc}"
+                f"  ID:{car.id} | {car.brand} {car.title} | Plate:{car.numplate} | "
+                f"Status:{car.status} | Driver:{driver_info}"
             )
     parts.append("")
 
@@ -235,7 +232,7 @@ def collect_company_context(user) -> str:
         )
         parts.append(
             f"Fuel this month ({now.strftime('%B %Y')}): "
-            f"{fuel_stats['total_liters'] or 0} liters, "
+            f"{fuel_stats['total_liters'] or 0}L, "
             f"cost: {fuel_stats['total_cost'] or 0} {company.default_currency}"
         )
 
@@ -261,14 +258,14 @@ def collect_company_context(user) -> str:
                 avg_consumption = round((agg['total_liters'] / agg['total_mileage']) * 100, 2)
 
         parts.append(
-            f"Total fuel records: {all_fuel.count()}, "
-            f"total liters: {total_fuel['total_liters'] or 0}, "
-            f"total cost: {total_fuel['total_cost'] or 0} {company.default_currency}, "
-            f"avg consumption: {avg_consumption} L/100km"
+            f"Fuel total: {all_fuel.count()} records, "
+            f"{total_fuel['total_liters'] or 0}L, "
+            f"cost: {total_fuel['total_cost'] or 0} {company.default_currency}, "
+            f"avg: {avg_consumption} L/100km"
         )
     parts.append("")
 
-    # Maintenance (spare parts / запчасти)
+    # Maintenance (spare parts)
     spares = Spare.objects.filter(car__company=company)
     if spares.exists():
         spare_stats = spares.aggregate(
@@ -277,19 +274,12 @@ def collect_company_context(user) -> str:
             count=Count('id'),
         )
         parts.append(
-            f"Spare parts / запчасти (maintenance records): {spare_stats['count']} entries, "
-            f"parts cost: {spare_stats['total_parts'] or 0} {company.default_currency}, "
-            f"labor cost: {spare_stats['total_labor'] or 0} {company.default_currency}"
+            f"Maintenance: {spare_stats['count']} records, "
+            f"parts: {spare_stats['total_parts'] or 0}, "
+            f"labor: {spare_stats['total_labor'] or 0} {company.default_currency}"
         )
-        # List individual spare records
-        for spare in spares.order_by('-installed_at')[:5]:
-            parts.append(
-                f"  - {spare.title} (car_id={spare.car_id}), "
-                f"parts: {spare.part_price}, labor: {spare.job_price}, "
-                f"date: {spare.installed_at}"
-            )
     else:
-        parts.append("Spare parts / запчасти: 0 records")
+        parts.append("Maintenance: 0 records")
     parts.append("")
 
     # Insurance
@@ -298,7 +288,6 @@ def collect_company_context(user) -> str:
     parts.append(
         f"Insurance: {active_insurances.count()} active, {expired_insurances.count()} expired"
     )
-    parts.append("")
 
     # Inspections
     active_inspections = Inspection.objects.filter(
@@ -306,19 +295,16 @@ def collect_company_context(user) -> str:
         inspected_at__gte=now.date() - timedelta(days=365)
     )
     parts.append(
-        f"Inspections: {active_inspections.count()} active (within last year)"
+        f"Inspections: {active_inspections.count()} within last year"
     )
+
+    # Tires & Accumulators
+    tire_count = Tires.objects.filter(car__company=company).count()
+    acc_count = Accumulator.objects.filter(car__company=company).count()
+    parts.append(f"Tires: {tire_count} | Accumulators: {acc_count}")
     parts.append("")
 
-    # Tires
-    tire_count = Tires.objects.filter(car__company=company).count()
-    parts.append(f"Tire records: {tire_count}")
-
-    # Accumulators
-    acc_count = Accumulator.objects.filter(car__company=company).count()
-    parts.append(f"Accumulator records: {acc_count}")
-
-    # Extended live datasets for accurate tables/charts and safe update/delete by record ID
+    # Monthly fuel breakdown (for analytics)
     monthly_fuel_rows = (
         Fuel.objects.filter(car__company=company)
         .values('year', 'month')
@@ -329,48 +315,56 @@ def collect_company_context(user) -> str:
         )
         .order_by('-year', '-month')[:12]
     )
-    parts.append("")
-    parts.append("Fuel monthly totals (latest 12 months in DB):")
-    for row in monthly_fuel_rows:
-        parts.append(
-            f"  fuel_month year={row['year']} month={row['month']} "
-            f"liters={row['total_liters'] or 0} cost={row['total_cost'] or 0} "
-            f"mileage={row['total_mileage'] or 0}"
-        )
+    if monthly_fuel_rows:
+        parts.append("Fuel by month (latest 12):")
+        for row in monthly_fuel_rows:
+            parts.append(
+                f"  {row['year']}-{row['month']:02d}: "
+                f"{row['total_liters'] or 0}L, "
+                f"cost:{row['total_cost'] or 0}, "
+                f"mileage:{row['total_mileage'] or 0}km"
+            )
+        parts.append("")
 
-    parts.append("Recent fuel records with IDs:")
-    for fuel in Fuel.objects.filter(car__company=company).select_related('car').order_by('-year', '-month', '-id')[:12]:
-        parts.append(
-            f"  fuel_id={fuel.id} | car_id={fuel.car_id} | car={fuel.car.numplate} | "
-            f"year={fuel.year} | month={fuel.month} | liters={fuel.liters} | "
-            f"cost={fuel.total_cost} | mileage={fuel.monthly_mileage} | consumption={fuel.consumption}"
-        )
+    # Recent records with IDs (for update/delete operations)
+    recent_fuel = Fuel.objects.filter(car__company=company).select_related('car').order_by('-year', '-month', '-id')[:10]
+    if recent_fuel:
+        parts.append("Recent fuel records:")
+        for f in recent_fuel:
+            parts.append(
+                f"  fuel_id={f.id} car_id={f.car_id} plate={f.car.numplate} "
+                f"{f.year}-{f.month:02d} {f.liters}L cost={f.total_cost}"
+            )
+        parts.append("")
 
-    parts.append("")
-    parts.append("Recent maintenance records with IDs:")
-    for spare in Spare.objects.filter(car__company=company).select_related('car').order_by('-installed_at', '-id')[:12]:
-        parts.append(
-            f"  spare_id={spare.id} | car_id={spare.car_id} | car={spare.car.numplate} | "
-            f"title={spare.title} | part_price={spare.part_price} | job_price={spare.job_price} | "
-            f"installed_at={spare.installed_at}"
-        )
+    recent_spares = Spare.objects.filter(car__company=company).select_related('car').order_by('-installed_at', '-id')[:10]
+    if recent_spares:
+        parts.append("Recent maintenance:")
+        for s in recent_spares:
+            parts.append(
+                f"  spare_id={s.id} car_id={s.car_id} plate={s.car.numplate} "
+                f"\"{s.title}\" parts={s.part_price} labor={s.job_price} date={s.installed_at}"
+            )
+        parts.append("")
 
-    parts.append("")
-    parts.append("Recent insurance records with IDs:")
-    for insurance in Insurance.objects.filter(car__company=company).select_related('car').order_by('-end_date', '-id')[:12]:
-        parts.append(
-            f"  insurance_id={insurance.id} | car_id={insurance.car_id} | car={insurance.car.numplate} | "
-            f"type={insurance.insurance_type} | number={insurance.number} | "
-            f"start_date={insurance.start_date} | end_date={insurance.end_date} | cost={insurance.cost}"
-        )
+    recent_insurance = Insurance.objects.filter(car__company=company).select_related('car').order_by('-end_date', '-id')[:10]
+    if recent_insurance:
+        parts.append("Recent insurance:")
+        for i in recent_insurance:
+            parts.append(
+                f"  ins_id={i.id} car_id={i.car_id} plate={i.car.numplate} "
+                f"{i.insurance_type} #{i.number} {i.start_date}→{i.end_date} cost={i.cost}"
+            )
+        parts.append("")
 
-    parts.append("")
-    parts.append("Recent inspection records with IDs:")
-    for inspection in Inspection.objects.filter(car__company=company).select_related('car').order_by('-inspected_at', '-id')[:12]:
-        parts.append(
-            f"  inspection_id={inspection.id} | car_id={inspection.car_id} | car={inspection.car.numplate} | "
-            f"number={inspection.number} | inspected_at={inspection.inspected_at} | cost={inspection.cost}"
-        )
+    recent_inspections = Inspection.objects.filter(car__company=company).select_related('car').order_by('-inspected_at', '-id')[:10]
+    if recent_inspections:
+        parts.append("Recent inspections:")
+        for insp in recent_inspections:
+            parts.append(
+                f"  insp_id={insp.id} car_id={insp.car_id} plate={insp.car.numplate} "
+                f"#{insp.number} date={insp.inspected_at} cost={insp.cost}"
+            )
 
     return "\n".join(parts)
 
@@ -381,58 +375,13 @@ def _compress_context(context: str, max_lines: int = MAX_CONTEXT_LINES) -> str:
     if len(lines) <= max_lines:
         return "\n".join(lines)
 
-    head = lines[:22]
-    tail = lines[-18:]
+    # Keep vehicle list (top) and recent records (bottom), trim middle
+    head = lines[:25]
+    tail = lines[-20:]
     middle_budget = max_lines - len(head) - len(tail) - 1
-    middle = lines[22:22 + max(0, middle_budget)]
-    compact = head + ["... context trimmed to fit model token limits ..."] + middle + tail
+    middle = lines[25:25 + max(0, middle_budget)]
+    compact = head + ["... (trimmed) ..."] + middle + tail
     return "\n".join(compact[:max_lines])
-
-
-def _build_action_prompt() -> str:
-    """Compact prompt focused on structured analytics and safe company-scoped actions."""
-    return (
-        "Use the live COMPANY CONTEXT above as the source of truth.\n"
-        "For vehicle lists and record lists, ALWAYS return a table JSON block. Do not answer with plain text.\n"
-        "For analytics, expenses, totals, trends, comparisons, reports, or summaries:\n"
-        "1. Return at least one table JSON block.\n"
-        "2. Return at least one chart JSON block.\n"
-        "3. Then write 1 short conclusion line.\n"
-        "4. End with one short follow-up question.\n"
-        "5. Never invent values.\n\n"
-        "Use only these JSON types: table, chart, action.\n"
-        "Do not use markdown tables.\n"
-        "TABLE JSON:\n"
-        '```json\n'
-        '{"type":"table","title":"Fuel expenses","headers":["Month","Liters","Cost"],"rows":[["2026-04",120,8400]],"filename":"fuel_expenses"}\n'
-        '```\n\n'
-        "CHART JSON:\n"
-        '```json\n'
-        '{"type":"chart","title":"Fuel expenses by month","chart_type":"bar","x_label":"Month","y_label":"Cost","filename":"fuel_expenses_chart","series":[{"name":"Fuel cost","color":"#2563eb","points":[{"label":"2026-04","value":8400}]}]}\n'
-        '```\n\n'
-        "For add/update/delete, first describe the change and ask for confirmation.\n"
-        "Then return exactly one action JSON block.\n"
-        "car_id and record_id must be integers, never strings.\n"
-        "Use only live IDs from context: car_id, fuel_id, spare_id, insurance_id, inspection_id.\n\n"
-        "Available actions:\n"
-        "- tool_add_car: brand, title, numplate, (vin, fueltype, type, year, driver, status, region, fuel_card, drivers_phone)\n"
-        "- tool_update_car: car_id + any editable car fields\n"
-        "- tool_delete_car: car_id\n"
-        "- tool_add_fuel: car_id, year, month, liters, (total_cost, monthly_mileage)\n"
-        "- tool_update_fuel: record_id, (car_id, year, month, liters, total_cost, monthly_mileage)\n"
-        "- tool_add_spare: car_id, title, installed_at, (description, part_price, job_price, job_description)\n"
-        "- tool_update_spare: record_id, (car_id, title, description, part_price, job_price, job_description, installed_at)\n"
-        "- tool_add_insurance: car_id, number, start_date, end_date, (insurance_type, cost)\n"
-        "- tool_update_insurance: record_id, (car_id, insurance_type, number, start_date, end_date, cost)\n"
-        "- tool_add_inspection: car_id, number, inspected_at, (cost)\n"
-        "- tool_update_inspection: record_id, (car_id, number, inspected_at, cost)\n"
-        '- tool_delete_record: model_name in ["fuel","spare","insurance","inspection"], record_id\n'
-        "- tool_list_cars: (status, brand, search)\n\n"
-        "ACTION JSON:\n"
-        '```json\n'
-        '{"action":"tool_update_fuel","params":{"record_id":12,"total_cost":9200},"description":"Update fuel record #12 cost to 9200"}\n'
-        '```'
-    )
 
 
 # =============================================================================
@@ -668,8 +617,7 @@ def _execute_tool(user, company, tool_name, arguments):
 def ask_ai(user, question: str, conversation=None) -> str:
     """
     Send a question to the AI provider (Groq) and return the response.
-    Supports function calling with tool loop (max 3 iterations).
-    
+
     Args:
         user: The user making the request
         question: The user's question
@@ -691,7 +639,6 @@ def ask_ai(user, question: str, conversation=None) -> str:
     # Log configuration (mask API key for security)
     masked_key = api_key[:10] + '...' + api_key[-4:] if len(api_key) > 14 else '***NOT SET***'
     logger.info(f"AI Settings - Provider: {ai_settings.get('provider')}, Model: {model}, API Key: {masked_key}")
-    logger.info(f"API Key length: {len(api_key)}, starts with: {api_key[:15] if len(api_key) > 15 else 'N/A'}")
 
     if not api_key:
         logger.warning("AI API key is not configured")
@@ -715,143 +662,23 @@ def ask_ai(user, question: str, conversation=None) -> str:
         client = Groq(api_key=api_key)
         logger.info(f"Groq client initialized for user {user.id}")
 
-        # Build the messages (no Groq tool calling — too slow with 9 tools)
-        # Instead, instruct AI to respond with JSON for actions
-        action_prompt = (
-            "\n\n"
-            "IMPORTANT: If the user asks you to ADD, UPDATE, or DELETE data, "
-            "you MUST have all the REQUIRED information before generating a JSON action block.\n\n"
-            "REQUIRED information for each action:\n"
-            "- tool_add_car: brand, title, numplate (3 fields minimum)\n"
-            "- tool_add_fuel: car_id (vehicle ID), year, month, liters\n"
-            "- tool_add_spare: car_id, title, installed_at\n"
-            "- tool_add_insurance: car_id, number, start_date, end_date\n"
-            "- tool_add_inspection: car_id, number, inspected_at\n"
-            "- tool_delete_car: car_id\n\n"
-            "HOW TO PARSE USER INPUT FOR ADDING A CAR:\n"
-            "If user says 'add car Toyota Camry O143O' or 'добавь машину Toyota Camry O143O':\n"
-            "  → brand = 'Toyota' (first word = brand)\n"
-            "  → title = 'Camry' (second word = model/title)\n"
-            "  → numplate = 'O143O' (last alphanumeric string = license plate)\n"
-            "If user says 'add car Volkswagen Passat AKO534':\n"
-            "  → brand = 'Volkswagen'\n"
-            "  → title = 'Passat'\n"
-            "  → numplate = 'AKO534'\n"
-            "ONLY ask for missing fields if they are genuinely absent from the user's message.\n\n"
-            "RULES:\n"
-            "1. If the user asks to add something but does NOT provide all required fields, "
-            "DO NOT generate a JSON action block. Instead, respond with text asking for the missing information.\n"
-            "2. For example, if user says 'add fuel' — reply: 'Which vehicle? How many liters? What month and year?'\n"
-            "3. If user says 'add car BMW' (missing title and numplate) — reply: 'I need a model name and license plate number.'\n"
-            "4. If user provides brand + model + numplate in one message — GENERATE THE JSON ACTION IMMEDIATELY.\n"
-            "5. If user says 'for car #1' or 'for the first car', look at the vehicle list in the context above and find the ID number (e.g., ID: 32 means car_id=32).\n"
-            "6. CRITICAL: In JSON params, car_id must be an INTEGER, not a string. Use 32, NOT '32' or 'car_id=32'.\n"
-            "7. ALWAYS remember the conversation context. If user previously said '90 liters for April 2026', remember it.\n\n"
-            "CORRECT JSON examples:\n"
-            '```json\n{"action": "tool_add_fuel", "params": {"car_id": 32, "year": 2026, "month": 4, "liters": 150}, "description": "Add 150L fuel to car #32"}\n```\n'
-            '```json\n{"action": "tool_add_car", "params": {"brand": "Toyota", "title": "Camry", "numplate": "ABC123"}, "description": "Add new Toyota Camry"}\n```\n'
-            '```json\n{"action": "tool_update_car", "params": {"car_id": 32, "driver": "Иванов"}, "description": "Assign driver to car #32"}\n```\n\n'
-            "WRONG (DO NOT DO THIS):\n"
-            '```json\n{"action": "tool_add_fuel", "params": {"car_id": "car_id=32", ...}}  ← WRONG! Use 32, not "car_id=32"\n```\n'
-            '```json\n{"action": "tool_add_fuel", "params": {"car_id": "32", ...}}  ← WRONG! Use 32 (integer), not "32" (string)\n```\n\n'
-            "When you DO have all required fields, respond in this EXACT format:\n\n"
-            "I will [describe what you're going to do in 1-2 sentences].\n\n"
-            "```json\n"
-            '{"action": "tool_name", "params": {...}, "description": "Brief summary of the action"}\n'
-            '```\n\n'
-            "IMPORTANT: Always write a clear description of what you will do BEFORE the JSON block. "
-            "Never just output a JSON block without explaining what will happen. "
-            "Always tell the user exactly what data will be changed, added, or deleted.\n\n"
-            "DATA TABLES — ALWAYS USE JSON FORMAT:\n"
-            "- NEVER use markdown tables for data. ALWAYS use a JSON code block.\n"
-            "- Format:\n"
-            '  ```json\n'
-            '  {"type": "table", "headers": ["Header1", "Header2", "Header3"], "rows": [["val1", "val2", "val3"], ["val1", "val2", "val3"]]}\n'
-            '  ```\n'
-            "- The system will automatically render this as a beautiful table.\n"
-            "- Example for listing cars:\n"
-            '  ```json\n'
-            '  {"type": "table", "headers": ["ID", "Машина", "Номер", "Статус"], "rows": [[1, "Toyota Camry", "O143O", "Активна"], [2, "BMW X5", "AA642401KG", "Активна"]]}\n'
-            '  ```\n'
-            "- Use short, clear column names. Keep cell values concise.\n"
-            "- For fuel records: {\"type\": \"table\", \"headers\": [\"Машина\", \"Месяц\", \"Литры\", \"Расход\"], \"rows\": [...]}\n"
-            "- For spare parts: {\"type\": \"table\", \"headers\": [\"Запчасть\", \"Цена\", \"Дата\"], \"rows\": [...]}\n"
-            "- ALWAYS include this JSON when listing data — it's how the user sees tables.\n\n"
-            "Available actions (optional fields in parentheses):\n"
-            "- tool_add_car: brand, title, numplate, (vin, fueltype, type, year, driver, status, region, fuel_card, drivers_phone)\n"
-            "- tool_update_car: car_id + fields to update\n"
-            "- tool_delete_car: car_id\n"
-            "- tool_add_fuel: car_id, year, month, liters, (total_cost, monthly_mileage)\n"
-            "- tool_add_spare: car_id, title, installed_at, (description, part_price, job_price, job_description)\n"
-            "- tool_add_insurance: car_id, number, start_date, end_date, (insurance_type, cost)\n"
-            "- tool_add_inspection: car_id, number, inspected_at, (cost)\n"
-            "- tool_list_cars: (status, brand, search)\n\n"
-            "For questions (not actions), just respond normally."
-        )
+        # Build messages — single system prompt with context appended
+        system_content = SYSTEM_PROMPT + context
 
-        action_prompt = (
-            "\n\n"
-            "You must base every answer on the live COMPANY CONTEXT above.\n"
-            "When the user asks for analytics, expenses, totals, trends, consumption, comparisons, reports, or summaries:\n"
-            "1. Output at least one table JSON block if data exists.\n"
-            "2. Output at least one chart JSON block if data exists.\n"
-            "3. Then write a short conclusion in the user's language.\n"
-            "4. End with one follow-up question like 'Что еще хотите узнать?'.\n"
-            "5. Never invent missing values. If data is missing, say that directly.\n\n"
-            "TABLE FORMAT:\n"
-            '```json\n'
-            '{"type":"table","title":"Fuel expenses","headers":["Month","Liters","Cost"],"rows":[["2026-04",120,8400],["2026-03",95,6400]],"filename":"fuel_expenses"}\n'
-            '```\n\n'
-            "CHART FORMAT:\n"
-            '```json\n'
-            '{"type":"chart","title":"Fuel expenses by month","chart_type":"bar","x_label":"Month","y_label":"Cost","filename":"fuel_expenses_chart","series":[{"name":"Fuel cost","color":"#2563eb","points":[{"label":"2026-04","value":8400},{"label":"2026-03","value":6400}]}]}\n'
-            '```\n\n'
-            "ACTION RULES:\n"
-            "- For add/update/delete actions, describe the change in 1-2 sentences before the JSON action block.\n"
-            "- Do not generate an action block until you have all required fields.\n"
-            "- For destructive or modifying actions, ask for confirmation and then return one JSON action block.\n"
-            "- car_id and record_id must always be integers, never strings.\n"
-            "- Use live IDs from context: car_id, fuel_id, spare_id, insurance_id, inspection_id.\n\n"
-            "AVAILABLE ACTIONS:\n"
-            "- tool_add_car: brand, title, numplate, (vin, fueltype, type, year, driver, status, region, fuel_card, drivers_phone)\n"
-            "- tool_update_car: car_id + any editable car fields\n"
-            "- tool_delete_car: car_id\n"
-            "- tool_add_fuel: car_id, year, month, liters, (total_cost, monthly_mileage)\n"
-            "- tool_update_fuel: record_id, (car_id, year, month, liters, total_cost, monthly_mileage)\n"
-            "- tool_add_spare: car_id, title, installed_at, (description, part_price, job_price, job_description)\n"
-            "- tool_update_spare: record_id, (car_id, title, description, part_price, job_price, job_description, installed_at)\n"
-            "- tool_add_insurance: car_id, number, start_date, end_date, (insurance_type, cost)\n"
-            "- tool_update_insurance: record_id, (car_id, insurance_type, number, start_date, end_date, cost)\n"
-            "- tool_add_inspection: car_id, number, inspected_at, (cost)\n"
-            "- tool_update_inspection: record_id, (car_id, number, inspected_at, cost)\n"
-            '- tool_delete_record: model_name in ["fuel","spare","insurance","inspection"], record_id\n'
-            "- tool_list_cars: (status, brand, search)\n\n"
-            "ACTION JSON FORMAT:\n"
-            '```json\n'
-            '{"action":"tool_update_fuel","params":{"record_id":12,"total_cost":9200},"description":"Update fuel record #12 cost to 9200"}\n'
-            '```\n'
-        )
-
-        action_prompt = _build_action_prompt()
+        messages = [
+            {"role": "system", "content": system_content},
+        ]
 
         # Get recent conversation history for context
         if conversation:
-            # Use the specific conversation's messages
             recent_msgs = AIChatMessage.objects.filter(
                 conversation=conversation,
             ).order_by('-created_at')[:MAX_HISTORY_MESSAGES]
         else:
-            # Fallback to user's messages (legacy behavior)
             recent_msgs = AIChatMessage.objects.filter(
                 company=company,
                 user=user,
             ).order_by('-created_at')[:MAX_HISTORY_MESSAGES]
-
-        messages = [
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "system", "content": f"COMPANY CONTEXT:\n{context}"},
-            {"role": "system", "content": action_prompt},
-        ]
 
         # Add conversation history (reversed to chronological order)
         for msg in reversed(list(recent_msgs)):
@@ -861,76 +688,39 @@ def ask_ai(user, question: str, conversation=None) -> str:
         messages.append({"role": "user", "content": question})
 
         # Log the API call details
-        logger.info(f"Making Groq API call for user {user.id}")
-        logger.info(f"Model: {model}")
-        logger.info(f"Messages count: {len(messages)}")
-        logger.debug(f"First 500 chars of last message: {messages[-1]['content'][:500] if messages else 'N/A'}")
+        logger.info(f"Making Groq API call for user {user.id}, model: {model}, messages: {len(messages)}")
 
         try:
             response = client.chat.completions.create(
                 model=model,
                 messages=messages,
-                temperature=0.4,
-                max_tokens=1100,
+                temperature=0.3,
+                max_tokens=2048,
             )
-            
-            # Log successful response
+
             logger.info(f"Groq API response received for user {user.id}")
-            logger.info(f"Response ID: {getattr(response, 'id', 'N/A')}")
-            logger.info(f"Response model: {getattr(response, 'model', 'N/A')}")
-            logger.info(f"Usage - Prompt tokens: {getattr(getattr(response, 'usage', None), 'prompt_tokens', 'N/A')}, "
-                       f"Completion tokens: {getattr(getattr(response, 'usage', None), 'completion_tokens', 'N/A')}")
-            
+            usage = getattr(response, 'usage', None)
+            if usage:
+                logger.info(f"Tokens - prompt: {usage.prompt_tokens}, completion: {usage.completion_tokens}")
+
             answer = response.choices[0].message.content
-            logger.info(f"AI response for user {user.id}: {len(answer)} chars, first 100 chars: {answer[:100]}")
+            logger.info(f"AI response for user {user.id}: {len(answer)} chars")
             return answer
         except Exception as api_error:
-            # Log the full API error details
             error_type = type(api_error).__name__
             error_msg = str(api_error)
-            logger.error(f"Groq API call failed for user {user.id}")
-            logger.error(f"Error type: {error_type}")
-            logger.error(f"Error message: {error_msg}")
-            logger.error(f"Full traceback:", exc_info=True)
-            
-            # If it's a Groq error, try to get more details
-            if hasattr(api_error, 'message'):
-                logger.error(f"Groq error message attribute: {api_error.message}")
-            if hasattr(api_error, 'status_code'):
-                logger.error(f"HTTP status code: {api_error.status_code}")
-            if hasattr(api_error, 'response'):
-                logger.error(f"Response object: {api_error.response}")
-            
-            raise  # Re-raise to be caught by outer exception handler
+            logger.error(f"Groq API call failed for user {user.id}: {error_type}: {error_msg}", exc_info=True)
+            raise
 
     except Exception as e:
         error_msg = str(e)
         error_type = type(e).__name__
         logger.error(f"Groq API error for user {user.id}: {error_msg}", exc_info=True)
-        logger.error(f"Error type name: {error_type}")
-        
-        # Log all error attributes
-        if hasattr(e, 'message'):
-            logger.error(f"Error.message: {e.message}")
-        if hasattr(e, 'status_code'):
-            logger.error(f"Error.status_code: {e.status_code}")
-        if hasattr(e, 'code'):
-            logger.error(f"Error.code: {e.code}")
-        if hasattr(e, 'type'):
-            logger.error(f"Error.type: {e.type}")
-        if hasattr(e, 'response') and e.response is not None:
-            logger.error(f"Error.response.status: {e.response.status_code if hasattr(e.response, 'status_code') else 'N/A'}")
-            try:
-                error_body = e.response.text if hasattr(e.response, 'text') else str(e.response)
-                logger.error(f"Error.response.body: {error_body[:500]}")
-            except:
-                pass
 
-        # Determine error type and return detailed message
         if 'api_key' in error_msg.lower() or 'invalid_api_key' in error_msg.lower() or 'authentication' in error_msg.lower():
             return (
                 "🔑 Ошибка авторизации: API-ключ недействителен или истёк.\n\n"
-                f"Детали ошибки: {error_msg}\n\n"
+                f"Детали: {error_msg}\n\n"
                 "Обратитесь к администратору для проверки настроек AI."
             )
         elif 'rate_limit' in error_msg.lower() or 'rate limit' in error_msg.lower():
@@ -946,7 +736,7 @@ def ask_ai(user, question: str, conversation=None) -> str:
         else:
             return (
                 f"❌ Произошла ошибка при обработке запроса.\n\n"
-                f"📋 Технические детали: {error_msg}\n\n"
+                f"📋 Детали: {error_msg}\n\n"
                 f"💡 Попробуйте переформулировать запрос или обратитесь к администратору."
             )
 

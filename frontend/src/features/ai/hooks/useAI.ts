@@ -1,10 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-import type { AIMessage, AIConversationSummary, AIResponse } from '../api/aiApi'
+import type { AIMessage, AIConversationSummary, AIResponse, AISuggestion } from '../api/aiApi'
 import {
   executeAIAction,
   getAIConversation,
   getAIConversations,
+  getAISuggestions,
   sendAIMessage,
   deleteConversation,
 } from '../api/aiApi'
@@ -74,5 +75,14 @@ export function useDeleteConversation() {
     onSuccess: async () => {
       await qc.invalidateQueries({ queryKey: aiKeys.conversations() })
     },
+  })
+}
+
+export function useAISuggestions() {
+  return useQuery<AISuggestion[]>({
+    queryKey: [...aiKeys.all, 'suggestions'] as const,
+    queryFn: getAISuggestions,
+    staleTime: 1000 * 60 * 10, // 10 min
+    refetchOnWindowFocus: false,
   })
 }

@@ -39,7 +39,9 @@ import {
   useSendAIMessage,
   useExecuteAIAction,
   useDeleteConversation,
+  useAISuggestions,
 } from '@features/ai/hooks/useAI'
+import { getAIConversation } from '@features/ai/api/aiApi'
 import { MarkdownText } from '@features/ai/ui/MarkdownText'
 import { parseActionsFromContent } from '@features/ai/ui/parseAction'
 
@@ -93,7 +95,7 @@ export function AIPage() {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [conversationToDelete, setConversationToDelete] = useState<number | null>(null)
-  
+
   const scrollRef = useRef<HTMLDivElement>(null)
   const viewportRef = useRef<HTMLDivElement>(null)
   const messageIdCounter = useRef(0)
@@ -102,6 +104,7 @@ export function AIPage() {
   const { mutate: sendMessage, isPending } = useSendAIMessage()
   const { mutate: executeAction, isPending: isExecuting } = useExecuteAIAction()
   const { mutate: deleteConversation } = useDeleteConversation()
+  const { data: suggestions = [] } = useAISuggestions()
 
   const nextMessageId = useCallback(() => {
     messageIdCounter.current += 1
@@ -115,11 +118,9 @@ export function AIPage() {
       setLocalMessages([])
       setExecutions([])
       messageIdCounter.current = 0
-      
-      // Fetch from API
-      fetch(`/api/v1/ai/conversations/${conversationId}/`)
-        .then((res) => res.json())
-        .then((data: { messages: Array<{ role: string; content: string; created_at: string }> }) => {
+
+      getAIConversation(conversationId)
+        .then((data) => {
           const formatted = data.messages.map((msg, idx) => {
             const parsed = parseActionsFromContent(msg.content)
             return {
@@ -134,7 +135,7 @@ export function AIPage() {
           messageIdCounter.current = data.messages.length
         })
         .catch(() => {
-          setError('Failed to load conversation')
+          setError('failed')
         })
     },
     [],
@@ -486,21 +487,29 @@ export function AIPage() {
               <Text size="sm" c="dimmed" ta="center" maw={400} lh={1.6}>
                 {t('ai.welcome_subtitle')}
               </Text>
-              <Stack gap="xs" mt="md" maw={400}>
-                {[
-                  'Какие машины в автопарке?',
-                  'Добавь топливо для машины #1',
-                  'Покажи расходы на запчасти',
-                ].map((suggestion) => (
+              <Stack gap="xs" mt="md" maw={450}>
+                {(suggestions.length > 0
+                  ? suggestions
+                  : [
+                    { text: 'Какие машины в автопарке?', icon: '🚗', category: 'fleet' },
+                    { text: 'Покажи расходы на топливо', icon: '⛽', category: 'fuel' },
+                    { text: 'Покажи расходы на запчасти', icon: '🔧', category: 'maintenance' },
+                  ]
+                ).map((s) => (
                   <Button
-                    key={suggestion}
+                    key={s.text}
                     variant="light"
                     size="xs"
                     radius="xl"
                     fullWidth
-                    onClick={() => setInput(suggestion)}
+                    leftSection={<Text size="sm">{s.icon}</Text>}
+                    onClick={() => setInput(s.text)}
+                    styles={{
+                      root: { justifyContent: 'flex-start' },
+                      label: { overflow: 'hidden', textOverflow: 'ellipsis' },
+                    }}
                   >
-                    {suggestion}
+                    {s.text}
                   </Button>
                 ))}
               </Stack>
