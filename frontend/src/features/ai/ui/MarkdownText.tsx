@@ -1,4 +1,4 @@
-import { useMemo, useRef, type CSSProperties } from 'react'
+import { memo, useMemo, useRef, type CSSProperties } from 'react'
 
 import ReactMarkdown from 'react-markdown'
 import rehypeRaw from 'rehype-raw'
@@ -186,7 +186,7 @@ async function downloadSvgAsPng(svgElement: SVGSVGElement, filename: string) {
   link.click()
 }
 
-function StructuredDataTable({ data }: { data: StructuredTableData }) {
+const StructuredDataTable = memo(function StructuredDataTable({ data }: { data: StructuredTableData }) {
   const title = data.title || 'Table'
   const filenameBase = (data.filename || title || 'ai-table').replace(/[^\w-]+/g, '_')
 
@@ -233,9 +233,9 @@ function StructuredDataTable({ data }: { data: StructuredTableData }) {
       </Table>
     </Paper>
   )
-}
+})
 
-function StructuredChart({ data }: { data: StructuredChartData }) {
+const StructuredChart = memo(function StructuredChart({ data }: { data: StructuredChartData }) {
   const wrapperRef = useRef<HTMLDivElement>(null)
   const title = data.title || 'Chart'
   const filenameBase = (data.filename || title || 'ai-chart').replace(/[^\w-]+/g, '_')
@@ -347,7 +347,7 @@ function StructuredChart({ data }: { data: StructuredChartData }) {
       </Box>
     </Paper>
   )
-}
+})
 
 function renderStructuredData(structured: StructuredData) {
   if (structured.type === 'table') {
@@ -361,7 +361,7 @@ function renderStructuredData(structured: StructuredData) {
   return null
 }
 
-export function MarkdownText({ content, isUser }: MarkdownTextProps) {
+export const MarkdownText = memo(function MarkdownText({ content, isUser }: MarkdownTextProps) {
   if (isUser || !content) {
     return (
       <Text size="sm" style={{ whiteSpace: 'pre-wrap', lineHeight: 1.5 }}>
@@ -493,4 +493,4 @@ export function MarkdownText({ content, isUser }: MarkdownTextProps) {
       </ReactMarkdown>
     </Box>
   )
-}
+})
