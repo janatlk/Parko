@@ -1,36 +1,26 @@
-import { useState } from 'react'
-
 import {
-  ActionIcon,
   Alert,
-  Box,
+  Button,
   Container,
+  Grid,
   Group,
-  Loader,
   Paper,
+  Skeleton,
   Stack,
   Text,
   Title,
-  Tooltip,
 } from '@mantine/core'
-import { IconAlertTriangle, IconCar, IconFlame, IconSettings, IconTools, IconRefresh } from '@tabler/icons-react'
+import { IconAlertTriangle, IconCar, IconFlame, IconGasStation, IconTools } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
 
-import {
-  useDashboardStats,
-  useExpiringItems,
-  useActivityFeed,
-  useCostByMonth,
-  useVehicleConsumption,
-  loadDashboardPreferences,
-} from '@features/dashboard'
+import { useDashboardOverview } from '@features/dashboard'
 import { StatsGrid } from '@features/dashboard/ui/StatCard'
-import { ExpiringSoon } from '@features/dashboard/ui/ExpiringSoon'
-import { ActivityFeed } from '@features/dashboard/ui/ActivityFeed'
-import { CostBreakdownChart } from '@features/dashboard/ui/CostBreakdownChart'
-import { CarsByStatus } from '@features/dashboard/ui/CarsByStatus'
-import { CustomizationPanel } from '@features/dashboard/ui/CustomizationPanel'
-import { VehicleConsumptionList } from '@features/dashboard/ui/VehicleConsumptionList'
+import { CostTrendChart } from '@features/dashboard/ui/CostTrendChart'
+import { FuelEfficiencyChart } from '@features/dashboard/ui/FuelEfficiencyChart'
+import { TopVehiclesChart } from '@features/dashboard/ui/TopVehiclesChart'
+import { ExpiringTable } from '@features/dashboard/ui/ExpiringTable'
+import { ActivityTimeline } from '@features/dashboard/ui/ActivityTimeline'
+import { VehicleRadarChart } from '@features/dashboard/ui/VehicleRadarChart'
 import { formatPrice } from '@shared/utils/formatPrice'
 import { useAuth } from '@features/auth/hooks/useAuth'
 
@@ -39,211 +29,171 @@ export function DashboardPage() {
   const { user } = useAuth()
   const currency = user?.currency || 'KGS'
 
-  const [preferencesOpen, setPreferencesOpen] = useState(false)
-  const [preferences, setPreferences] = useState(() => loadDashboardPreferences())
-  const [chartMonths, setChartMonths] = useState<string>('6')
-  const [costChartSize, setCostChartSize] = useState<{ w: number; h: number } | null>(null)
-  const [carsChartSize, setCarsChartSize] = useState<{ w: number; h: number } | null>(null)
+  const { data, isLoading, error, refetch } = useDashboardOverview(6, 8)
 
-  const handleResetLayout = () => {
-    setCostChartSize(null)
-    setCarsChartSize(null)
-    localStorage.removeItem('parko_cost_chart_size')
-    localStorage.removeItem('parko_cars_chart_size')
-  }
-
-  const { data: stats, isLoading: statsLoading, error: statsError } = useDashboardStats()
-  const { data: expiringData, isLoading: expiringLoading } = useExpiringItems()
-  const { data: activityItems, isLoading: activityLoading } = useActivityFeed(10)
-  const { data: costData, isLoading: costLoading } = useCostByMonth(Number(chartMonths))
-  const { data: vehicleConsumption, isLoading: vehicleLoading } = useVehicleConsumption(10)
-
-  if (statsLoading) {
+  if (isLoading) {
     return (
-      <Container py="xl">
-        <Group justify="center" py="xl">
-          <Loader size="xl" />
-        </Group>
+      <Container size="fluid" px="sm" py="sm">
+        <Stack gap="sm">
+          <Skeleton height={32} width={180} radius="md" />
+          <SimpleGridSkeleton />
+          <Grid gutter="sm">
+            <Grid.Col span={{ base: 12, md: 8 }}>
+              <Skeleton height={220} radius="md" />
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, md: 4 }}>
+              <Skeleton height={220} radius="md" />
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, md: 6 }}>
+              <Skeleton height={260} radius="md" />
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, md: 6 }}>
+              <Skeleton height={260} radius="md" />
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, md: 6 }}>
+              <Skeleton height={260} radius="md" />
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, md: 6 }}>
+              <Skeleton height={260} radius="md" />
+            </Grid.Col>
+            <Grid.Col span={12}>
+              <Skeleton height={140} radius="md" />
+            </Grid.Col>
+          </Grid>
+        </Stack>
       </Container>
     )
   }
 
-  if (statsError) {
+  if (error) {
     return (
-      <Container py="xl">
-        <Alert icon={<IconAlertTriangle size={20} />} color="red" title={t('common.error_loading')}>
+      <Container size="fluid" px="sm" py="sm">
+        <Alert
+          icon={<IconAlertTriangle size={18} />}
+          color="red"
+          title={t('common.error_loading')}
+          mb="sm"
+        >
           {t('dashboard.loading_error')}
         </Alert>
+        <Button onClick={() => refetch()} variant="light" color="blue" size="sm">
+          {t('common.retry')}
+        </Button>
       </Container>
     )
   }
 
-  const totalCars = stats?.total_cars ?? 0
+  const stats = data?.stats
+  const history = data?.history || []
 
   const statCards = [
-    preferences.showOperationalCost ? {
-      icon: <IconCar size={24} />,
+    {
+      icon: <IconCar size={18} />,
+      label: t('dashboard.active_cars'),
+      value: `${stats?.active_cars ?? 0} / ${stats?.total_cars ?? 0}`,
+      color: '#228be6',
+    },
+    {
+      icon: <IconGasStation size={18} />,
+      label: t('dashboard.total_fuel_cost'),
+      value: formatPrice(stats?.total_fuel_cost_month ?? 0, currency),
+      color: '#40c057',
+      currentValue: stats?.total_fuel_cost_month,
+      previousValue: stats?.total_fuel_cost_prev_month,
+      inverseTrend: true,
+      sparklineData: history.map((h) => ({ value: h.fuel_cost })),
+    },
+    {
+      icon: <IconFlame size={18} />,
+      label: t('dashboard.avg_consumption'),
+      value: `${(stats?.avg_fuel_consumption ?? 0).toFixed(1)} ${t('dashboard.avg_consumption_unit')}`,
+      color: '#fd7e14',
+      sparklineData: history.map((h) => ({ value: h.avg_consumption })),
+    },
+    {
+      icon: <IconTools size={18} />,
       label: t('dashboard.total_operational_cost'),
       value: formatPrice(stats?.total_operational_cost ?? 0, currency),
-      color: 'blue',
+      color: '#845ef7',
       currentValue: stats?.total_operational_cost,
       previousValue: stats?.prev_operational_cost,
       inverseTrend: true,
-    } : null,
-    preferences.showActiveCars ? {
-      icon: <IconCar size={24} />,
-      label: t('dashboard.active_cars'),
-      value: `${stats?.active_cars ?? 0} / ${totalCars}`,
-      color: 'teal',
-    } : null,
-    preferences.showAvgConsumption ? {
-      icon: <IconFlame size={24} />,
-      label: t('dashboard.avg_consumption'),
-      value: `${(stats?.avg_fuel_consumption ?? 0).toFixed(1)} ${t('dashboard.avg_consumption_unit')}`,
-      color: 'green',
-      currentValue: stats?.avg_fuel_consumption,
-      previousValue: stats?.prev_avg_fuel_consumption,
-      inverseTrend: true,
-    } : null,
-    preferences.showSparePartsCost ? {
-      icon: <IconTools size={24} />,
-      label: t('dashboard.spare_parts_cost'),
-      value: formatPrice(stats?.total_spare_parts_cost_month ?? 0, currency),
-      color: 'cyan',
-      currentValue: stats?.total_spare_parts_cost_month,
-      previousValue: stats?.total_spare_parts_cost_prev_month,
-      inverseTrend: true,
-    } : null,
-    preferences.showMaintenanceCars ? {
-      icon: <IconTools size={24} />,
-      label: t('dashboard.maintenance_cars'),
-      value: stats?.maintenance_cars ?? 0,
-      color: 'orange',
-    } : null,
-  ].filter((card): card is NonNullable<typeof card> => card !== null)
+      sparklineData: history.map((h) => ({ value: h.total_cost })),
+    },
+  ]
+
+  // Limit activity items to align height with TopVehiclesChart
+  const activityItems = data?.activity?.slice(0, 6)
 
   return (
-    <Container size="fluid" px="md" py="md">
-      <Stack gap="md">
+    <Container size="fluid" px="sm" py="sm">
+      <Stack gap="sm">
         {/* Header */}
         <Group justify="space-between">
           <div>
-            <Title order={2} fw={700}>{t('dashboard.title')}</Title>
+            <Title order={3} fw={700}>{t('dashboard.title')}</Title>
             <Text c="dimmed" size="xs">{t('dashboard.welcome')}</Text>
           </div>
-          <Group gap="xs">
-            <Tooltip label="Reset chart sizes">
-              <ActionIcon
-                variant="outline"
-                size="md"
-                radius="md"
-                onClick={handleResetLayout}
-              >
-                <IconRefresh size={20} />
-              </ActionIcon>
-            </Tooltip>
-            <ActionIcon
-              variant="outline"
-              size="md"
-              radius="md"
-              onClick={() => setPreferencesOpen(true)}
-            >
-              <IconSettings size={20} />
-            </ActionIcon>
-          </Group>
         </Group>
 
-        {/* Stat Cards Grid */}
-        {statCards.length > 0 && (
-          <StatsGrid stats={statCards} compact />
-        )}
+        {/* Stat Cards */}
+        <StatsGrid stats={statCards} />
 
-        {/* Main Dashboard Grid — Flexbox for dynamic sizing */}
-        <Box
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: 8,
-            alignItems: 'flex-start',
-          }}
-        >
-          {preferences.showCostChart && (
-            <Box
-              style={{
-                flex: costChartSize && costChartSize.w > 0
-                  ? `0 0 ${costChartSize.w}px`
-                  : '1 1 300px',
-                minWidth: 280,
-              }}
-            >
-              <Paper p="sm" radius="md" withBorder style={{ overflow: 'visible' }}>
-                <CostBreakdownChart
-                  data={costData}
-                  isLoading={costLoading}
-                  monthsRange={chartMonths}
-                  setMonthsRange={setChartMonths}
-                  compact
-                  onResize={setCostChartSize}
-                />
-              </Paper>
-            </Box>
-          )}
+        {/* Main Grid */}
+        <Grid gutter="sm" align="stretch">
+          {/* Cost Trend */}
+          <Grid.Col span={{ base: 12, md: 8 }}>
+            <Paper withBorder p="sm" radius="md" h="100%">
+              <CostTrendChart data={history} />
+            </Paper>
+          </Grid.Col>
 
-          {preferences.showActivityFeed && (
-            <Box style={{ flex: '1 1 300px', minWidth: 280 }}>
-              <Paper p="sm" radius="md" withBorder>
-                <ActivityFeed items={activityItems} isLoading={activityLoading} compact />
-              </Paper>
-            </Box>
-          )}
+          {/* Fuel Efficiency */}
+          <Grid.Col span={{ base: 12, md: 4 }}>
+            <Paper withBorder p="sm" radius="md" h="100%">
+              <FuelEfficiencyChart data={history} />
+            </Paper>
+          </Grid.Col>
 
-          {preferences.showExpiringSoon && (
-            <Box style={{ flex: '1 1 300px', minWidth: 280 }}>
-              <Paper p="sm" radius="md" withBorder>
-                <ExpiringSoon data={expiringData} isLoading={expiringLoading} compact />
-              </Paper>
-            </Box>
-          )}
+          {/* Vehicle Comparison — Radar */}
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <Paper withBorder p="sm" radius="md" h="100%">
+              <VehicleRadarChart data={data?.top_vehicles} />
+            </Paper>
+          </Grid.Col>
 
-          {preferences.showFleetStatus && (
-            <Box
-              style={{
-                flex: carsChartSize && carsChartSize.w > 0
-                  ? `0 0 ${carsChartSize.w}px`
-                  : '1 1 300px',
-                minWidth: 280,
-              }}
-            >
-              <Paper p="sm" radius="md" withBorder style={{ overflow: 'visible' }}>
-                <CarsByStatus
-                  total={stats?.total_cars}
-                  active={stats?.active_cars}
-                  maintenance={stats?.maintenance_cars}
-                  inactive={stats?.inactive_cars}
-                  compact
-                  onResize={setCarsChartSize}
-                />
-              </Paper>
-            </Box>
-          )}
+          {/* Top Vehicles */}
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <Paper withBorder p="sm" radius="md" h="100%">
+              <TopVehiclesChart data={data?.top_vehicles} />
+            </Paper>
+          </Grid.Col>
 
-          {preferences.showVehicleConsumption && (
-            <Box style={{ flex: '1 1 300px', minWidth: 280 }}>
-              <Paper p="sm" radius="md" withBorder>
-                <VehicleConsumptionList items={vehicleConsumption} isLoading={vehicleLoading} compact />
-              </Paper>
-            </Box>
-          )}
-        </Box>
+          {/* Recent Activity — sliced to match TopVehicles height */}
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <Paper withBorder p="sm" radius="md" h="100%">
+              <ActivityTimeline items={activityItems} />
+            </Paper>
+          </Grid.Col>
+
+          {/* Expiring Soon */}
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <Paper withBorder p="sm" radius="md" h="100%">
+              <ExpiringTable data={data?.expiring} />
+            </Paper>
+          </Grid.Col>
+        </Grid>
       </Stack>
-
-      {/* Customization Drawer */}
-      <CustomizationPanel
-        opened={preferencesOpen}
-        onClose={() => setPreferencesOpen(false)}
-        preferences={preferences}
-        onPreferencesChange={setPreferences}
-      />
     </Container>
+  )
+}
+
+function SimpleGridSkeleton() {
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+      {Array.from({ length: 4 }).map((_, i) => (
+        <Skeleton key={i} height={88} radius="md" />
+      ))}
+    </div>
   )
 }

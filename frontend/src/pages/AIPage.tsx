@@ -18,6 +18,7 @@ import {
   rem,
   Menu,
   Modal,
+  useMantineColorScheme,
 } from '@mantine/core'
 import {
   IconBrain,
@@ -95,6 +96,8 @@ export function AIPage() {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [conversationToDelete, setConversationToDelete] = useState<number | null>(null)
+  const { colorScheme } = useMantineColorScheme()
+  const isDark = colorScheme === 'dark'
 
   const scrollRef = useRef<HTMLDivElement>(null)
   const viewportRef = useRef<HTMLDivElement>(null)
@@ -326,14 +329,14 @@ export function AIPage() {
           style={{
             width: 260,
             flexShrink: 0,
-            background: 'var(--mantine-color-gray-0)',
-            borderRight: '1px solid var(--mantine-color-gray-3)',
+            background: isDark ? '#141517' : 'var(--mantine-color-gray-0)',
+            borderRight: `1px solid ${isDark ? '#2C2E33' : 'var(--mantine-color-gray-3)'}`,
             display: 'flex',
             flexDirection: 'column',
           }}
         >
           {/* New Chat Button */}
-          <Box p="md" style={{ borderBottom: '1px solid var(--mantine-color-gray-3)' }}>
+          <Box p="md" style={{ borderBottom: `1px solid ${isDark ? '#2C2E33' : 'var(--mantine-color-gray-3)'}` }}>
             <Button
               fullWidth
               leftSection={<IconPlus size={18} />}
@@ -370,7 +373,7 @@ export function AIPage() {
                       cursor: 'pointer',
                       background:
                         currentConversationId === conv.id
-                          ? 'var(--mantine-color-gray-2)'
+                          ? (isDark ? 'rgba(255,255,255,0.06)' : 'var(--mantine-color-gray-2)')
                           : 'transparent',
                       transition: 'all 0.15s ease',
                     }}
@@ -547,7 +550,7 @@ export function AIPage() {
                               : 'var(--mantine-radius-md) var(--mantine-radius-md) var(--mantine-radius-md) 4px',
                             background: isUser
                               ? 'var(--mantine-color-blue-filled)'
-                              : 'var(--mantine-color-gray-0)',
+                              : (isDark ? '#1a1b1e' : 'var(--mantine-color-gray-0)'),
                             color: isUser ? '#ffffff' : undefined,
                           }}
                         >
@@ -632,7 +635,7 @@ export function AIPage() {
                     <Avatar size={32} radius="xl" variant="light" color="blue">
                       <IconBrain size={18} />
                     </Avatar>
-                    <Paper p="sm" radius="md" bg="var(--mantine-color-gray-0)">
+                    <Paper p="sm" radius="md" bg={isDark ? '#1a1b1e' : 'var(--mantine-color-gray-0)'}>
                       <Group gap="xs">
                         <Loader size="xs" />
                         <Text size="sm" c="dimmed">
@@ -650,8 +653,8 @@ export function AIPage() {
           <Box
             p="md"
             style={{
-              borderTop: '1px solid var(--mantine-color-gray-3)',
-              background: 'var(--mantine-color-body)',
+              borderTop: `1px solid ${isDark ? '#2C2E33' : 'var(--mantine-color-gray-3)'}`,
+              background: isDark ? '#1a1b1e' : 'var(--mantine-color-body)',
             }}
           >
             <Group gap="xs" style={{ position: 'relative' }}>

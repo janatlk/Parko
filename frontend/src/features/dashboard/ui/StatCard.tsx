@@ -1,93 +1,122 @@
 import type { ReactNode } from 'react'
 
-import type { MantineColor } from '@mantine/core'
-import { Group, SimpleGrid, Stack, Text, ThemeIcon, useMantineColorScheme } from '@mantine/core'
+import { Group, Paper, SimpleGrid, Stack, Text, useMantineColorScheme } from '@mantine/core'
+import {
+  Area,
+  AreaChart,
+  ResponsiveContainer,
+  Tooltip,
+} from 'recharts'
 
 import { TrendIndicator } from './TrendIndicator'
+
+type SparklineData = {
+  value: number
+}
 
 type StatCardProps = {
   icon: ReactNode
   label: string
   value: string | number
-  color?: MantineColor
+  color?: string
   currentValue?: number
   previousValue?: number
   inverseTrend?: boolean
-  compact?: boolean
+  sparklineData?: SparklineData[]
 }
 
-function getColors(color: string, isDark: boolean) {
-  const light: Record<string, { bg: string; border: string; text: string; valueText: string }> = {
-    blue: { bg: 'linear-gradient(135deg, #e7f5ff 0%, #d0ebff 100%)', border: '#a5d8ff', text: '#1971c2', valueText: '#1864ab' },
-    teal: { bg: 'linear-gradient(135deg, #e6fcf5 0%, #c3fae8 100%)', border: '#96f2d7', text: '#0ca678', valueText: '#099268' },
-    green: { bg: 'linear-gradient(135deg, #ebfbee 0%, #d3f9d8 100%)', border: '#b2f2bb', text: '#2f9e44', valueText: '#2b8a3e' },
-    cyan: { bg: 'linear-gradient(135deg, #e3fafc 0%, #c5f6fa 100%)', border: '#99e9f2', text: '#1098ad', valueText: '#0c8599' },
-    orange: { bg: 'linear-gradient(135deg, #fff4e6 0%, #ffe8cc 100%)', border: '#ffd8a8', text: '#e67700', valueText: '#d9480f' },
-    violet: { bg: 'linear-gradient(135deg, #f3f0ff 0%, #e5dbff 100%)', border: '#d0bfff', text: '#7048e8', valueText: '#5f3dc4' },
-    red: { bg: 'linear-gradient(135deg, #fff5f5 0%, #ffe3e3 100%)', border: '#ffc9c9', text: '#e03131', valueText: '#c92a2a' },
-  }
-  const dark: Record<string, { bg: string; border: string; text: string; valueText: string }> = {
-    blue: { bg: 'linear-gradient(135deg, #1c3a5f 0%, #18304a 100%)', border: '#2a5a8f', text: '#74b0f0', valueText: '#91c4f5' },
-    teal: { bg: 'linear-gradient(135deg, #1a3a3a 0%, #152e2e 100%)', border: '#2a6a6a', text: '#63d0b8', valueText: '#80e0cc' },
-    green: { bg: 'linear-gradient(135deg, #1a3a2a 0%, #152e22 100%)', border: '#2a6a4a', text: '#69db7c', valueText: '#8ce99a' },
-    cyan: { bg: 'linear-gradient(135deg, #1a3a4a 0%, #152e3a 100%)', border: '#2a6a8a', text: '#66d9e8', valueText: '#80e5f0' },
-    orange: { bg: 'linear-gradient(135deg, #3a2a1a 0%, #2e2215 100%)', border: '#6a4a2a', text: '#ffa94d', valueText: '#ffc078' },
-    violet: { bg: 'linear-gradient(135deg, #2a1a4a 0%, #22153a 100%)', border: '#4a2a7a', text: '#b197fc', valueText: '#c8a8ff' },
-    red: { bg: 'linear-gradient(135deg, #3a1a1a 0%, #2e1515 100%)', border: '#6a2a2a', text: '#ff8787', valueText: '#ffa8a8' },
-  }
-  const map = isDark ? dark : light
-  return map[color] || map.blue
+const SPARKLINE_COLOR_LIGHT = '#228be6'
+const SPARKLINE_COLOR_DARK = '#4dabf7'
+
+function MiniSparkline({ data, isDark }: { data: SparklineData[]; isDark: boolean }) {
+  if (!data || data.length < 2) return null
+  const color = isDark ? SPARKLINE_COLOR_DARK : SPARKLINE_COLOR_LIGHT
+
+  return (
+    <div style={{ width: '100%', height: 32, marginTop: 6 }}>
+      <ResponsiveContainer width="100%" height="100%">
+        <AreaChart data={data} margin={{ top: 2, right: 0, left: 0, bottom: 0 }}>
+          <defs>
+            <linearGradient id="sparklineGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor={color} stopOpacity={isDark ? 0.25 : 0.15} />
+              <stop offset="95%" stopColor={color} stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <Area
+            type="monotone"
+            dataKey="value"
+            stroke={color}
+            strokeWidth={1.5}
+            fill="url(#sparklineGrad)"
+            dot={false}
+            isAnimationActive={false}
+          />
+          <Tooltip content={() => null} cursor={{ stroke: 'transparent' }} />
+        </AreaChart>
+      </ResponsiveContainer>
+    </div>
+  )
 }
 
 export function StatCard({
   icon,
   label,
   value,
-  color = 'blue',
+  color = '#228be6',
   currentValue,
   previousValue,
   inverseTrend = false,
-  compact = false,
+  sparklineData,
 }: StatCardProps) {
   const { colorScheme } = useMantineColorScheme()
   const isDark = colorScheme === 'dark'
-  const colors = getColors(color as string, isDark)
 
   return (
-    <Group
-      justify="space-between"
-      align="center"
-      p={compact ? 'sm' : 'md'}
+    <Paper
+      withBorder
+      p="sm"
+      radius="md"
       style={{
-        background: colors.bg,
-        borderRadius: 'var(--mantine-radius-md)',
-        border: `1px solid ${colors.border}`,
+        background: isDark ? '#1a1b1e' : '#ffffff',
+        borderColor: isDark ? '#2C2E33' : '#e9ecef',
       }}
     >
-      <Stack gap={compact ? 2 : 'xs'}>
-        <Text size={compact ? 'xs' : 'sm'} fw={500} style={{ color: colors.text }}>
-          {label}
-        </Text>
-        <Text size={compact ? 'lg' : 'xl'} fw={700} style={{ color: colors.valueText }}>
-          {value}
-        </Text>
-        {currentValue !== undefined && previousValue !== undefined && (
-          <TrendIndicator
-            currentValue={currentValue}
-            previousValue={previousValue}
-            inverseGood={inverseTrend}
-          />
-        )}
-      </Stack>
-      <ThemeIcon
-        size={compact ? 40 : 48}
-        variant="gradient"
-        gradient={{ from: `${color}-4`, to: `${color}-7` }}
-        radius="md"
-      >
-        {icon}
-      </ThemeIcon>
-    </Group>
+      <Group justify="space-between" align="flex-start" gap="xs">
+        <Stack gap={2} style={{ flex: 1 }}>
+          <Text size="xs" c="dimmed" tt="uppercase" fw={600}>
+            {label}
+          </Text>
+          <Text size="lg" fw={700} style={{ color: isDark ? '#e9ecef' : '#212529', lineHeight: 1.2 }}>
+            {value}
+          </Text>
+          {currentValue !== undefined && previousValue !== undefined && (
+            <TrendIndicator
+              currentValue={currentValue}
+              previousValue={previousValue}
+              inverseGood={inverseTrend}
+            />
+          )}
+        </Stack>
+        <div
+          style={{
+            width: 32,
+            height: 32,
+            borderRadius: 8,
+            background: isDark ? `${color}18` : `${color}12`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color,
+            flexShrink: 0,
+          }}
+        >
+          {icon}
+        </div>
+      </Group>
+      {sparklineData && sparklineData.length > 1 && (
+        <MiniSparkline data={sparklineData} isDark={isDark} />
+      )}
+    </Paper>
   )
 }
 
@@ -100,18 +129,15 @@ type StatsGridProps = {
     currentValue?: number
     previousValue?: number
     inverseTrend?: boolean
+    sparklineData?: SparklineData[]
   }>
-  compact?: boolean
 }
 
-export function StatsGrid({ stats, compact = false }: StatsGridProps) {
+export function StatsGrid({ stats }: StatsGridProps) {
   return (
-    <SimpleGrid
-      cols={{ base: 1, sm: 2, lg: 4 }}
-      spacing={compact ? 'sm' : 'md'}
-    >
+    <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="sm">
       {stats.map((stat, index) => (
-        <StatCard key={index} {...stat} compact={compact} />
+        <StatCard key={index} {...stat} />
       ))}
     </SimpleGrid>
   )

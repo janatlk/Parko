@@ -34,6 +34,312 @@ def _get_previous_month_stats(company, current_year, current_month, model, date_
     return model.objects.filter(**kwargs)
 
 
+class DashboardOverviewView(APIView):
+    """Consolidated dashboard overview with stats, history, top vehicles, expiring items and activity."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        company_id = request.user.company.id
+        months = int(request.query_params.get('months', 6))
+        limit = int(request.query_params.get('limit', 8))
+        cache_key = f'dashboard_overview_{company_id}_{months}_{limit}'
+
+        data = cache.get(cache_key)
+        if data is not None:
+            return Response(data)
+
+        company = request.user.company
+        now = timezone.now()
+        current_month = now.month
+        current_year = now.year
+
+        # --- STATS (current snapshot) ---
+        total_cars = Car.objects.filter(company=company).count()
+        active_cars = Car.objects.filter(company=company, status='ACTIVE').count()
+        maintenance_cars = Car.objects.filter(company=company, status='MAINTENANCE').count()
+        inactive_cars = Car.objects.filter(company=company, status='INACTIVE').count()
+
+        fuel_this_month = Fuel.objects.filter(car__company=company, month=current_month, year=current_year)
+        if not fuel_this_month.exists():
+            latest_fuel = Fuel.objects.filter(car__company=company).order_by('-year', '-month').first()
+            if latest_fuel:
+                fuel_this_month = Fuel.objects.filter(car__company=company, month=latest_fuel.month, year=latest_fuel.year)
+
+        total_fuel_cost_month = fuel_this_month.aggregate(total=Sum('total_cost'))['total'] or 0
+
+        if current_month == 1:
+            prev_year, prev_month = current_year - 1, 12
+        else:
+            prev_year, prev_month = current_year, current_month - 1
+
+        fuel_prev_month = Fuel.objects.filter(car__company=company, month=prev_month, year=prev_year)
+        total_fuel_cost_prev_month = fuel_prev_month.aggregate(total=Sum('total_cost'))['total'] or 0
+
+        all_fuel_with_data = Fuel.objects.filter(car__company=company, liters__gt=0, monthly_mileage__gt=0)
+        avg_fuel_consumption = 0
+        if all_fuel_with_data.exists():
+            agg = all_fuel_with_data.aggregate(total_liters=Sum('liters'), total_mileage=Sum('monthly_mileage'))
+            if agg['total_liters'] and agg['total_mileage'] and agg['total_mileage'] > 0:
+                avg_fuel_consumption = round((agg['total_liters'] / agg['total_mileage']) * 100, 2)
+
+        spare_parts_cost_month = Spare.objects.filter(
+            car__company=company, installed_at__year=current_year, installed_at__month=current_month
+        ).aggregate(total=Sum('part_price') + Sum('job_price'))['total'] or 0
+
+        prev_spare_parts = Spare.objects.filter(
+            car__company=company, installed_at__year=prev_year, installed_at__month=prev_month
+        ).aggregate(total=Sum('part_price') + Sum('job_price'))['total'] or 0
+
+        total_operational_cost = total_fuel_cost_month + spare_parts_cost_month
+        prev_operational_cost = total_fuel_cost_prev_month + prev_spare_parts
+
+        active_insurances = Insurance.objects.filter(car__company=company, end_date__gte=now.date()).count()
+        active_inspections = Inspection.objects.filter(car__company=company, inspected_at__gte=now.date() - timedelta(days=365)).count()
+
+        expiring_count = Insurance.objects.filter(
+            car__company=company, end_date__lte=now.date() + timedelta(days=30), end_date__gte=now.date()
+        ).count()
+        expiring_inspections = sum(
+            1 for i in Inspection.objects.filter(car__company=company)
+            if 0 <= (i.inspected_at + timedelta(days=365) - now.date()).days <= 30
+        )
+
+        stats_data = {
+            'total_cars': total_cars,
+            'active_cars': active_cars,
+            'maintenance_cars': maintenance_cars,
+            'inactive_cars': inactive_cars,
+            'total_fuel_cost_month': round(float(total_fuel_cost_month), 2),
+            'total_fuel_cost_prev_month': round(float(total_fuel_cost_prev_month), 2),
+            'total_spare_parts_cost_month': round(float(spare_parts_cost_month), 2),
+            'total_spare_parts_cost_prev_month': round(float(prev_spare_parts), 2),
+            'total_operational_cost': round(float(total_operational_cost), 2),
+            'prev_operational_cost': round(float(prev_operational_cost), 2),
+            'active_insurances': active_insurances,
+            'active_inspections': active_inspections,
+            'expiring_items_count': expiring_count + expiring_inspections,
+            'avg_fuel_consumption': avg_fuel_consumption,
+        }
+
+        # --- HISTORY (monthly breakdown) ---
+        month_ranges = []
+        for i in range(months):
+            month_date = now - timedelta(days=30 * i)
+            month_ranges.append((month_date.year, month_date.month))
+        seen = set()
+        unique_months = []
+        for yr, mn in month_ranges:
+            if (yr, mn) not in seen:
+                seen.add((yr, mn))
+                unique_months.append((yr, mn))
+
+        history = []
+        for year, month in unique_months:
+            month_date = date(year, month, 1)
+            month_name = month_date.strftime('%B')
+
+            fuel_data = Fuel.objects.filter(car__company=company, year=year, month=month).aggregate(
+                total_liters=Sum('liters'), total_cost=Sum('total_cost'), total_mileage=Sum('monthly_mileage')
+            )
+            spare_data = Spare.objects.filter(car__company=company, installed_at__year=year, installed_at__month=month).aggregate(
+                total_parts=Sum('part_price'), total_labor=Sum('job_price')
+            )
+            insurance_data = Insurance.objects.filter(car__company=company, start_date__year=year, start_date__month=month).aggregate(
+                total_cost=Sum('cost')
+            )
+            inspection_data = Inspection.objects.filter(car__company=company, inspected_at__year=year, inspected_at__month=month).aggregate(
+                total_cost=Sum('cost')
+            )
+            tires_data = Tires.objects.filter(car__company=company, installed_at__year=year, installed_at__month=month).aggregate(
+                total_cost=Sum('price')
+            )
+            accumulator_data = Accumulator.objects.filter(car__company=company, installed_at__year=year, installed_at__month=month).aggregate(
+                total_cost=Sum('price')
+            )
+
+            fuel_cost = float(fuel_data['total_cost'] or 0)
+            spare_cost = float(spare_data['total_parts'] or 0) + float(spare_data['total_labor'] or 0)
+            insurance_cost = float(insurance_data['total_cost'] or 0)
+            inspection_cost = float(inspection_data['total_cost'] or 0)
+            tires_cost = float(tires_data['total_cost'] or 0)
+            accumulator_cost = float(accumulator_data['total_cost'] or 0)
+            total_liters = float(fuel_data['total_liters'] or 0)
+            total_mileage = float(fuel_data['total_mileage'] or 0)
+
+            month_avg_consumption = 0
+            if total_mileage > 0:
+                raw = (total_liters / total_mileage) * 100
+                month_avg_consumption = round(raw, 2) if raw <= 100 else 0
+
+            history.append({
+                'year': year,
+                'month': month,
+                'month_name': month_name,
+                'fuel_cost': round(fuel_cost, 2),
+                'spare_cost': round(spare_cost, 2),
+                'insurance_cost': round(insurance_cost, 2),
+                'inspection_cost': round(inspection_cost, 2),
+                'tires_cost': round(tires_cost, 2),
+                'accumulator_cost': round(accumulator_cost, 2),
+                'total_cost': round(fuel_cost + spare_cost + insurance_cost + inspection_cost + tires_cost + accumulator_cost, 2),
+                'total_liters': round(total_liters, 2),
+                'total_mileage': round(total_mileage, 2),
+                'avg_consumption': month_avg_consumption,
+            })
+
+        history.sort(key=lambda x: (x['year'], x['month']))
+
+        # --- TOP VEHICLES BY TOTAL COST ---
+        cars = Car.objects.filter(company=company)
+        top_vehicles = []
+        for car in cars:
+            fuel_cost = Fuel.objects.filter(car=car).aggregate(total=Sum('total_cost'))['total'] or 0
+            spare_cost_data = Spare.objects.filter(car=car).aggregate(parts=Sum('part_price'), labor=Sum('job_price'))
+            spare_cost = float(spare_cost_data['parts'] or 0) + float(spare_cost_data['labor'] or 0)
+            insurance_cost = Insurance.objects.filter(car=car).aggregate(total=Sum('cost'))['total'] or 0
+            inspection_cost = Inspection.objects.filter(car=car).aggregate(total=Sum('cost'))['total'] or 0
+            tires_cost = Tires.objects.filter(car=car).aggregate(total=Sum('price'))['total'] or 0
+            accumulator_cost = Accumulator.objects.filter(car=car).aggregate(total=Sum('price'))['total'] or 0
+            total_cost = float(fuel_cost) + spare_cost + float(insurance_cost) + float(inspection_cost) + float(tires_cost) + float(accumulator_cost)
+
+            fuel_records = Fuel.objects.filter(car=car, liters__gt=0, monthly_mileage__gt=0)
+            avg_consumption = 0
+            if fuel_records.exists():
+                agg = fuel_records.aggregate(total_liters=Sum('liters'), total_mileage=Sum('monthly_mileage'))
+                if agg['total_mileage'] and agg['total_mileage'] > 0:
+                    avg_consumption = round((agg['total_liters'] / agg['total_mileage']) * 100, 2)
+
+            if total_cost > 0 or fuel_records.exists():
+                top_vehicles.append({
+                    'id': car.id,
+                    'numplate': car.numplate,
+                    'brand': car.brand,
+                    'title': car.title,
+                    'total_cost': round(total_cost, 2),
+                    'fuel_cost': round(float(fuel_cost), 2),
+                    'maintenance_cost': round(spare_cost, 2),
+                    'other_cost': round(float(insurance_cost) + float(inspection_cost) + float(tires_cost) + float(accumulator_cost), 2),
+                    'avg_consumption': avg_consumption,
+                })
+
+        top_vehicles.sort(key=lambda x: x['total_cost'], reverse=True)
+        top_vehicles = top_vehicles[:limit]
+
+        # --- EXPIRING ITEMS ---
+        today = now.date()
+        warning_days = 30
+        expiring_items = []
+        total_renewal_cost = 0
+
+        insurances = Insurance.objects.filter(car__company=company, end_date__lte=today + timedelta(days=warning_days)).select_related('car')
+        for insurance in insurances:
+            days_until = (insurance.end_date - today).days
+            expiring_items.append({
+                'id': insurance.id,
+                'car_id': insurance.car.id,
+                'car_numplate': insurance.car.numplate,
+                'type': 'insurance',
+                'end_date': insurance.end_date.isoformat(),
+                'days_until_expiry': days_until,
+                'cost': float(insurance.cost),
+            })
+            total_renewal_cost += insurance.cost
+
+        inspections = Inspection.objects.filter(car__company=company).select_related('car')
+        for inspection in inspections:
+            expiry_date = inspection.inspected_at + timedelta(days=365)
+            days_until = (expiry_date - today).days
+            if days_until <= warning_days:
+                expiring_items.append({
+                    'id': inspection.id,
+                    'car_id': inspection.car.id,
+                    'car_numplate': inspection.car.numplate,
+                    'type': 'inspection',
+                    'end_date': expiry_date.isoformat(),
+                    'days_until_expiry': days_until,
+                    'cost': float(inspection.cost),
+                })
+                total_renewal_cost += inspection.cost
+
+        expiring_items.sort(key=lambda x: x['days_until_expiry'])
+
+        # --- ACTIVITY FEED ---
+        activities = []
+        fuel_entries = Fuel.objects.filter(car__company=company).select_related('car').order_by('-created_at')[:limit]
+        for fuel in fuel_entries:
+            activities.append({
+                'id': fuel.id,
+                'type': 'fuel',
+                'car_id': fuel.car.id,
+                'car_numplate': fuel.car.numplate,
+                'title': f"Fuel: {fuel.month_name} {fuel.year}",
+                'description': f"{fuel.liters}L - {fuel.total_cost} с.",
+                'date': fuel.created_at.isoformat() if fuel.created_at else now.isoformat(),
+                'cost': float(fuel.total_cost),
+            })
+
+        spares = Spare.objects.filter(car__company=company).select_related('car').order_by('-installed_at')[:limit]
+        for spare in spares:
+            activities.append({
+                'id': spare.id,
+                'type': 'maintenance',
+                'car_id': spare.car.id,
+                'car_numplate': spare.car.numplate,
+                'title': f"Maintenance: {spare.title}",
+                'description': f"Parts: {spare.part_price} с. + Labor: {spare.job_price} с.",
+                'date': spare.installed_at.isoformat() if spare.installed_at else now.isoformat(),
+                'cost': float(spare.part_price or 0) + float(spare.job_price or 0),
+            })
+
+        new_cars = Car.objects.filter(company=company).order_by('-created_at')[:limit]
+        for car in new_cars:
+            activities.append({
+                'id': car.id,
+                'type': 'car_added',
+                'car_id': car.id,
+                'car_numplate': car.numplate,
+                'title': f"Vehicle added: {car.brand} {car.title or ''}",
+                'description': f"VIN: {car.vin or 'N/A'}",
+                'date': car.created_at.isoformat() if car.created_at else now.isoformat(),
+                'cost': 0,
+            })
+
+        all_cars_edited = Car.objects.filter(company=company, updated_at__isnull=False).order_by('-updated_at')[:limit * 2]
+        for car in all_cars_edited:
+            if car.updated_at and car.created_at:
+                if abs((car.updated_at - car.created_at).total_seconds()) < 60:
+                    continue
+                if car.updated_at == car.created_at:
+                    continue
+            activities.append({
+                'id': car.id,
+                'type': 'car_edited',
+                'car_id': car.id,
+                'car_numplate': car.numplate,
+                'title': f"Vehicle updated: {car.brand} {car.title or ''}",
+                'description': f"Last modified: {car.updated_at.strftime('%d.%m.%Y %H:%M') if car.updated_at else 'N/A'}",
+                'date': car.updated_at.isoformat() if car.updated_at else now.isoformat(),
+                'cost': 0,
+            })
+
+        activities.sort(key=lambda x: x['date'], reverse=True)
+        activities = activities[:limit]
+
+        data = {
+            'stats': stats_data,
+            'history': history,
+            'top_vehicles': top_vehicles,
+            'expiring': {
+                'items': expiring_items,
+                'total_renewal_cost': round(float(total_renewal_cost), 2),
+            },
+            'activity': activities,
+        }
+
+        cache.set(cache_key, data, 300)
+        return Response(data)
+
+
 class DashboardStatsView(APIView):
     """Get dashboard statistics for the current user's company."""
     permission_classes = [IsAuthenticated]

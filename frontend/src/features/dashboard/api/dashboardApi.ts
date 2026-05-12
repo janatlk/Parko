@@ -92,6 +92,47 @@ export type FuelStatsByMonth = {
   avg_consumption: number
 }
 
+export type HistoryMonth = {
+  year: number
+  month: number
+  month_name: string
+  fuel_cost: number
+  spare_cost: number
+  insurance_cost: number
+  inspection_cost: number
+  tires_cost: number
+  accumulator_cost: number
+  total_cost: number
+  total_liters: number
+  total_mileage: number
+  avg_consumption: number
+}
+
+export type TopVehicle = {
+  id: number
+  numplate: string
+  brand: string
+  title: string
+  total_cost: number
+  fuel_cost: number
+  maintenance_cost: number
+  other_cost: number
+  avg_consumption: number
+}
+
+export type DashboardOverview = {
+  stats: DashboardStats
+  history: HistoryMonth[]
+  top_vehicles: TopVehicle[]
+  expiring: ExpiringItemsResponse
+  activity: ActivityFeedItem[]
+}
+
+export async function getDashboardOverview(params?: { months?: number; limit?: number }): Promise<DashboardOverview> {
+  const { data } = await http.get<DashboardOverview>('dashboard/overview/', { params })
+  return data
+}
+
 export async function getDashboardStats(): Promise<DashboardStats> {
   const { data } = await http.get<DashboardStats>('dashboard/stats/')
   return data

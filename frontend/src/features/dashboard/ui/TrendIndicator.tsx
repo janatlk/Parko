@@ -14,8 +14,8 @@ export function TrendIndicator({ currentValue, previousValue, inverseGood = fals
   // Handle edge cases
   if (previousValue === 0 && currentValue === 0) {
     return (
-      <Group gap="xs" c="dimmed">
-        <IconMinus size={16} />
+      <Group gap={4} c="dimmed">
+        <IconMinus size={14} />
         <Text size="xs">{t('dashboard.no_change')}</Text>
       </Group>
     )
@@ -23,8 +23,8 @@ export function TrendIndicator({ currentValue, previousValue, inverseGood = fals
 
   if (previousValue === 0) {
     return (
-      <Group gap="xs" c="green">
-        <IconArrowUp size={16} />
+      <Group gap={4} c="green">
+        <IconArrowUp size={14} />
         <Text size="xs" fw={500}>{t('dashboard.new')}</Text>
       </Group>
     )
@@ -45,12 +45,13 @@ export function TrendIndicator({ currentValue, previousValue, inverseGood = fals
     isGood = isIncrease
   }
 
-  const color = isGood ? 'green' : isIncrease ? 'red' : 'dimmed'
+  // Color hierarchy: good = green, bad = orange (not red), neutral = dimmed
+  const color = isGood ? 'green' : isIncrease ? 'orange' : 'dimmed'
   const Icon = isIncrease ? IconArrowUp : isDecrease ? IconArrowDown : IconMinus
 
   return (
-    <Group gap="xs" c={color}>
-      <Icon size={16} />
+    <Group gap={4} c={color}>
+      <Icon size={14} />
       <Text size="xs" fw={500}>
         {isIncrease ? '+' : ''}{percentChange}%
       </Text>

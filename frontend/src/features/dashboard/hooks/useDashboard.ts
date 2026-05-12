@@ -8,7 +8,17 @@ import {
   getVehicleConsumption,
   getFuelStatsByMonth,
   getRecentFuelEntries,
+  getDashboardOverview,
 } from '../api/dashboardApi'
+
+export function useDashboardOverview(months = 6, limit = 8) {
+  return useQuery({
+    queryKey: ['dashboard', 'overview', months, limit],
+    queryFn: () => getDashboardOverview({ months, limit }),
+    retry: 1,
+    staleTime: 60_000,
+  })
+}
 
 export function useDashboardStats() {
   return useQuery({
