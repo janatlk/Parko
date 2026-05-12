@@ -1,4 +1,4 @@
-import { AppShell, Avatar, Badge, Burger, Button, Group, NavLink, Select, Stack, Text, useMantineColorScheme } from '@mantine/core'
+import { AppShell, Avatar, Badge, Burger, Button, Divider, Group, NavLink, Select, Stack, Text, ThemeIcon, useMantineColorScheme } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { NavLink as RouterNavLink, Outlet, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -14,6 +14,8 @@ import {
   IconUser,
   IconLogout,
   IconLanguage,
+  IconTools,
+  IconClipboardCheck,
 } from '@tabler/icons-react'
 
 import { useAuth } from '@features/auth/hooks/useAuth'
@@ -187,11 +189,37 @@ export function AppLayout() {
             onClick={() => toggle()}
             styles={() => getNavStyles(isDark, activePath.startsWith('/dashboard'))}
           />
+
+          {/* CRUD Section - Grouped and Highlighted */}
+          <Divider
+            my="sm"
+            label={t('common.data_management')}
+            labelPosition="left"
+            styles={{
+              label: {
+                color: isDark ? '#74b0f0' : '#1971c2',
+                fontWeight: 600,
+                fontSize: '11px',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+              },
+            }}
+          />
+
+          <Group gap={4} mb={4} px="xs">
+            <ThemeIcon size={16} variant="light" color="blue" radius="xl">
+              <IconClipboardCheck size={10} />
+            </ThemeIcon>
+            <Text size="xs" fw={600} c={isDark ? 'blue.3' : 'blue.7'}>
+              {t('common.main_tables')}
+            </Text>
+          </Group>
+
           <NavLink
             component={RouterNavLink}
             to="/cars"
             label={t('cars.title')}
-            leftSection={<IconCar size={18} stroke={1.5} color={isDark ? '#868e96' : undefined} />}
+            leftSection={<IconCar size={18} stroke={1.5} color={isDark ? '#4dabf7' : '#1971c2'} />}
             active={activePath.startsWith('/cars')}
             onClick={() => toggle()}
             styles={() => getNavStyles(isDark, activePath.startsWith('/cars'))}
@@ -200,7 +228,7 @@ export function AppLayout() {
             component={RouterNavLink}
             to="/fuel"
             label={t('fuel.title')}
-            leftSection={<IconGasStation size={18} stroke={1.5} color={isDark ? '#868e96' : undefined} />}
+            leftSection={<IconGasStation size={18} stroke={1.5} color={isDark ? '#69db7c' : '#40c057'} />}
             active={activePath.startsWith('/fuel')}
             onClick={() => toggle()}
             styles={() => getNavStyles(isDark, activePath.startsWith('/fuel'))}
@@ -209,7 +237,7 @@ export function AppLayout() {
             component={RouterNavLink}
             to="/spares"
             label={t('spares.title')}
-            leftSection={<IconCar size={18} stroke={1.5} color={isDark ? '#868e96' : undefined} />}
+            leftSection={<IconTools size={18} stroke={1.5} color={isDark ? '#ffa94d' : '#fd7e14'} />}
             active={activePath.startsWith('/spares')}
             onClick={() => toggle()}
             styles={() => getNavStyles(isDark, activePath.startsWith('/spares'))}
@@ -218,7 +246,7 @@ export function AppLayout() {
             component={RouterNavLink}
             to="/insurances"
             label={t('insurances.title')}
-            leftSection={<IconShield size={18} stroke={1.5} color={isDark ? '#868e96' : undefined} />}
+            leftSection={<IconShield size={18} stroke={1.5} color={isDark ? '#9775fa' : '#845ef7'} />}
             active={activePath.startsWith('/insurances')}
             onClick={() => toggle()}
             styles={() => getNavStyles(isDark, activePath.startsWith('/insurances'))}
@@ -227,7 +255,7 @@ export function AppLayout() {
             component={RouterNavLink}
             to="/inspections"
             label={t('inspections.title')}
-            leftSection={<IconCalendarStats size={18} stroke={1.5} color={isDark ? '#868e96' : undefined} />}
+            leftSection={<IconCalendarStats size={18} stroke={1.5} color={isDark ? '#f783ac' : '#e64980'} />}
             active={activePath.startsWith('/inspections')}
             onClick={() => toggle()}
             styles={() => getNavStyles(isDark, activePath.startsWith('/inspections'))}
@@ -236,11 +264,14 @@ export function AppLayout() {
             component={RouterNavLink}
             to="/users"
             label={t('users.title')}
-            leftSection={<IconUsers size={18} stroke={1.5} color={isDark ? '#868e96' : undefined} />}
+            leftSection={<IconUsers size={18} stroke={1.5} color={isDark ? '#38d9a9' : '#20c997'} />}
             active={activePath.startsWith('/users')}
             onClick={() => toggle()}
             styles={() => getNavStyles(isDark, activePath.startsWith('/users'))}
           />
+
+          <Divider my="sm" />
+
           <NavLink
             component={RouterNavLink}
             to="/reports"

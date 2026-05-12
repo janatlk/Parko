@@ -40,8 +40,8 @@ function AppContent() {
           autoClose={3000}
           styles={{
             notification: {
-              opacity: 0.9,
-              pointerEvents: 'auto',
+              opacity: 0.8,
+              pointerEvents: 'none',
             },
             root: {
               pointerEvents: 'none',

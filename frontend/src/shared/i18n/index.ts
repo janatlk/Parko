@@ -34,6 +34,8 @@ const resources = {
         october: 'Октябрь',
         november: 'Ноябрь',
         december: 'Декабрь',
+        data_management: 'Управление данными',
+        main_tables: 'Основные таблицы',
       },
       theme: {
         light: 'Светлая',
@@ -706,6 +708,8 @@ const resources = {
         october: 'October',
         november: 'November',
         december: 'December',
+        data_management: 'Data Management',
+        main_tables: 'Main Tables',
       },
       theme: {
         light: 'Light',
@@ -1397,6 +1401,8 @@ const resources = {
         october: 'Октябрь',
         november: 'Ноябрь',
         december: 'Декабрь',
+        data_management: 'Маалымат башкаруу',
+        main_tables: 'Негизги таблицалар',
       },
       theme: {
         light: 'Ачык',
