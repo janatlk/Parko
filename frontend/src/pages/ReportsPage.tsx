@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
-import { Container, Tabs, Title, Stack, Notification, Group } from '@mantine/core'
-import { IconChartBar, IconFolderOpen, IconExclamationCircle, IconCheck } from '@tabler/icons-react'
+import { Container, Tabs, Title, Stack, Notification, Group, Badge } from '@mantine/core'
+import { IconChartBar, IconFolderOpen, IconExclamationCircle, IconCheck, IconClock } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
 import { notifications } from '@mantine/notifications'
 
@@ -43,6 +43,8 @@ export function ReportsPage() {
       label: `${car.numplate} - ${car.brand}`,
     })) || []
 
+  const savedCount = savedReports?.length ?? 0
+
   // Show loading state
   if (isLoadingCars) {
     return (
@@ -54,9 +56,6 @@ export function ReportsPage() {
     )
   }
 
-  /**
-   * Handle report generation — all reports use the same flow
-   */
   const handleGenerate = (params: {
     report_type: string
     from_date: string
@@ -78,7 +77,6 @@ export function ReportsPage() {
           setGeneratedReport(data)
           setActiveTab('results')
 
-          // Save report if requested
           if (params.save_report && params.report_name) {
             createSavedMutation.mutate(
               {
@@ -130,9 +128,6 @@ export function ReportsPage() {
     )
   }
 
-  /**
-   * Handle export
-   */
   const handleExport = async (format: 'json' | 'csv' | 'xlsx' | 'pdf') => {
     if (!generatedReport) return
 
@@ -165,9 +160,6 @@ export function ReportsPage() {
     }
   }
 
-  /**
-   * Handle save report from results page
-   */
   const handleSaveReport = (reportName: string) => {
     if (!generatedReport) return
 
@@ -202,18 +194,12 @@ export function ReportsPage() {
     )
   }
 
-  /**
-   * Handle viewing a saved report
-   */
   const handleViewSaved = (report: SavedReportList) => {
     setGeneratedReport(null)
     setSelectedSavedReport(report)
     setActiveTab('results')
   }
 
-  /**
-   * Handle exporting a saved report
-   */
   const handleExportSaved = async (report: SavedReportList, format: 'json' | 'csv' | 'xlsx' | 'pdf') => {
     try {
       const blob = await exportMutation.mutateAsync({ id: report.id, format })
@@ -235,9 +221,6 @@ export function ReportsPage() {
     }
   }
 
-  /**
-   * Helper to download blob
-   */
   const downloadBlob = (blob: Blob, filename: string) => {
     const url = window.URL.createObjectURL(blob)
     const link = document.createElement('a')
@@ -272,15 +255,30 @@ export function ReportsPage() {
               leftSection={<IconFolderOpen size={16} />}
               onClick={() => setSelectedSavedReport(null)}
             >
-              {t('reports.saved_reports') || 'Saved Reports'}
+              <Group gap={4}>
+                {t('reports.saved_reports') || 'Saved Reports'}
+                {savedCount > 0 && (
+                  <Badge size="xs" variant="filled" color="blue">
+                    {savedCount}
+                  </Badge>
+                )}
+              </Group>
             </Tabs.Tab>
-            <Tabs.Tab value="results" disabled={!generatedReport && !selectedSavedReport}>
+            <Tabs.Tab
+              value="results"
+              disabled={!generatedReport && !selectedSavedReport}
+              leftSection={<IconClock size={16} />}
+            >
               {t('reports.results') || 'Results'}
             </Tabs.Tab>
           </Tabs.List>
 
           <Tabs.Panel value="new" pt="md">
-            <ReportBuilder carOptions={carOptions} onGenerate={handleGenerate} isLoading={generateMutation.isPending} />
+            <ReportBuilder
+              carOptions={carOptions}
+              onGenerate={handleGenerate}
+              isLoading={generateMutation.isPending}
+            />
           </Tabs.Panel>
 
           <Tabs.Panel value="saved" pt="md">
@@ -294,9 +292,16 @@ export function ReportsPage() {
 
           <Tabs.Panel value="results" pt="md">
             {selectedSavedReport && savedReportData ? (
-              <ReportResults report={savedReportData} onExport={(format) => handleExportSaved(selectedSavedReport, format)} />
+              <ReportResults
+                report={savedReportData}
+                onExport={(format) => handleExportSaved(selectedSavedReport, format)}
+              />
             ) : generatedReport ? (
-              <ReportResults report={generatedReport} onExport={handleExport} onSave={handleSaveReport} />
+              <ReportResults
+                report={generatedReport}
+                onExport={handleExport}
+                onSave={handleSaveReport}
+              />
             ) : (
               <Notification icon={<IconExclamationCircle />} color="gray">
                 {t('reports.no_report_selected') || 'No report selected'}

@@ -13,7 +13,6 @@ class LanguageChoices(models.TextChoices):
 class ThemeChoices(models.TextChoices):
     LIGHT = "light", "Light"
     DARK = "dark", "Dark"
-    SYSTEM = "system", "System (auto)"
 
 
 class RegionChoices(models.TextChoices):
@@ -72,7 +71,7 @@ class User(AbstractUser):
     theme = models.CharField(
         max_length=10,
         choices=ThemeChoices.choices,
-        default=ThemeChoices.SYSTEM,
+        default=ThemeChoices.DARK,
         help_text='Theme preference for UI'
     )
     currency = models.CharField(

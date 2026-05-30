@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parko — Презентация</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/theme/black.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap');
+        
+        :root {
+            --parko-orange: #ff9100;
+            --parko-blue: #228be6;
+            --parko-dark: #0a0a0a;
+            --parko-gray: #868e96;
+        }
+        
+        .reveal {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #141414 100%);
+        }
+        
+        .reveal h1, .reveal h2, .reveal h3 {
+            font-family: 'Inter', sans-serif;
+            font-weight: 900;
+            text-transform: none;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+            color: #fff;
+        }
+        
+        .reveal h1 { font-size: 3.2em; }
+        .reveal h2 { font-size: 2.4em; }
+        .reveal h3 { font-size: 1.6em; font-weight: 700; }
+        
+        .reveal p, .reveal li {
+            font-weight: 300;
+            line-height: 1.5;
+            color: #e9ecef;
+        }
+        
+        .reveal .slides section {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .reveal .slides section.has-dark-background {
+            background: transparent;
+        }
+        
+        .accent { color: var(--parko-orange); }
+        .dim { color: var(--parko-gray); font-weight: 300; }
+        .highlight { color: var(--parko-blue); }
+        
+        .big-number {
+            font-size: 5em;
+            font-weight: 900;
+            color: var(--parko-orange);
+            line-height: 1;
+            margin: 0.2em 0;
+        }
+        
+        .story-text {
+            font-size: 1.3em;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .slide-img {
+            max-height: 60vh;
+            border-radius: 12px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8);
+            margin: 20px 0;
+        }
+        
+        .split {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            width: 100%;
+            max-width: 1100px;
+        }
+        
+        .split-left { text-align: left; }
+        .split-right { text-align: left; }
+        
+        .badge {
+            display: inline-block;
+            background: rgba(255,145,0,0.15);
+            color: var(--parko-orange);
+            padding: 8px 20px;
+            border-radius: 100px;
+            font-size: 0.75em;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 1em;
+        }
+        
+        .time-marker {
+            font-size: 0.9em;
+            color: var(--parko-gray);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            margin-bottom: 0.5em;
+        }
+        
+        .chat-bubble {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 20px 28px;
+            margin: 12px 0;
+            text-align: left;
+            max-width: 600px;
+            font-size: 0.9em;
+        }
+        .chat-bubble.user { border-left: 4px solid var(--parko-blue); }
+        .chat-bubble.ai { border-left: 4px solid var(--parko-orange); }
+        .chat-label { font-size: 0.7em; color: var(--parko-gray); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.1em; }
+        
+        .reveal .progress { background: rgba(255,145,0,0.2); height: 4px; }
+        .reveal .progress span { background: var(--parko-orange); }
+        
+        .reveal .controls { color: var(--parko-orange); }
+        
+        @media print {
+            .reveal .slides section {
+                height: auto;
+                page-break-after: always;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+            
+            <!-- Slide 1: Hook -->
+            <section>
+                <div class="time-marker">История одного понедельника</div>
+                <h1>Айбек не спал<br>этой ночью</h1>
+                <p class="story-text dim">Потому что завтра — отчёт за квартал. А данные разбросаны по 47 таблицам.</p>
+                <div style="margin-top: 60px;">
+                    <span class="badge">Parko Fleet Management</span>
+                </div>
+            </section>
+            
+            <!-- Slide 2: 8 AM -->
+            <section>
+                <div class="time-marker">08:00</div>
+                <div class="big-number">47</div>
+                <h2>открытых вкладок Excel</h2>
+                <p class="story-text">Топливо в одной таблице. ТО — в другой. Страховки — в папке на рабочем столе.<br><span class="dim">Ни одна из них не обновлялась в реальном времени.</span></p>
+            </section>
+            
+            <!-- Slide 3: 12 PM -->
+            <section>
+                <div class="time-marker">12:30</div>
+                <h1>Страховка просрочена.<br><span class="accent">Снова.</span></h1>
+                <p class="story-text">Машина простаивает. Штраф. Звонки. <span class="dim">Человеческий фактор, который невозможно устранить бумажкой на стене.</span></p>
+            </section>
+            
+            <!-- Slide 4: 6 PM -->
+            <section>
+                <div class="time-marker">18:00</div>
+                <h2>Отчёт за месяц</h2>
+                <div class="big-number">≈3 ч</div>
+                <p class="story-text">Сбор данных из разных источников. Сверка. Правка формул. Повторная сверка.<br><span class="dim">Каждый месяц. Каждый квартал. Каждый год.</span></p>
+            </section>
+            
+            <!-- Slide 5: Turn -->
+            <section>
+                <h1 style="font-size: 2.8em;">А если бы Айбек<br><span class="accent">просто спросил?</span></h1>
+                <p class="story-text" style="margin-top: 40px;">Без таблиц. Без ручного поиска. Без страха, что что-то забыл.</p>
+            </section>
+            
+            <!-- Slide 6: AI Demo -->
+            <section>
+                <div class="split">
+                    <div class="split-left">
+                        <span class="badge">AI-Ассистент Parko</span>
+                        <h2 style="font-size: 1.6em; margin-top: 0.3em;">Не чат ради чата.<br>Чат ради <span class="accent">дела</span>.</h2>
+                        <div class="chat-bubble user">
+                            <div class="chat-label">Диспетчер</div>
+                            «Сколько мы потратили на топливо в марте? И какой расход на Mercedes 777?»
+                        </div>
+                        <div class="chat-bubble ai">
+                            <div class="chat-label">Parko AI — 3 секунды</div>
+                            «284 500 ₽. Расход Mercedes 777 — 12.4 л/100 км, выше нормы на 8%. Рекомендую проверить топливную систему.»
+                        </div>
+                    </div>
+                    <div class="split-right">
+                        <img src="../screenshots/ai_chat.png" alt="AI Chat" class="slide-img">
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Slide 7: Dashboard -->
+            <section>
+                <div class="split">
+                    <div class="split-left">
+                        <img src="../screenshots/dashboarddark.png" alt="Dashboard" class="slide-img">
+                    </div>
+                    <div class="split-right">
+                        <span class="badge">Единый дашборд</span>
+                        <h2 style="font-size: 1.6em; margin-top: 0.3em;">Всё, что важно —<br>на <span class="highlight">одном</span> экране</h2>
+                        <p style="font-size: 0.9em; margin-top: 1em;">
+                            ✓ Состояние флота в реальном времени<br>
+                            ✓ Просроченные страховки подсвечены красным<br>
+                            ✓ Расход топлива по каждой машине<br>
+                            ✓ Стоимость километра — автоматически
+                        </p>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Slide 8: Numbers -->
+            <section>
+                <span class="badge">Эффект внедрения</span>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 60px; margin-top: 40px; max-width: 900px;">
+                    <div>
+                        <div class="big-number" style="font-size: 3.5em;">5ч</div>
+                        <p class="dim">рутины в день</p>
+                        <div style="font-size: 2em; margin: 10px 0;">↓</div>
+                        <div class="big-number" style="font-size: 3.5em; color: var(--parko-blue);">20 мин</div>
+                        <p class="dim">решений</p>
+                    </div>
+                    <div>
+                        <div class="big-number" style="font-size: 3.5em;">0</div>
+                        <p class="dim">просроченных страховок</p>
+                        <div style="font-size: 2em; margin: 10px 0;">↓</div>
+                        <div class="big-number" style="font-size: 3.5em; color: var(--parko-blue);">100%</div>
+                        <p class="dim">контроль сроков</p>
+                    </div>
+                    <div>
+                        <div class="big-number" style="font-size: 3.5em;">12</div>
+                        <p class="dim">таблиц в месяц</p>
+                        <div style="font-size: 2em; margin: 10px 0;">↓</div>
+                        <div class="big-number" style="font-size: 3.5em; color: var(--parko-blue);">1 клик</div>
+                        <p class="dim">PDF / Excel / Email</p>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Slide 9: Scale -->
+            <section>
+                <span class="badge">Масштабирование</span>
+                <h2 style="margin-top: 0.3em;">Одна компания → Десять компаний</h2>
+                <p class="story-text">Multi-tenant архитектура: каждый клиент видит только свои данные.<br>Роли: админ, диспетчер, механик, водитель, бухгалтер.</p>
+                <div style="margin-top: 50px; display: flex; gap: 40px; justify-content: center;">
+                    <div style="text-align: center;">
+                        <img src="../screenshots/cars.png" alt="Cars" class="slide-img" style="max-height: 30vh;">
+                        <p class="dim" style="font-size: 0.8em;">Управление ТС</p>
+                    </div>
+                    <div style="text-align: center;">
+                        <img src="../screenshots/report.png" alt="Report" class="slide-img" style="max-height: 30vh;">
+                        <p class="dim" style="font-size: 0.8em;">Автоотчёты</p>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Slide 10: Final -->
+            <section>
+                <h1 style="font-size: 3.5em;">Parko</h1>
+                <h2 style="font-weight: 300; margin-top: 0.2em;">Автопарк, который <span class="accent">управляет собой</span></h2>
+                <p class="dim" style="margin-top: 60px; font-size: 0.9em;">
+                    Django · React 19 · PostgreSQL · Groq AI<br>
+                    SaaS · Multi-tenant · Dark Mode · i18n (RU/EN/KG)
+                </p>
+            </section>
+            
+            <!-- Slide 11: Questions -->
+            <section>
+                <h1 style="font-size: 4em;">Вопросы?</h1>
+                <p class="dim" style="margin-top: 40px; font-size: 1.1em;">
+                    Жанузаков Жанат · IT-26 · Compass College<br>
+                    <span class="accent">github.com/janat08/parko</span>
+                </p>
+            </section>
+            
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.js"></script>
+    <script>
+        Reveal.initialize({
+            hash: true,
+            slideNumber: false,
+            controls: true,
+            progress: true,
+            center: true,
+            transition: 'fade',
+            backgroundTransition: 'fade',
+            width: 1280,
+            height: 720,
+            margin: 0.04
+        });
+    </script>
+</body>
+</html>

@@ -15,5 +15,5 @@ export type User = {
   company_name?: string
   is_active: boolean
   currency: string
-  theme: 'light' | 'dark' | 'system'
+  theme: 'light' | 'dark'
 }

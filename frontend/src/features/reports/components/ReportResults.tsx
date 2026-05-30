@@ -17,17 +17,30 @@ import {
   ActionIcon,
   Button,
   Group,
-  Menu,
   Paper,
   SimpleGrid,
   Stack,
   Table,
   Text,
   Title,
+  Badge,
+  Divider,
+  Tooltip as MantineTooltip,
 } from '@mantine/core'
-import { IconDownload, IconFileExport, IconFileDescription, IconTable, IconFileCode, IconShare, IconDeviceFloppy } from '@tabler/icons-react'
+import {
+  IconFileCode,
+  IconFileSpreadsheet,
+  IconFileDescription,
+  IconShare,
+  IconDeviceFloppy,
+  IconTable,
+  IconCalendar,
+  IconCar,
+  IconChartBar,
+} from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
+import dayjs from 'dayjs'
 
 import type { ChartData, ReportResponse } from '../api/reportsApi'
 import { ShareReportModal } from './ShareReportModal'
@@ -43,9 +56,15 @@ interface ReportResultsProps {
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316']
 
-/**
- * Render different chart types based on data
- */
+const reportTypeLabels: Record<string, string> = {
+  fuel_consumption: 'reports.type_fuel',
+  maintenance_costs: 'reports.type_maintenance',
+  insurance_inspection: 'reports.type_insurance_inspection',
+  vehicle_utilization: 'reports.type_utilization',
+  cost_analysis: 'reports.type_cost_analysis',
+  cost_per_km: 'reports.type_cost_per_km',
+}
+
 function ChartRenderer({ chart }: { chart: ChartData }) {
   const { user } = useAuth()
   const currency = user?.currency || 'KGS'
@@ -141,12 +160,8 @@ function ChartRenderer({ chart }: { chart: ChartData }) {
   return null
 }
 
-/**
- * Prepare data for bar charts
- */
 function prepareBarChartData(data: ChartData['data']) {
   if (!data.labels || !data.datasets) return []
-
   return data.labels.map((label, idx) => {
     const entry: Record<string, string | number | null> = { name: label }
     data.datasets?.forEach((dataset) => {
@@ -156,19 +171,12 @@ function prepareBarChartData(data: ChartData['data']) {
   })
 }
 
-/**
- * Prepare data for line charts
- */
 function prepareLineChartData(data: ChartData['data']) {
   return prepareBarChartData(data)
 }
 
-/**
- * Prepare data for pie charts
- */
 function preparePieChartData(data: ChartData['data']) {
   if (!data.data || !data.labels) return []
-
   return data.labels.map((label, idx) => ({
     name: label,
     value: data.data?.[idx] ?? 0,
@@ -176,22 +184,12 @@ function preparePieChartData(data: ChartData['data']) {
   }))
 }
 
-/**
- * Format large numbers for display
- */
 function formatNumber(num: number): string {
-  if (num >= 1000000) {
-    return `${(num / 1000000).toFixed(1)}M`
-  }
-  if (num >= 1000) {
-    return `${(num / 1000).toFixed(1)}K`
-  }
+  if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`
+  if (num >= 1000) return `${(num / 1000).toFixed(1)}K`
   return num.toFixed(1)
 }
 
-/**
- * Summary Card Component
- */
 function SummaryCard({ label, value, t, currency }: { label: string; value: string | number; t: (key: string) => string; currency?: string }) {
   const translatedLabel = label.startsWith('reports.') ? t(label) : label
   const curr = currency || 'KGS'
@@ -211,7 +209,7 @@ export function ReportResults({ report, onExport, onSave }: ReportResultsProps) 
   const { t } = useTranslation()
   const { user } = useAuth()
   const currency = user?.currency || 'KGS'
-  const { data, summary, charts } = report
+  const { data, summary, charts, report_type, from_date, to_date } = report
   const [shareModalOpened, setShareModalOpened] = useState(false)
   const [saveModalOpened, setSaveModalOpened] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
@@ -220,7 +218,6 @@ export function ReportResults({ report, onExport, onSave }: ReportResultsProps) 
     if (!onSave) return
     setIsSaving(true)
     onSave(name)
-    // Reset saving state after notification is shown (parent handles this)
     setTimeout(() => setIsSaving(false), 1000)
   }
 
@@ -240,63 +237,90 @@ export function ReportResults({ report, onExport, onSave }: ReportResultsProps) 
 
   return (
     <Stack gap="md">
-      {/* Export Actions */}
-      <Group justify="flex-end">
-        <Text size="sm" c="dimmed" mr="sm">
-          {t('reports.export') || 'Export:'}
-        </Text>
-        {onSave && (
-          <Button
-            variant="outline"
-            size="sm"
-            leftSection={<IconDeviceFloppy size={16} />}
-            onClick={() => setSaveModalOpened(true)}
-          >
-            {t('reports.save_report') || 'Save Report'}
-          </Button>
-        )}
-        <Button
-          variant="outline"
-          size="sm"
-          leftSection={<IconShare size={16} />}
-          onClick={() => setShareModalOpened(true)}
-        >
-          {t('reports.share_email') || 'Share'}
-        </Button>
-        <Menu shadow="md" width={200}>
-          <Menu.Target>
-            <Button variant="outline" size="sm" leftSection={<IconFileExport size={16} />}>
-              {t('reports.export_as') || 'Export As'}
-            </Button>
-          </Menu.Target>
-          <Menu.Dropdown>
-            <Menu.Item
-              leftSection={<IconFileCode size={16} />}
-              onClick={() => onExport('json')}
-            >
+      {/* Metadata & Actions Bar */}
+      <Paper p="md" withBorder>
+        <Group justify="space-between" align="flex-start" wrap="wrap">
+          <Stack gap="xs">
+            <Group gap="xs">
+              <IconChartBar size={18} color="var(--mantine-color-blue-filled)" />
+              <Title order={5}>
+                {t(reportTypeLabels[report_type] || 'reports.unknown')}
+              </Title>
+              <Badge variant="light" color="blue">
+                {data.length} {t('reports.records') || 'records'}
+              </Badge>
+            </Group>
+            <Group gap="md">
+              <Group gap={4}>
+                <IconCalendar size={14} color="var(--mantine-color-dimmed)" />
+                <Text size="sm" c="dimmed">
+                  {dayjs(from_date).format('DD.MM.YYYY')} — {dayjs(to_date).format('DD.MM.YYYY')}
+                </Text>
+              </Group>
+              <Group gap={4}>
+                <IconCar size={14} color="var(--mantine-color-dimmed)" />
+                <Text size="sm" c="dimmed">
+                  {t('reports.generated_at') || 'Generated'} {dayjs().format('DD.MM.YYYY HH:mm')}
+                </Text>
+              </Group>
+            </Group>
+          </Stack>
+
+          <Group gap="xs">
+            {onSave && (
+              <MantineTooltip label={t('reports.save_report') || 'Save Report'}>
+                <Button
+                  variant="light"
+                  size="sm"
+                  leftSection={<IconDeviceFloppy size={16} />}
+                  onClick={() => setSaveModalOpened(true)}
+                >
+                  {t('common.save') || 'Save'}
+                </Button>
+              </MantineTooltip>
+            )}
+            <MantineTooltip label={t('reports.share_email') || 'Share via Email'}>
+              <Button
+                variant="light"
+                size="sm"
+                leftSection={<IconShare size={16} />}
+                onClick={() => setShareModalOpened(true)}
+              >
+                {t('reports.share') || 'Share'}
+              </Button>
+            </MantineTooltip>
+          </Group>
+        </Group>
+
+        <Divider my="sm" />
+
+        {/* Export Buttons */}
+        <Group gap="xs">
+          <Text size="sm" fw={500}>
+            {t('reports.export_as') || 'Export as'}:
+          </Text>
+          <MantineTooltip label="JSON">
+            <Button variant="default" size="xs" leftSection={<IconFileCode size={14} />} onClick={() => onExport('json')}>
               JSON
-            </Menu.Item>
-            <Menu.Item
-              leftSection={<IconDownload size={16} />}
-              onClick={() => onExport('csv')}
-            >
+            </Button>
+          </MantineTooltip>
+          <MantineTooltip label="CSV">
+            <Button variant="default" size="xs" leftSection={<IconFileDescription size={14} />} onClick={() => onExport('csv')}>
               CSV
-            </Menu.Item>
-            <Menu.Item
-              leftSection={<IconDownload size={16} />}
-              onClick={() => onExport('xlsx')}
-            >
-              Excel (XLSX)
-            </Menu.Item>
-            <Menu.Item
-              leftSection={<IconFileDescription size={16} />}
-              onClick={() => onExport('pdf')}
-            >
+            </Button>
+          </MantineTooltip>
+          <MantineTooltip label="Excel">
+            <Button variant="default" size="xs" leftSection={<IconFileSpreadsheet size={14} />} onClick={() => onExport('xlsx')}>
+              Excel
+            </Button>
+          </MantineTooltip>
+          <MantineTooltip label="PDF">
+            <Button variant="default" size="xs" leftSection={<IconFileDescription size={14} />} onClick={() => onExport('pdf')}>
               PDF
-            </Menu.Item>
-          </Menu.Dropdown>
-        </Menu>
-      </Group>
+            </Button>
+          </MantineTooltip>
+        </Group>
+      </Paper>
 
       {/* Share Modal */}
       <ShareReportModal
@@ -335,9 +359,7 @@ export function ReportResults({ report, onExport, onSave }: ReportResultsProps) 
       {/* Data Table */}
       <Paper p="md" withBorder>
         <Group justify="space-between" mb="md">
-          <Title order={4}>
-            {t('reports.data_table') || 'Data Table'}
-          </Title>
+          <Title order={4}>{t('reports.data_table') || 'Data Table'}</Title>
           <ActionIcon variant="subtle">
             <IconTable size={18} />
           </ActionIcon>
@@ -368,13 +390,8 @@ export function ReportResults({ report, onExport, onSave }: ReportResultsProps) 
   )
 }
 
-/**
- * Format camelCase/snake_case labels to readable text
- */
 function formatLabel(key: string): string {
-  // Translation map for report labels
   const translationMap: Record<string, string> = {
-    // Cost Analysis
     car_numplate: 'reports.car',
     fuel_cost: 'reports.fuel_cost',
     maintenance_cost: 'reports.maintenance_costs',
@@ -394,32 +411,25 @@ function formatLabel(key: string): string {
     grand_total: 'reports.grand_total',
     total_parts_cost: 'reports.total_parts_cost',
     total_labor_cost: 'reports.total_labor_cost',
-    // Cost per Km
     total_distance: 'reports.cost_per_km.total_distance',
     avg_cost_per_km: 'reports.cost_per_km.avg_cost_per_km',
     vehicle_count: 'reports.cost_per_km.vehicle_count',
     fuel_cost_per_km: 'reports.cost_per_km.fuel_cost',
     maintenance_cost_per_km: 'reports.cost_per_km.maintenance_cost',
-    // Insurance/Inspection
     type: 'reports.type_label',
     status: 'reports.status',
     number: 'reports.number',
     start_date: 'reports.start_date',
     end_date: 'reports.end_date',
-    // Common
     car_id: 'reports.car',
   }
 
-  // Return translation key if exists, otherwise format normally
   return translationMap[key] || key
     .replace(/([A-Z])/g, ' $1')
     .replace(/_/g, ' ')
     .replace(/^./, (str) => str.toUpperCase())
 }
 
-/**
- * Translate label if it's a translation key
- */
 function translateLabel(label: string, t: (key: string) => string): string {
   if (label.startsWith('reports.')) {
     return t(label)

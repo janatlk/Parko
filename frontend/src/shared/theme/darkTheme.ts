@@ -14,7 +14,6 @@ export const darkTheme = createTheme({
       '#141517',
       '#101113',
     ],
-    // Черно-белая палитра для кнопок
     mono: [
       '#ffffff',
       '#f8f9fa',
@@ -29,15 +28,9 @@ export const darkTheme = createTheme({
       '#000000',
     ],
   },
-  primaryColor: 'mono',
+  primaryColor: 'blue',
   fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif',
   headings: {
     fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif',
-  },
-  // Кастомные стили для кнопок
-  defaultGradient: {
-    from: '#ffffff',
-    to: '#ffffff',
-    deg: 0,
   },
 })

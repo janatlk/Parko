@@ -32,6 +32,7 @@ import {
   IconUser,
   IconSparkles,
   IconDotsVertical,
+  IconSettings,
 } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
 
@@ -93,7 +94,7 @@ export function AIPage() {
   const [error, setError] = useState<string | null>(null)
   const [executions, setExecutions] = useState<ExecutionResult[]>([])
   const [currentConversationId, setCurrentConversationId] = useState<number | null>(null)
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [conversationToDelete, setConversationToDelete] = useState<number | null>(null)
   const { colorScheme } = useMantineColorScheme()
@@ -252,47 +253,25 @@ export function AIPage() {
           onSuccess: (data) => {
             setExecutions((prev) => [
               ...prev,
-              { messageId, actionIndex, success: data.success, response: data.result || data.response },
-            ])
-            const id = nextMessageId()
-            setLocalMessages((prev) => [
-              ...prev,
-              {
-                role: 'assistant' as const,
-                content: data.result || data.response || 'Действие выполнено.',
-                actions: [],
-                id,
-                timestamp: new Date().toISOString(),
-              },
+              { messageId, actionIndex, success: data.success, response: data.result || data.response || '' },
             ])
           },
           onError: () => {
             setExecutions((prev) => [
               ...prev,
-              { messageId, actionIndex, success: false, response: '' },
-            ])
-            const id = nextMessageId()
-            setLocalMessages((prev) => [
-              ...prev,
-              {
-                role: 'assistant' as const,
-                content: t('ai.action_failed'),
-                actions: [],
-                id,
-                timestamp: new Date().toISOString(),
-              },
+              { messageId, actionIndex, success: false, response: t('ai.action_failed') || 'Action failed' },
             ])
           },
         },
       )
     },
-    [currentConversationId, executeAction, nextMessageId, t],
+    [currentConversationId, executeAction, t],
   )
 
   const handleCancelAction = useCallback((messageId: number, actionIndex: number) => {
     setExecutions((prev) => [
       ...prev,
-      { messageId, actionIndex, success: false, response: '' },
+      { messageId, actionIndex, success: false, response: 'Отменено' },
     ])
   }, [])
 
@@ -446,7 +425,7 @@ export function AIPage() {
                 <Text size="xs" c="dimmed">
                   {currentConversationId
                     ? conversations.find((c) => c.id === currentConversationId)?.title
-                    : 'Новый разговор'}
+                    : t('ai.new_conversation') || 'New conversation'}
                 </Text>
               </div>
             </Group>
@@ -572,47 +551,71 @@ export function AIPage() {
                                 )
                                 const isActionExecuted = !!actionExecution
 
-                                if (isActionExecuted) return null
-
                                 return (
-                                  <Box key={`${msg.id}-${idx}`} mb="xs">
-                                    <Text size="xs" fw={600} c="orange.7" mb={4}>
-                                      ⚙️ Запланированное действие: {idx + 1}/{msg.actions.length}
-                                    </Text>
-                                    <Text
-                                      size="xs"
-                                      c="dimmed"
-                                      mb="xs"
-                                      style={{ whiteSpace: 'pre-wrap' }}
-                                    >
-                                      {act.description ||
-                                        `${act.action} — ${JSON.stringify(act.params)}`}
-                                    </Text>
-                                    <Group gap="xs">
-                                      <Button
-                                        size="xs"
-                                        color="green"
-                                        variant="light"
-                                        leftSection={<IconCheck size={14} />}
-                                        onClick={() =>
-                                          handleConfirmAction(msg.id, idx, act.action, act.params)
-                                        }
-                                        loading={isExecuting}
-                                        disabled={isExecuting}
-                                      >
-                                        Подтвердить
-                                      </Button>
-                                      <Button
-                                        size="xs"
-                                        color="red"
-                                        variant="light"
-                                        leftSection={<IconX size={14} />}
-                                        onClick={() => handleCancelAction(msg.id, idx)}
-                                        disabled={isExecuting}
-                                      >
-                                        Отменить
-                                      </Button>
+                                  <Box
+                                    key={`${msg.id}-${idx}`}
+                                    mb="xs"
+                                    p="xs"
+                                    style={{
+                                      borderRadius: 'var(--mantine-radius-sm)',
+                                      background: isDark ? '#1a1b1e' : 'var(--mantine-color-gray-0)',
+                                    }}
+                                  >
+                                    <Group gap={6} mb={4} wrap="nowrap">
+                                      <IconSettings size={14} color="var(--mantine-color-orange-7)" />
+                                      <Text size="xs" fw={600} c="orange.7">
+                                        Действие {idx + 1}/{msg.actions.length}
+                                      </Text>
                                     </Group>
+                                    {isActionExecuted ? (
+                                      <Group gap={6} align="center" wrap="nowrap">
+                                        {actionExecution?.success ? (
+                                          <IconCheck size={14} color="var(--mantine-color-green-6)" />
+                                        ) : (
+                                          <IconX size={14} color="var(--mantine-color-red-6)" />
+                                        )}
+                                        <Text size="xs" c={actionExecution?.success ? 'green.7' : 'red.7'}>
+                                          {actionExecution?.response}
+                                        </Text>
+                                      </Group>
+                                    ) : (
+                                      <>
+                                        <Text
+                                          size="xs"
+                                          c="dimmed"
+                                          mb={6}
+                                          style={{ whiteSpace: 'pre-wrap' }}
+                                        >
+                                          {act.description ||
+                                            `${act.action} — ${JSON.stringify(act.params)}`}
+                                        </Text>
+                                        <Group gap={6}>
+                                          <Button
+                                            size="compact-xs"
+                                            color="green"
+                                            variant="light"
+                                            leftSection={<IconCheck size={12} />}
+                                            onClick={() =>
+                                              handleConfirmAction(msg.id, idx, act.action, act.params)
+                                            }
+                                            loading={isExecuting}
+                                            disabled={isExecuting}
+                                          >
+                                            Подтвердить
+                                          </Button>
+                                          <Button
+                                            size="compact-xs"
+                                            color="red"
+                                            variant="light"
+                                            leftSection={<IconX size={12} />}
+                                            onClick={() => handleCancelAction(msg.id, idx)}
+                                            disabled={isExecuting}
+                                          >
+                                            Отменить
+                                          </Button>
+                                        </Group>
+                                      </>
+                                    )}
                                   </Box>
                                 )
                               })}

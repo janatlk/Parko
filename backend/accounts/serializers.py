@@ -99,6 +99,8 @@ class LogoutSerializer(serializers.Serializer):
 
 
 class MeUpdateSerializer(serializers.ModelSerializer):
+    theme = serializers.ChoiceField(choices=[('light', 'Light'), ('dark', 'Dark')])
+
     class Meta:
         model = User
         fields = [

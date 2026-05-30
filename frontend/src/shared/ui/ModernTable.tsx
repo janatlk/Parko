@@ -73,8 +73,8 @@ export function ModernTable({
 
   return (
     <>
-      <Paper withBorder radius="md" style={{ overflow: 'hidden' }}>
-        <Table highlightOnHover>
+      <Paper withBorder radius="md" style={{ overflow: 'hidden', overflowX: 'auto' }}>
+        <Table highlightOnHover style={{ minWidth: 600 }}>
           <Table.Thead>
             <Table.Tr>
               {withRowNumbers && (

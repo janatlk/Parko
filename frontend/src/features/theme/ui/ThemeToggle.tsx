@@ -1,17 +1,16 @@
-import { SegmentedControl, Box } from '@mantine/core'
-import { IconSun, IconMoon, IconDeviceDesktop } from '@tabler/icons-react'
-import { useTheme } from '@app/providers/ThemeProvider'
+import { SegmentedControl, Box, useMantineColorScheme } from '@mantine/core'
+import { IconSun, IconMoon } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
 
 export function ThemeToggle() {
   const { t } = useTranslation()
-  const { theme, setTheme } = useTheme()
+  const { colorScheme, setColorScheme } = useMantineColorScheme()
 
   return (
     <Box>
       <SegmentedControl
-        value={theme}
-        onChange={(value) => setTheme(value as 'light' | 'dark' | 'system')}
+        value={colorScheme}
+        onChange={(value) => setColorScheme(value as 'light' | 'dark')}
         data={[
           {
             value: 'light',
@@ -28,15 +27,6 @@ export function ThemeToggle() {
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <IconMoon size={16} />
                 <span>{t('theme.dark')}</span>
-              </div>
-            ),
-          },
-          {
-            value: 'system',
-            label: (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <IconDeviceDesktop size={16} />
-                <span>{t('theme.system')}</span>
               </div>
             ),
           },

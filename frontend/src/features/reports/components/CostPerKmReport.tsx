@@ -15,6 +15,7 @@ import {
   Title,
   Loader,
   Alert,
+  useMantineColorScheme,
 } from '@mantine/core'
 import {
   IconDownload,
@@ -70,6 +71,8 @@ type CostPerKmReportProps = {
 export function CostPerKmReport({ data, onExport }: CostPerKmReportProps) {
   const { t } = useTranslation()
   const { user } = useAuth()
+  const { colorScheme } = useMantineColorScheme()
+  const isDark = colorScheme === 'dark'
   const currency = user?.currency || 'KGS'
 
   const [saveModalOpened, setSaveModalOpened] = useState(false)
@@ -241,8 +244,8 @@ export function CostPerKmReport({ data, onExport }: CostPerKmReportProps) {
       {/* Charts */}
       {by_vehicle.length > 0 && (
         <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="md">
-          <CostBreakdownChart vehicles={by_vehicle} currency={currency} t={t} />
-          <CostPerKmChart vehicles={by_vehicle} currency={currency} t={t} />
+          <CostBreakdownChart vehicles={by_vehicle} currency={currency} t={t} isDark={isDark} />
+          <CostPerKmChart vehicles={by_vehicle} currency={currency} t={t} isDark={isDark} />
         </SimpleGrid>
       )}
 
@@ -250,7 +253,7 @@ export function CostPerKmReport({ data, onExport }: CostPerKmReportProps) {
       <Paper withBorder radius="md" p="md" shadow="sm">
         <Group justify="space-between" mb="md">
           <Title order={4}>{t('reports.cost_per_km.vehicle_breakdown')}</Title>
-          <IconTable size={20} color="#666" />
+          <IconTable size={20} style={{ color: 'var(--mantine-color-dimmed)' }} />
         </Group>
 
         {by_vehicle.length === 0 ? (
@@ -317,10 +320,12 @@ function CostBreakdownChart({
   vehicles,
   currency,
   t,
+  isDark,
 }: {
   vehicles: CostPerKmVehicle[]
   currency: string
   t: (key: string) => string
+  isDark: boolean
 }) {
   const chartData = vehicles.map((v) => ({
     name: `${v.brand} ${v.numplate}`,
@@ -342,12 +347,12 @@ function CostBreakdownChart({
       </Title>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={chartData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+          <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#2C2E33' : '#e9ecef'} />
           <XAxis dataKey="name" tick={{ fontSize: 12 }} angle={-30} textAnchor="end" height={60} />
           <YAxis tick={{ fontSize: 12 }} tickFormatter={(v: number) => formatPriceShort(v, currency)} />
           <Tooltip
             formatter={(value) => formatPrice(value as number, currency)}
-            cursor={{ fill: 'rgba(59,130,246,0.06)' }}
+            cursor={{ fill: isDark ? 'rgba(59,130,246,0.12)' : 'rgba(59,130,246,0.06)' }}
           />
           <Legend />
           <Bar dataKey={fuelKey} stackId="a" fill={COST_COLORS.fuel} name={fuelKey} radius={[0, 0, 0, 0]} />
@@ -368,10 +373,12 @@ function CostPerKmChart({
   vehicles,
   currency,
   t,
+  isDark,
 }: {
   vehicles: CostPerKmVehicle[]
   currency: string
   t: (key: string) => string
+  isDark: boolean
 }) {
   const chartData = vehicles.map((v) => ({
     name: `${v.brand} ${v.numplate}`,
@@ -387,12 +394,12 @@ function CostPerKmChart({
       </Title>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={chartData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+          <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#2C2E33' : '#e9ecef'} />
           <XAxis dataKey="name" tick={{ fontSize: 12 }} angle={-30} textAnchor="end" height={60} />
           <YAxis tick={{ fontSize: 12 }} tickFormatter={(v: number) => formatPriceShort(v, currency)} />
           <Tooltip
             formatter={(value) => formatPrice(value as number, currency)}
-            cursor={{ fill: 'rgba(59,130,246,0.06)' }}
+            cursor={{ fill: isDark ? 'rgba(59,130,246,0.12)' : 'rgba(59,130,246,0.06)' }}
           />
           <Legend />
           <Bar dataKey={cpkKey} fill={COST_COLORS.total} name={cpkKey} radius={[6, 6, 0, 0]}>
@@ -400,10 +407,10 @@ function CostPerKmChart({
               <Cell
                 key={`cell-${index}`}
                 fill={
-                  index % 4 === 0 ? '#3b82f6' :
-                  index % 4 === 1 ? '#14b8a6' :
-                  index % 4 === 2 ? '#8b5cf6' :
-                  '#f97316'
+                  index % 4 === 0 ? COST_COLORS.fuel :
+                  index % 4 === 1 ? COST_COLORS.maintenance :
+                  index % 4 === 2 ? COST_COLORS.insurance :
+                  COST_COLORS.inspection
                 }
               />
             ))}

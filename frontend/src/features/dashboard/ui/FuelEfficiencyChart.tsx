@@ -1,5 +1,4 @@
 import { useState } from 'react'
-
 import { Box, Group, SegmentedControl, Text, useMantineColorScheme } from '@mantine/core'
 import { useTranslation } from 'react-i18next'
 import {
@@ -33,10 +32,10 @@ function getGoal(): number {
 }
 
 export function FuelEfficiencyChart({ data = [] }: FuelEfficiencyChartProps) {
+  const [monthsRange, setMonthsRange] = useState<string>('6')
   const { t } = useTranslation()
   const { colorScheme } = useMantineColorScheme()
   const isDark = colorScheme === 'dark'
-  const [monthsRange, setMonthsRange] = useState<string>('6')
   const goal = getGoal()
   const chartColor = isDark ? CHART_COLOR_DARK : CHART_COLOR_LIGHT
   const refColor = isDark ? '#868e96' : '#adb5bd'

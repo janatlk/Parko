@@ -69,15 +69,17 @@ export function UsersPage() {
 
   return (
     <Container>
-      <Group justify="space-between" align="center" mb="xs">
-        <Title order={2}>{t('users.title')}</Title>
+      <Group justify="space-between" align="center" mb="xs" wrap="wrap" gap="sm">
+        <Title order={2} style={{ flex: 1, minWidth: 200 }}>{t('users.title')}</Title>
 
-        <PermissionGuard canAccess={canEdit} mode="disable">
-          <Button onClick={openCreate}>{t('users.create')}</Button>
-        </PermissionGuard>
+        <div style={{ width: '100%' }}>
+          <PermissionGuard canAccess={canEdit} mode="disable">
+            <Button onClick={openCreate}>{t('users.create')}</Button>
+          </PermissionGuard>
+        </div>
       </Group>
 
-      <Group align="flex-end" mb="md">
+      <Group align="flex-end" mb="md" wrap="wrap" gap="sm">
         <Select
           label={t('users.role')}
           placeholder={t('common.all') || 'All'}
@@ -85,7 +87,7 @@ export function UsersPage() {
           value={roleFilter}
           onChange={setRoleFilter}
           clearable
-          w={240}
+          style={{ flex: 1, minWidth: 140 }}
         />
         <Select
           label={t('users.status')}
@@ -97,7 +99,7 @@ export function UsersPage() {
           value={statusFilter}
           onChange={setStatusFilter}
           clearable
-          w={160}
+          style={{ flex: 1, minWidth: 140 }}
         />
       </Group>
 

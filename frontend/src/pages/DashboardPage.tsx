@@ -29,7 +29,7 @@ export function DashboardPage() {
   const { user } = useAuth()
   const currency = user?.currency || 'KGS'
 
-  const { data, isLoading, error, refetch } = useDashboardOverview(6, 8)
+  const { data, isLoading, error, refetch } = useDashboardOverview(12, 8)
 
   if (isLoading) {
     return (

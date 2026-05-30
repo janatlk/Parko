@@ -1,16 +1,7 @@
-import { MantineProvider } from '@mantine/core'
-import { Notifications } from '@mantine/notifications'
-import { ModalsProvider } from '@mantine/modals'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 
-import '@mantine/notifications/styles.css'
-import '@mantine/dates/styles.css'
-
-import { ThemeProvider } from '@app/providers/ThemeProvider'
 import { ProtectedRoute } from '@app/router/ProtectedRoute'
 import { AppLayout } from '@widgets/layout/AppLayout'
-import { darkTheme } from '@shared/theme/darkTheme'
-import { useTheme } from '@app/providers/ThemeProvider'
 import { CarsPage } from '@pages/CarsPage'
 import { CarDetailPage } from '@pages/CarDetailPage'
 import { DashboardPage } from '@pages/DashboardPage'
@@ -26,64 +17,31 @@ import { SparesPage } from '@pages/SparesPage'
 import { UsersPage } from '@pages/UsersPage'
 import { AIPage } from '@pages/AIPage'
 
-function AppContent() {
-  const { resolvedTheme } = useTheme()
-  
-  return (
-    <MantineProvider
-      forceColorScheme={resolvedTheme}
-      theme={darkTheme}
-    >
-      <ModalsProvider>
-        <Notifications
-          position="top-right"
-          autoClose={3000}
-          styles={{
-            notification: {
-              opacity: 0.8,
-              pointerEvents: 'none',
-            },
-            root: {
-              pointerEvents: 'none',
-            },
-          }}
-        />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route
-              element={
-                <ProtectedRoute>
-                  <AppLayout />
-                </ProtectedRoute>
-              }
-            >
-              <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/cars" element={<CarsPage />} />
-              <Route path="/cars/:id" element={<CarDetailPage />} />
-              <Route path="/fuel" element={<FuelPage />} />
-              <Route path="/spares" element={<SparesPage />} />
-              <Route path="/insurances" element={<InsurancesPage />} />
-              <Route path="/inspections" element={<InspectionsPage />} />
-              <Route path="/users" element={<UsersPage />} />
-              <Route path="/reports" element={<ReportsPage />} />
-              <Route path="/ai" element={<AIPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
-            </Route>
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
-        </BrowserRouter>
-      </ModalsProvider>
-    </MantineProvider>
-  )
-}
-
 export function App() {
   return (
-    <ThemeProvider>
-      <AppContent />
-    </ThemeProvider>
+    <Routes>
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route
+        element={
+          <ProtectedRoute>
+            <AppLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/cars" element={<CarsPage />} />
+        <Route path="/cars/:id" element={<CarDetailPage />} />
+        <Route path="/fuel" element={<FuelPage />} />
+        <Route path="/spares" element={<SparesPage />} />
+        <Route path="/insurances" element={<InsurancesPage />} />
+        <Route path="/inspections" element={<InspectionsPage />} />
+        <Route path="/users" element={<UsersPage />} />
+        <Route path="/reports" element={<ReportsPage />} />
+        <Route path="/ai" element={<AIPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+      </Route>
+      <Route path="*" element={<NotFoundPage />} />
+    </Routes>
   )
 }
-

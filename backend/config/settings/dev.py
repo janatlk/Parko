@@ -10,7 +10,7 @@ SECRET_KEY = env.str('DJANGO_SECRET_KEY', default='django-insecure-change-this-i
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1', '192.168.0.116', '*'])
 
 # Database - Support both SQLite (local) and PostgreSQL (Supabase)
 # Use PostgreSQL if POSTGRES_HOST is set, otherwise use SQLite

@@ -94,12 +94,12 @@ export function InspectionsPage() {
 
   return (
     <Container>
-      <Group justify="space-between" align="center" mb="xs">
-        <Title order={2}>{t('inspections.title')}</Title>
-        <Button onClick={() => setModalOpened(true)}>{t('inspections.add')}</Button>
+      <Group justify="space-between" align="center" mb="xs" wrap="wrap" gap="sm">
+        <Title order={2} style={{ flex: 1, minWidth: 200 }}>{t('inspections.title')}</Title>
+        <Button onClick={() => setModalOpened(true)} style={{ width: '100%' }}>{t('inspections.add')}</Button>
       </Group>
 
-      <Group align="flex-end" mb="md">
+      <Group align="flex-end" mb="md" wrap="wrap" gap="sm">
         <Select
           label={t('inspections.form.car')}
           placeholder={t('common.all') || 'All'}
@@ -108,7 +108,7 @@ export function InspectionsPage() {
           onChange={setCarFilter}
           clearable
           searchable
-          w={260}
+          style={{ flex: 1, minWidth: 180 }}
         />
       </Group>
 

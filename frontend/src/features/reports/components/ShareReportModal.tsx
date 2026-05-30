@@ -195,7 +195,7 @@ export function ShareReportModal({ opened, onClose, report }: Props) {
                 multiline
                 w={320}
               >
-                <IconHelp size={16} style={{ cursor: 'pointer' }} color="#666" />
+                <IconHelp size={16} style={{ cursor: 'pointer', color: 'var(--mantine-color-dimmed)' }} />
               </Tooltip>
             </Group>
             <Select
@@ -287,7 +287,7 @@ export function ShareReportModal({ opened, onClose, report }: Props) {
 
         {/* Change API Key Modal */}
         {showChangeKey && (
-          <Stack gap="sm" mt="md" p="md" bg="gray.0" style={{ borderRadius: 'var(--mantine-radius-md)' }}>
+          <Stack gap="sm" mt="md" p="md" style={{ borderRadius: 'var(--mantine-radius-md)' }}>
             <Text size="sm" fw={500}>
               {t('reports.email_service') || 'Email Service'}
             </Text>

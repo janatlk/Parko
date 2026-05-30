@@ -115,21 +115,23 @@ export function CarsPage() {
 
   return (
     <Container>
-      <Group justify="space-between" align="center" mb="xs">
-        <Title order={2}>{t('cars.title')}</Title>
+      <Group justify="space-between" align="center" mb="xs" wrap="wrap" gap="sm">
+        <Title order={2} style={{ flex: 1, minWidth: 200 }}>{t('cars.title')}</Title>
 
-        <PermissionGuard canAccess={canEdit} mode="disable">
-          <Button onClick={openCreate}>{t('cars.add')}</Button>
-        </PermissionGuard>
+        <div style={{ width: '100%' }}>
+          <PermissionGuard canAccess={canEdit} mode="disable">
+            <Button onClick={openCreate}>{t('cars.add')}</Button>
+          </PermissionGuard>
+        </div>
       </Group>
 
-      <Group align="flex-end" mb="md">
+      <Group align="flex-end" mb="md" wrap="wrap" gap="sm">
         <TextInput
           label={t('cars.search')}
           placeholder={t('cars.search_placeholder') || 'Numplate, VIN, driver...'}
           value={search}
           onChange={(e) => setSearch(e.currentTarget.value)}
-          w={320}
+          style={{ flex: 1, minWidth: 180 }}
         />
         <Select
           label={t('cars.status')}
@@ -138,7 +140,7 @@ export function CarsPage() {
           value={statusFilter}
           onChange={setStatusFilter}
           clearable
-          w={200}
+          style={{ flex: 1, minWidth: 140 }}
         />
       </Group>
 

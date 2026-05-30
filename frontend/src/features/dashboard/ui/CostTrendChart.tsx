@@ -1,5 +1,4 @@
 import { useState } from 'react'
-
 import { Box, Group, SegmentedControl, Text, useMantineColorScheme } from '@mantine/core'
 import { useTranslation } from 'react-i18next'
 import {
@@ -24,12 +23,12 @@ const CHART_COLOR_LIGHT = '#228be6'
 const CHART_COLOR_DARK = '#4dabf7'
 
 export function CostTrendChart({ data = [] }: CostTrendChartProps) {
+  const [monthsRange, setMonthsRange] = useState<string>('6')
   const { t } = useTranslation()
   const { user } = useAuth()
   const { colorScheme } = useMantineColorScheme()
   const isDark = colorScheme === 'dark'
   const currency = user?.currency || 'KGS'
-  const [monthsRange, setMonthsRange] = useState<string>('6')
   const chartColor = isDark ? CHART_COLOR_DARK : CHART_COLOR_LIGHT
 
   const displayData = data.slice(-Number(monthsRange))

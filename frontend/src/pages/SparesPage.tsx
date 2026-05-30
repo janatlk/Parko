@@ -158,12 +158,12 @@ export function SparesPage() {
 
   return (
     <Container>
-      <Group justify="space-between" align="center" mb="xs">
-        <Title order={2}>{t('spares.title')}</Title>
-        <Button onClick={openCreate}>{t('spares.add')}</Button>
+      <Group justify="space-between" align="center" mb="xs" wrap="wrap" gap="sm">
+        <Title order={2} style={{ flex: 1, minWidth: 200 }}>{t('spares.title')}</Title>
+        <Button onClick={openCreate} style={{ width: '100%' }}>{t('spares.add')}</Button>
       </Group>
 
-      <Group align="flex-end" mb="md" gap="sm">
+      <Group align="flex-end" mb="md" wrap="wrap" gap="sm">
         <Select
           label={t('spares.form.car')}
           placeholder={t('common.all')}
@@ -172,7 +172,7 @@ export function SparesPage() {
           onChange={setCarFilter}
           clearable
           searchable
-          w={260}
+          style={{ flex: 1, minWidth: 140 }}
         />
 
         <Select
@@ -182,7 +182,7 @@ export function SparesPage() {
           value={yearFilter}
           onChange={setYearFilter}
           clearable
-          w={120}
+          style={{ flex: 1, minWidth: 140 }}
         />
 
         <Select
@@ -192,7 +192,7 @@ export function SparesPage() {
           value={monthFilter}
           onChange={setMonthFilter}
           clearable
-          w={140}
+          style={{ flex: 1, minWidth: 140 }}
         />
 
         <TextInput
@@ -200,7 +200,7 @@ export function SparesPage() {
           placeholder={t('spares.form.search_placeholder')}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          w={200}
+          style={{ flex: 1, minWidth: 180 }}
         />
       </Group>
 

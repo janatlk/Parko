@@ -1,4 +1,4 @@
-import { AppShell, Avatar, Badge, Burger, Button, Divider, Group, NavLink, Select, Stack, Text, ThemeIcon, useMantineColorScheme } from '@mantine/core'
+import { AppShell, Avatar, Badge, Box, Burger, Button, Divider, Group, NavLink, Select, Stack, Text, ThemeIcon, useMantineColorScheme } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { NavLink as RouterNavLink, Outlet, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -30,9 +30,9 @@ function getNavStyles(isDark: boolean, isActive: boolean) {
       root: {
         borderRadius: 'var(--mantine-radius-md)',
         background: isDark
-          ? 'linear-gradient(135deg, #1c3a5f 0%, #18304a 100%)'
-          : 'linear-gradient(135deg, #e7f5ff 0%, #d0ebff 100%)',
-        color: isDark ? '#74b0f0' : '#1971c2',
+          ? 'var(--mantine-color-blue-9)'
+          : 'var(--mantine-color-blue-0)',
+        color: isDark ? 'var(--mantine-color-blue-3)' : 'var(--mantine-color-blue-7)',
         fontWeight: 600,
       },
     }
@@ -65,7 +65,7 @@ export function AppLayout() {
     <AppShell
       header={{ height: 64 }}
       navbar={{
-        width: 280,
+        width: { base: '100%', sm: 280 },
         breakpoint: 'sm',
         collapsed: { mobile: !opened },
       }}
@@ -93,57 +93,77 @@ export function AppLayout() {
           </Group>
 
           <Group gap="sm">
-            <ThemeToggle />
-            <Select
-              leftSection={<IconLanguage size={14} color="rgba(255,255,255,0.7)" />}
-              data={LANGUAGES.map((l) => ({ value: l, label: l.toUpperCase() }))}
-              value={user?.language ?? 'ru'}
-              onChange={(value) => {
-                if (!value) return
-                if (!user) return
-                void i18n.changeLanguage(value)
-                showSuccess(`Язык изменён на ${value.toUpperCase()}`)
-                void (async () => {
-                  try {
-                    const updated = await patchMeApi({ language: value as typeof user.language })
-                    setUser(updated)
-                  } catch {
-                    setUser({ ...user, language: value as typeof user.language })
-                  }
-                })()
-              }}
-              size="xs"
-              w={100}
-              variant="filled"
-              styles={{
-                input: {
-                  background: 'rgba(255, 255, 255, 0.15)',
-                  border: '1px solid rgba(255, 255, 255, 0.3)',
-                  color: '#ffffff',
-                  '&:hover': { background: 'rgba(255, 255, 255, 0.25)' },
-                },
-                dropdown: {
-                  background: isDark ? '#1a1b1e' : '#ffffff',
-                  color: isDark ? '#e9ecef' : '#000000',
-                },
-              }}
-            />
-            <Button
-              variant="outline"
-              color="white"
-              size="xs"
-              leftSection={<IconLogout size={14} />}
-              onClick={() => void logout()}
-              fw={500}
-              styles={{
-                root: {
-                  borderColor: 'rgba(255, 255, 255, 0.5)',
-                  '&:hover': { background: 'rgba(255, 255, 255, 0.15)' },
-                },
-              }}
-            >
-              {t('dashboard.logout')}
-            </Button>
+            <Box hiddenFrom="sm">
+              <Button
+                variant="outline"
+                color="white"
+                size="compact-xs"
+                onClick={() => void logout()}
+                styles={{
+                  root: {
+                    borderColor: 'rgba(255, 255, 255, 0.5)',
+                    padding: '4px 8px',
+                    minHeight: 28,
+                    '&:hover': { background: 'rgba(255, 255, 255, 0.15)' },
+                  },
+                }}
+              >
+                <IconLogout size={16} />
+              </Button>
+            </Box>
+            <Group gap="sm" visibleFrom="sm">
+              <ThemeToggle />
+              <Select
+                leftSection={<IconLanguage size={14} color="rgba(255,255,255,0.7)" />}
+                data={LANGUAGES.map((l) => ({ value: l, label: l.toUpperCase() }))}
+                value={user?.language ?? 'ru'}
+                onChange={(value) => {
+                  if (!value) return
+                  if (!user) return
+                  void i18n.changeLanguage(value)
+                  showSuccess(t('common.language_changed', { lang: value.toUpperCase() }))
+                  void (async () => {
+                    try {
+                      const updated = await patchMeApi({ language: value as typeof user.language })
+                      setUser(updated)
+                    } catch {
+                      setUser({ ...user, language: value as typeof user.language })
+                    }
+                  })()
+                }}
+                size="xs"
+                w={100}
+                variant="filled"
+                styles={{
+                  input: {
+                    background: 'rgba(255, 255, 255, 0.15)',
+                    border: '1px solid rgba(255, 255, 255, 0.3)',
+                    color: '#ffffff',
+                    '&:hover': { background: 'rgba(255, 255, 255, 0.25)' },
+                  },
+                  dropdown: {
+                    background: isDark ? '#1a1b1e' : '#ffffff',
+                    color: isDark ? '#e9ecef' : '#000000',
+                  },
+                }}
+              />
+              <Button
+                variant="outline"
+                color="white"
+                size="xs"
+                leftSection={<IconLogout size={14} />}
+                onClick={() => void logout()}
+                fw={500}
+                styles={{
+                  root: {
+                    borderColor: 'rgba(255, 255, 255, 0.5)',
+                    '&:hover': { background: 'rgba(255, 255, 255, 0.15)' },
+                  },
+                }}
+              >
+                {t('dashboard.logout')}
+              </Button>
+            </Group>
           </Group>
         </Group>
       </AppShell.Header>
@@ -152,21 +172,22 @@ export function AppLayout() {
         bg={isDark ? '#141517' : 'white'}
         p="xs"
         className="app-shell-navbar"
-        style={{ borderRight: `1px solid ${isDark ? '#2C2E33' : 'var(--mantine-color-gray-2)'}` }}
+        style={{
+          borderRight: `1px solid ${isDark ? '#2C2E33' : 'var(--mantine-color-gray-2)'}`,
+          maxWidth: '100vw',
+        }}
       >
         {/* User Info Card */}
         <Group gap="sm" mb="md" p="sm" style={{
-          background: isDark
-            ? 'linear-gradient(135deg, #1c3a5f 0%, #18304a 100%)'
-            : 'linear-gradient(135deg, #e7f5ff 0%, #d0ebff 100%)',
-          borderRadius: '8px',
-          border: `1px solid ${isDark ? '#2a5a8f' : '#a5d8ff'}`,
+          background: isDark ? 'var(--mantine-color-dark-6)' : 'var(--mantine-color-gray-0)',
+          borderRadius: 'var(--mantine-radius-md)',
+          border: `1px solid ${isDark ? 'var(--mantine-color-dark-4)' : 'var(--mantine-color-gray-3)'}`,
         }}>
           <Avatar size={40} radius="xl" color="blue" variant="filled">
             {getInitials()}
           </Avatar>
-          <Stack gap={0} style={{ flex: 1 }}>
-            <Text size="sm" fw={600} truncate style={{ color: isDark ? '#e9ecef' : 'inherit' }}>
+          <Stack gap={0} style={{ flex: 1, minWidth: 0 }}>
+            <Text size="sm" fw={600} truncate>
               {user?.first_name || user?.last_name ? `${user.first_name ?? ''} ${user.last_name ?? ''}`.trim() : user?.username}
             </Text>
             <Text size="xs" c="dimmed" truncate>

@@ -1,3 +1,4 @@
+// import { useState } from 'react'
 import {
   ActionIcon,
   Badge,
@@ -12,6 +13,7 @@ import {
 } from '@mantine/core'
 import { IconDownload, IconEye, IconTrash } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
+import { modals } from '@mantine/modals'
 import dayjs from 'dayjs'
 
 import { useDeleteSavedReport } from '../hooks/useReports'
@@ -37,13 +39,20 @@ export function SavedReportsList({ reports, isLoading, onView, onExport }: Saved
   const { t } = useTranslation()
   const deleteMutation = useDeleteSavedReport()
 
-  // Ensure reports is always an array
   const reportsArray = Array.isArray(reports) ? reports : []
 
-  const handleDelete = (id: number) => {
-    if (window.confirm(t('reports.confirm_delete') || 'Are you sure you want to delete this report?')) {
-      deleteMutation.mutate(id)
-    }
+  const handleDelete = (report: SavedReportList) => {
+    modals.openConfirmModal({
+      title: t('reports.delete') || 'Delete Report',
+      children: (
+        <Text size="sm">
+          {t('reports.confirm_delete') || 'Are you sure you want to delete this report?'}
+        </Text>
+      ),
+      labels: { confirm: t('common.delete') || 'Delete', cancel: t('common.cancel') || 'Cancel' },
+      confirmProps: { color: 'red' },
+      onConfirm: () => deleteMutation.mutate(report.id),
+    })
   }
 
   const handleExport = (report: SavedReportList, format: 'json' | 'csv' | 'xlsx') => {
@@ -149,7 +158,7 @@ export function SavedReportsList({ reports, isLoading, onView, onExport }: Saved
                   <ActionIcon
                     variant="subtle"
                     color="red"
-                    onClick={() => handleDelete(report.id)}
+                    onClick={() => handleDelete(report)}
                     loading={deleteMutation.isPending}
                     title={t('reports.delete') || 'Delete'}
                   >

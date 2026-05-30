@@ -9,25 +9,22 @@ import {
   Group,
   Paper,
   Select,
-  SimpleGrid,
+  SegmentedControl,
   Stack,
   Text,
   TextInput,
   Title,
   ThemeIcon,
-  Alert,
+  Divider,
+  SimpleGrid,
+  useMantineColorScheme,
 } from '@mantine/core'
 import {
-  IconUser,
-  IconMail,
-  IconBuilding,
-  IconShield,
-  IconLanguage,
-  IconMapPin,
   IconCheck,
   IconX,
   IconAlertCircle,
-  IconCurrencyDollar,
+  IconSun,
+  IconMoon,
 } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
 
@@ -52,9 +49,53 @@ const REGIONS = [
   { value: 'other', label: 'Другой' },
 ]
 
+const CURRENCIES = [
+  { value: 'KGS', label: 'KGS — Киргизский сом' },
+  { value: 'USD', label: 'USD — Доллар США' },
+  { value: 'EUR', label: 'EUR — Евро' },
+  { value: 'RUB', label: 'RUB — Российский рубль' },
+]
+
+const ROLE_META: Record<
+  string,
+  { label: string; color: string; description: string }
+> = {
+  COMPANY_ADMIN: {
+    label: 'Администратор',
+    color: 'orange',
+    description: 'Полный доступ к управлению компанией',
+  },
+  DISPATCHER: {
+    label: 'Диспетчер',
+    color: 'blue',
+    description: 'Управление транспортом и маршрутами',
+  },
+  MECHANIC: {
+    label: 'Механик',
+    color: 'green',
+    description: 'Доступ к ТО и запчастям',
+  },
+  DRIVER: {
+    label: 'Водитель',
+    color: 'yellow',
+    description: 'Ограниченный доступ к своим данным',
+  },
+  ACCOUNTANT: {
+    label: 'Бухгалтер',
+    color: 'grape',
+    description: 'Доступ к отчётам и финансам',
+  },
+  GUEST: {
+    label: 'Гость',
+    color: 'gray',
+    description: 'Только чтение',
+  },
+}
+
 export function ProfilePage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { user, setUser } = useAuth()
+  const { setColorScheme } = useMantineColorScheme()
   const updateMe = useUpdateMeMutation()
 
   const [formData, setFormData] = useState({
@@ -64,33 +105,46 @@ export function ProfilePage() {
     region: user?.region ?? '',
     language: user?.language ?? 'ru',
     currency: user?.currency ?? 'KGS',
-    theme: user?.theme ?? 'system',
+    theme: user?.theme ?? 'dark',
   })
 
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   if (!user) {
     return (
-      <Container py="xl">
-        <Alert icon={<IconAlertCircle size={20} />} color="gray" title={t('profile.no_data_title') || 'No user data'}>
-          {t('profile.no_data_message') || 'User information is not available'}
-        </Alert>
+      <Container size="md" py="xl">
+        <Paper withBorder radius="md" p="xl">
+          <Group gap="md">
+            <ThemeIcon size="xl" radius="xl" color="gray" variant="light">
+              <IconAlertCircle size={24} />
+            </ThemeIcon>
+            <div>
+              <Text fw={600} size="lg">
+                {t('profile.no_data_title') || 'Нет данных пользователя'}
+              </Text>
+              <Text c="dimmed" size="sm">
+                {t('profile.no_data_message') || 'Информация о пользователе недоступна'}
+              </Text>
+            </div>
+          </Group>
+        </Paper>
       </Container>
     )
   }
 
-  const handleInputChange = (field: string) => (event: React.ChangeEvent<HTMLInputElement> | string) => {
-    const value = typeof event === 'string' ? event : event.currentTarget.value
-    setFormData((prev) => ({ ...prev, [field]: value }))
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: '' }))
+  const handleInputChange =
+    (field: string) => (event: React.ChangeEvent<HTMLInputElement> | string) => {
+      const value = typeof event === 'string' ? event : event.currentTarget.value
+      setFormData((prev) => ({ ...prev, [field]: value }))
+      if (errors[field]) {
+        setErrors((prev) => ({ ...prev, [field]: '' }))
+      }
     }
-  }
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
     if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Invalid email format'
+      newErrors.email = t('validation.invalid_email') || 'Неверный формат email'
     }
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -107,12 +161,16 @@ export function ProfilePage() {
         region: formData.region,
         language: formData.language as Language,
         currency: formData.currency,
-        theme: formData.theme as 'light' | 'dark' | 'system',
+        theme: formData.theme as 'light' | 'dark',
       })
       setUser(updated)
-      showSuccess(t('profile.saved') || 'Profile updated successfully')
-    } catch (error) {
-      showError(t('profile.save_failed') || 'Failed to update profile')
+      setColorScheme(formData.theme as 'light' | 'dark')
+      if (formData.language !== i18n.language) {
+        i18n.changeLanguage(formData.language)
+      }
+      showSuccess(t('profile.saved') || 'Профиль обновлён')
+    } catch {
+      showError(t('profile.save_failed') || 'Не удалось обновить профиль')
     }
   }
 
@@ -123,188 +181,214 @@ export function ProfilePage() {
     return user.username.substring(0, 2).toUpperCase()
   }
 
-  const roleColors: Record<string, string> = {
-    ADMIN: 'red',
-    MANAGER: 'blue',
-    USER: 'gray',
+  const getFullName = () => {
+    const parts = [formData.first_name, formData.last_name].filter(Boolean)
+    return parts.length > 0 ? parts.join(' ') : user.username
   }
 
-  return (
-    <Container size="md" py="xl">
-      <Stack gap="xl">
-        {/* Header */}
-        <Group justify="space-between">
-          <div>
-            <Title order={2} fw={700}>{t('profile.title')}</Title>
-            <Text c="dimmed" size="sm">{t('profile.subtitle') || 'Manage your personal information'}</Text>
-          </div>
-        </Group>
+  const roleMeta = ROLE_META[user.role] || ROLE_META.GUEST
+  const isDirty =
+    formData.first_name !== (user.first_name ?? '') ||
+    formData.last_name !== (user.last_name ?? '') ||
+    formData.email !== (user.email ?? '') ||
+    formData.region !== (user.region ?? '') ||
+    formData.language !== (user.language ?? 'ru') ||
+    formData.currency !== (user.currency ?? 'KGS') ||
+    formData.theme !== (user.theme ?? 'system')
 
-        {/* Profile Card */}
-        <Paper withBorder shadow="sm" radius="md" p="xl">
-          <Group gap="xl" align="flex-start">
-            {/* Avatar Section */}
-            <Box style={{ flexShrink: 0 }}>
-              <Avatar
-                size={120}
-                radius={120}
-                color="blue"
-                variant="filled"
-                style={{ border: '4px solid var(--mantine-color-blue-light)' }}
-              >
-                {getInitials()}
-              </Avatar>
-              <Group justify="center" mt="md" gap="xs">
-                <Badge color={roleColors[user.role] ?? 'gray'} variant="light" size="lg">
-                  {user.role}
+  return (
+    <Container size="md" py="md" px="sm">
+      <Stack gap="md">
+        {/* ===== HERO CARD ===== */}
+        <Paper
+          radius="md"
+          p={{ base: 'md', sm: 'xl' }}
+          withBorder
+        >
+          <Group gap="md" align="center" wrap="wrap">
+            <Avatar
+              size={64}
+              radius="xl"
+              color={roleMeta.color}
+              variant="filled"
+              style={{ fontSize: 24, fontWeight: 700 }}
+            >
+              {getInitials()}
+            </Avatar>
+
+            <Box style={{ flex: 1, minWidth: 200 }}>
+              <Title order={3} fw={700}>
+                {getFullName()}
+              </Title>
+              <Text c="dimmed" size="sm" mt={2}>
+                @{user.username}
+                {formData.email && (
+                  <>
+                    {' · '}
+                    {formData.email}
+                  </>
+                )}
+              </Text>
+              <Group gap="xs" mt="sm">
+                <Badge size="sm" color={roleMeta.color} variant="light">
+                  {roleMeta.label}
                 </Badge>
-                <Badge color={user.is_active ? 'teal' : 'red'} variant="light" size="lg">
-                  {user.is_active ? t('users.active') : t('users.inactive')}
+                <Badge
+                  size="sm"
+                  color={user.is_active ? 'green' : 'red'}
+                  variant="light"
+                >
+                  {user.is_active ? t('users.active') || 'Активен' : t('users.inactive') || 'Неактивен'}
                 </Badge>
               </Group>
             </Box>
+          </Group>
+        </Paper>
 
-            {/* Info Section */}
-            <Box style={{ flex: 1 }}>
-              <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
-                <TextInput
-                  label={
-                    <Group gap="xs">
-                      <IconUser size={16} />
-                      <Text size="sm" fw={500}>{t('users.first_name')}</Text>
+        {/* ===== PROFILE & SETTINGS ===== */}
+        <Paper withBorder radius="md" p={{ base: 'md', sm: 'xl' }}>
+          <Title order={5} fw={600} mb="md">
+            {t('profile.personal_info') || 'Личные данные'}
+          </Title>
+
+          <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+            <TextInput
+              label={t('users.first_name')}
+              placeholder={t('users.first_name_placeholder') || 'Введите имя'}
+              value={formData.first_name}
+              onChange={handleInputChange('first_name')}
+            />
+            <TextInput
+              label={t('users.last_name')}
+              placeholder={t('users.last_name_placeholder') || 'Введите фамилию'}
+              value={formData.last_name}
+              onChange={handleInputChange('last_name')}
+            />
+            <TextInput
+              label={t('users.email')}
+              placeholder="email@example.com"
+              value={formData.email}
+              onChange={handleInputChange('email')}
+              error={errors.email}
+            />
+            <Select
+              label={t('users.region')}
+              data={REGIONS}
+              value={formData.region || 'unknown'}
+              onChange={(value) => handleInputChange('region')(value || 'unknown')}
+            />
+          </SimpleGrid>
+
+          <Divider my="lg" />
+
+          <Title order={5} fw={600} mb="md">
+            {t('profile.settings') || 'Настройки'}
+          </Title>
+
+          <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+            <Select
+              label={t('users.language')}
+              data={LANGUAGES.map((l) => ({ value: l, label: l.toUpperCase() }))}
+              value={formData.language}
+              onChange={(value) => handleInputChange('language')(value || 'ru')}
+            />
+            <Select
+              label={t('profile.currency')}
+              data={CURRENCIES}
+              value={formData.currency}
+              onChange={(value) => handleInputChange('currency')(value || 'KGS')}
+            />
+          </SimpleGrid>
+
+          <Box mt="md">
+            <Text size="sm" c="dimmed" mb={6}>
+              {t('profile.theme') || 'Тема оформления'}
+            </Text>
+            <SegmentedControl
+              value={formData.theme}
+              onChange={(value) => handleInputChange('theme')(value)}
+              data={[
+                {
+                  value: 'light',
+                  label: (
+                    <Group gap={6} justify="center" wrap="nowrap">
+                      <IconSun size={16} />
+                      <Text size="sm">{t('theme.light')}</Text>
                     </Group>
-                  }
-                  placeholder={t('users.first_name_placeholder') || 'Enter first name'}
-                  value={formData.first_name}
-                  onChange={handleInputChange('first_name')}
-                  size="sm"
-                />
-                <TextInput
-                  label={
-                    <Group gap="xs">
-                      <IconUser size={16} />
-                      <Text size="sm" fw={500}>{t('users.last_name')}</Text>
+                  ),
+                },
+                {
+                  value: 'dark',
+                  label: (
+                    <Group gap={6} justify="center" wrap="nowrap">
+                      <IconMoon size={16} />
+                      <Text size="sm">{t('theme.dark')}</Text>
                     </Group>
-                  }
-                  placeholder={t('users.last_name_placeholder') || 'Enter last name'}
-                  value={formData.last_name}
-                  onChange={handleInputChange('last_name')}
-                  size="sm"
-                />
-                <TextInput
-                  label={
-                    <Group gap="xs">
-                      <IconMail size={16} />
-                      <Text size="sm" fw={500}>{t('users.email')}</Text>
-                    </Group>
-                  }
-                  placeholder={t('users.email_placeholder') || 'email@example.com'}
-                  value={formData.email}
-                  onChange={handleInputChange('email')}
-                  error={errors.email}
-                  size="sm"
-                />
-                <Select
-                  label={
-                    <Group gap="xs">
-                      <IconMapPin size={16} />
-                      <Text size="sm" fw={500}>{t('users.region')}</Text>
-                    </Group>
-                  }
-                  data={REGIONS}
-                  value={formData.region}
-                  onChange={(value) => handleInputChange('region')(value || 'unknown')}
-                  size="sm"
-                />
-                <Select
-                  label={
-                    <Group gap="xs">
-                      <IconLanguage size={16} />
-                      <Text size="sm" fw={500}>{t('users.language')}</Text>
-                    </Group>
-                  }
-                  data={LANGUAGES.map((l) => ({ value: l, label: l.toUpperCase() }))}
-                  value={formData.language}
-                  onChange={(value) => handleInputChange('language')(value || 'ru')}
-                  size="sm"
-                />
-                <Select
-                  label={
-                    <Group gap="xs">
-                      <IconCurrencyDollar size={16} />
-                      <Text size="sm" fw={500}>{t('profile.currency')}</Text>
-                    </Group>
-                  }
-                  data={[
-                    { value: 'KGS', label: 'KGS - Киргизский сом' },
-                    { value: 'USD', label: 'USD - Доллар США' },
-                    { value: 'EUR', label: 'EUR - Евро' },
-                    { value: 'RUB', label: 'RUB - Российский рубль' },
-                  ]}
-                  value={formData.currency}
-                  onChange={(value) => handleInputChange('currency')(value || 'KGS')}
-                  size="sm"
-                />
-                <div>
-                  <Group gap="xs" mb={6}>
-                    <IconShield size={16} />
-                    <Text size="sm" fw={500}>{t('auth.username')}</Text>
-                  </Group>
-                  <Text size="sm" c="dimmed" pt={6}>{user.username}</Text>
-                </div>
-              </SimpleGrid>
+                  ),
+                },
+              ]}
+              size="sm"
+              radius="md"
+            />
+          </Box>
+        </Paper>
+
+        {/* ===== COMPANY & SECURITY ===== */}
+        <Paper withBorder radius="md" p={{ base: 'md', sm: 'xl' }}>
+          <Title order={5} fw={600} mb="md">
+            {t('profile.company') || 'Компания'} &amp; {t('profile.security') || 'Безопасность'}
+          </Title>
+
+          <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+            {user.company_name && (
+              <Box>
+                <Text size="sm" c="dimmed" mb={4}>
+                  {t('profile.company')}
+                </Text>
+                <Text size="md" fw={600}>
+                  {user.company_name}
+                </Text>
+                <Text size="xs" c="dimmed">
+                  ID: {user.company}
+                </Text>
+              </Box>
+            )}
+            <Box>
+              <Text size="sm" c="dimmed" mb={4}>
+                {t('auth.username')}
+              </Text>
+              <Text size="md" fw={600}>
+                {user.username}
+              </Text>
             </Box>
-          </Group>
+            <Box>
+              <Text size="sm" c="dimmed" mb={4}>
+                {t('users.role')}
+              </Text>
+              <Group gap="xs">
+                <Box
+                  style={{
+                    width: 10,
+                    height: 10,
+                    borderRadius: '50%',
+                    background: `var(--mantine-color-${roleMeta.color}-filled)`,
+                  }}
+                />
+                <Text size="md" fw={600}>
+                  {roleMeta.label}
+                </Text>
+              </Group>
+            </Box>
+          </SimpleGrid>
         </Paper>
 
-        {/* Company Info */}
-        {user.company_name && (
-          <Paper withBorder shadow="sm" radius="md" p="md">
-            <Group gap="sm">
-              <ThemeIcon variant="light" size="lg" color="blue">
-                <IconBuilding size={20} />
-              </ThemeIcon>
-              <div>
-                <Text size="sm" c="dimmed" fw={500}>{t('users.company') || 'Company'}</Text>
-                <Text size="lg" fw={600}>{user.company_name}</Text>
-              </div>
-            </Group>
-          </Paper>
-        )}
-
-        {/* Theme Settings */}
-        <Paper withBorder shadow="sm" radius="md" p="md">
-          <Group gap="sm">
-            <ThemeIcon variant="light" size="lg" color="violet">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="4"/>
-                <path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>
-              </svg>
-            </ThemeIcon>
-            <div>
-              <Text size="sm" c="dimmed" fw={500}>{t('profile.theme') || 'Theme'}</Text>
-              <Text size="xs" c="dimmed" pt={2}>{t('profile.theme_description') || 'Choose your preferred theme'}</Text>
-            </div>
-            <div style={{ marginLeft: 'auto' }}>
-              <Select
-                data={[
-                  { value: 'light', label: t('theme.light') },
-                  { value: 'dark', label: t('theme.dark') },
-                  { value: 'system', label: t('theme.system') },
-                ]}
-                value={formData.theme}
-                onChange={(value) => handleInputChange('theme')(value || 'system')}
-                size="sm"
-                w={140}
-              />
-            </div>
-          </Group>
-        </Paper>
-
-        {/* Action Buttons */}
+        {/* ===== ACTIONS ===== */}
         <Group justify="flex-end" gap="sm">
           <Button
             variant="default"
+            size="md"
+            radius="md"
+            disabled={!isDirty}
             onClick={() => {
               setFormData({
                 first_name: user.first_name ?? '',
@@ -317,16 +401,20 @@ export function ProfilePage() {
               })
               setErrors({})
             }}
+            leftSection={<IconX size={18} />}
+            opacity={isDirty ? 1 : 0.5}
           >
-            <Group gap="xs">
-              <IconX size={16} />
-              {t('common.cancel')}
-            </Group>
+            {t('common.cancel')}
           </Button>
           <Button
             loading={updateMe.isPending}
-            leftSection={<IconCheck size={16} />}
+            leftSection={<IconCheck size={18} />}
             onClick={handleSave}
+            disabled={!isDirty}
+            size="md"
+            radius="md"
+            color={isDirty ? 'blue' : 'gray'}
+            opacity={isDirty ? 1 : 0.5}
           >
             {t('profile.save_changes')}
           </Button>

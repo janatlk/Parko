@@ -40,50 +40,34 @@ export function LandingHeader() {
   }
 
   return (
-    <Box component="header" style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      height: 70,
-      background: 'rgba(0, 0, 0, 0.95)',
-      backdropFilter: 'blur(10px)',
-      borderBottom: '1px solid #222222',
-      zIndex: 200,
-    }}>
+    <Box
+      component="header"
+      pos="fixed"
+      top={0}
+      left={0}
+      right={0}
+      h={70}
+      bg="rgba(0, 0, 0, 0.95)"
+      style={{ backdropFilter: 'blur(10px)', zIndex: 200, borderBottom: '1px solid #222222' }}
+    >
       <Group h={70} px="xl" justify="space-between">
         <Group gap="xs" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
           <IconCar size={32} stroke={1.5} color="#ffffff" />
-          <Text size="xl" fw={700} c="#ffffff" style={{ letterSpacing: '1px' }}>
+          <Text size="xl" fw={700} c="white" style={{ letterSpacing: '1px' }}>
             PARKO
           </Text>
         </Group>
 
         {/* Desktop Navigation */}
         <Group gap="lg" visibleFrom="sm">
-          <Text 
-            c="#888888" 
-            size="sm" 
-            style={{ cursor: 'pointer' }}
-            onClick={() => scrollToSection('features')}
-          >
-            Возможности
+          <Text c="dimmed" size="sm" style={{ cursor: 'pointer' }} onClick={() => scrollToSection('features')}>
+            {t('landing.nav_features') || 'Возможности'}
           </Text>
-          <Text 
-            c="#888888" 
-            size="sm" 
-            style={{ cursor: 'pointer' }}
-            onClick={() => scrollToSection('about')}
-          >
-            О системе
+          <Text c="dimmed" size="sm" style={{ cursor: 'pointer' }} onClick={() => scrollToSection('about')}>
+            {t('landing.nav_about') || 'О системе'}
           </Text>
-          <Text 
-            c="#888888" 
-            size="sm" 
-            style={{ cursor: 'pointer' }}
-            onClick={() => scrollToSection('contact')}
-          >
-            Контакты
+          <Text c="dimmed" size="sm" style={{ cursor: 'pointer' }} onClick={() => scrollToSection('contact')}>
+            {t('landing.nav_contact') || 'Контакты'}
           </Text>
         </Group>
 
@@ -95,64 +79,29 @@ export function LandingHeader() {
             onChange={handleLanguageChange}
             size="xs"
             w={90}
-            styles={{
-              input: {
-                background: '#111111',
-                border: '1px solid #333333',
-                color: '#ffffff',
-              },
-            }}
+            variant="filled"
           />
-          <Button
-            size="sm"
-            onClick={handleDemo}
-            variant="outline"
-            styles={{
-              root: {
-                background: 'transparent',
-                border: '1px solid #444444',
-                color: '#ffffff',
-                '&:hover': {
-                  background: 'rgba(255, 255, 255, 0.05)',
-                },
-              },
-            }}
-          >
+          <Button size="sm" onClick={handleDemo} variant="outline" color="gray">
             {t('landing.demo')}
           </Button>
-          <Button
-            size="sm"
-            onClick={() => navigate('/login')}
-            style={{
-              background: '#000000 !important',
-              color: '#ffffff !important',
-            }}
-          >
+          <Button size="sm" onClick={() => navigate('/login')} variant="filled" color="white" c="dark">
             {t('landing.login')}
           </Button>
         </Group>
 
         {/* Mobile Menu Button */}
-        <Burger
-          opened={mobileOpened}
-          onClick={() => setMobileOpened(!mobileOpened)}
-          color="#ffffff"
-          hiddenFrom="sm"
-        />
+        <Burger opened={mobileOpened} onClick={() => setMobileOpened(!mobileOpened)} color="#ffffff" hiddenFrom="sm" />
       </Group>
 
       {/* Mobile Menu */}
       {mobileOpened && (
         <Box
-          style={{
-            position: 'absolute',
-            top: 70,
-            left: 0,
-            right: 0,
-            background: '#000000',
-            borderBottom: '1px solid #222222',
-            padding: 20,
-          }}
+          pos="absolute"
+          top={70}
+          left={0}
+          right={0}
+          bg="dark.9"
+          style={{ borderBottom: '1px solid #222222', padding: 20 }}
         >
           <Group justify="space-between" mb="md">
             <Select
@@ -162,41 +111,14 @@ export function LandingHeader() {
               onChange={handleLanguageChange}
               size="xs"
               w={100}
-              styles={{
-                input: {
-                  background: '#111111',
-                  border: '1px solid #333333',
-                  color: '#ffffff',
-                },
-              }}
+              variant="filled"
             />
           </Group>
           <Group justify="space-around">
-            <Button
-              fullWidth
-              onClick={handleDemo}
-              variant="outline"
-              styles={{
-                root: {
-                  background: 'transparent',
-                  border: '1px solid #444444',
-                  color: '#ffffff',
-                  '&:hover': {
-                    background: 'rgba(255, 255, 255, 0.05)',
-                  },
-                },
-              }}
-            >
+            <Button fullWidth onClick={handleDemo} variant="outline" color="gray">
               {t('landing.demo')}
             </Button>
-            <Button
-              fullWidth
-              onClick={() => navigate('/login')}
-              style={{
-                background: '#000000 !important',
-                color: '#ffffff !important',
-              }}
-            >
+            <Button fullWidth onClick={() => navigate('/login')} variant="filled" color="white" c="dark">
               {t('landing.login')}
             </Button>
           </Group>

@@ -3,6 +3,8 @@ import { memo, useMemo, useRef, type CSSProperties } from 'react'
 import ReactMarkdown from 'react-markdown'
 import rehypeRaw from 'rehype-raw'
 import {
+  Area,
+  AreaChart,
   Bar,
   BarChart,
   CartesianGrid,
@@ -12,6 +14,11 @@ import {
   LineChart,
   Pie,
   PieChart,
+  PolarAngleAxis,
+  PolarGrid,
+  PolarRadiusAxis,
+  Radar,
+  RadarChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -47,7 +54,7 @@ type StructuredChartSeries = {
 type StructuredChartData = {
   type: 'chart'
   title?: string
-  chart_type: 'bar' | 'line' | 'pie'
+  chart_type: 'bar' | 'line' | 'pie' | 'area' | 'radar'
   x_label?: string
   y_label?: string
   filename?: string
@@ -92,17 +99,71 @@ function sanitizeStyle(styleValue: unknown): CSSProperties | undefined {
   return sanitized
 }
 
-function tryParseStructuredData(code: string): StructuredData | null {
-  try {
-    const parsed = JSON.parse(code)
-    if (!parsed || typeof parsed !== 'object' || !('type' in parsed)) return null
+function extractJsonObjects(text: string): { json: string; start: number; end: number }[] {
+  const results: { json: string; start: number; end: number }[] = []
+  let depth = 0
+  let start = -1
+  let inString = false
+  let escape = false
 
-    if (parsed.type === 'table' && Array.isArray(parsed.headers) && Array.isArray(parsed.rows)) {
-      return parsed as StructuredTableData
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i]
+
+    if (escape) {
+      escape = false
+      continue
     }
 
-    if (parsed.type === 'chart' && Array.isArray(parsed.series)) {
-      return parsed as StructuredChartData
+    if (char === '\\') {
+      escape = true
+      continue
+    }
+
+    if (char === '"') {
+      inString = !inString
+      continue
+    }
+
+    if (inString) continue
+
+    if (char === '{') {
+      if (depth === 0) start = i
+      depth++
+    } else if (char === '}') {
+      depth--
+      if (depth === 0 && start !== -1) {
+        results.push({ json: text.slice(start, i + 1), start, end: i + 1 })
+        start = -1
+      }
+    }
+  }
+
+  return results
+}
+
+function tryParseStructuredData(code: string): StructuredData | null {
+  try {
+    // Try parsing as-is first
+    let parsed: unknown
+    try {
+      parsed = JSON.parse(code)
+    } catch {
+      // If failed, remove all whitespace/newlines and try again
+      // This handles AI-generated JSON with accidental line breaks inside ```json blocks
+      const compact = code.replace(/\s+/g, ' ').trim()
+      parsed = JSON.parse(compact)
+    }
+
+    if (!parsed || typeof parsed !== 'object' || !('type' in parsed)) return null
+
+    const p = parsed as Record<string, unknown>
+
+    if (p.type === 'table' && Array.isArray(p.headers) && Array.isArray(p.rows)) {
+      return p as StructuredTableData
+    }
+
+    if (p.type === 'chart' && Array.isArray(p.series)) {
+      return p as StructuredChartData
     }
   } catch {
     return null
@@ -316,6 +377,43 @@ const StructuredChart = memo(function StructuredChart({ data }: { data: Structur
                 />
               ))}
             </LineChart>
+          ) : data.chart_type === 'area' ? (
+            <AreaChart data={chartRows}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="label" label={data.x_label ? { value: data.x_label, position: 'insideBottom', offset: -4 } : undefined} />
+              <YAxis label={data.y_label ? { value: data.y_label, angle: -90, position: 'insideLeft' } : undefined} />
+              <Tooltip />
+              <Legend />
+              {data.series.map((series, index) => (
+                <Area
+                  key={series.name}
+                  type="monotone"
+                  dataKey={series.name}
+                  stroke={series.color || COLORS[index % COLORS.length]}
+                  fill={series.color || COLORS[index % COLORS.length]}
+                  fillOpacity={0.3}
+                  strokeWidth={2}
+                />
+              ))}
+            </AreaChart>
+          ) : data.chart_type === 'radar' ? (
+            <RadarChart data={chartRows} outerRadius={100}>
+              <PolarGrid />
+              <PolarAngleAxis dataKey="label" />
+              <PolarRadiusAxis />
+              <Tooltip />
+              <Legend />
+              {data.series.map((series, index) => (
+                <Radar
+                  key={series.name}
+                  name={series.name}
+                  dataKey={series.name}
+                  stroke={series.color || COLORS[index % COLORS.length]}
+                  fill={series.color || COLORS[index % COLORS.length]}
+                  fillOpacity={0.3}
+                />
+              ))}
+            </RadarChart>
           ) : data.chart_type === 'pie' ? (
             <PieChart>
               <Pie data={pieRows} dataKey="value" nameKey="name" outerRadius={100} label>
@@ -361,25 +459,172 @@ function renderStructuredData(structured: StructuredData) {
   return null
 }
 
+const markdownComponents = {
+  span: ({ children, ...props }: { children?: React.ReactNode; style?: React.CSSProperties }) => {
+    const style = sanitizeStyle(props.style)
+    return <span style={style}>{children}</span>
+  },
+  strong: ({ children }: { children?: React.ReactNode }) => (
+    <Text component="span" fw={700} inherit>
+      {children}
+    </Text>
+  ),
+  em: ({ children }: { children?: React.ReactNode }) => <Text component="em" inherit>{children}</Text>,
+  code: ({ children, className }: { children?: React.ReactNode; className?: string }) => {
+    const isBlock = className?.includes('language-')
+    if (isBlock) {
+      const codeStr = String(children).replace(/\n$/, '')
+      const structured = tryParseStructuredData(codeStr)
+      if (structured) {
+        return renderStructuredData(structured)
+      }
+      return (
+        <Code block style={{ margin: '8px 0', fontSize: '0.85em' }}>
+          {codeStr}
+        </Code>
+      )
+    }
+    return (
+      <Code style={{ fontSize: '0.85em', padding: '2px 6px' }}>
+        {children}
+      </Code>
+    )
+  },
+  h1: ({ children }: { children?: React.ReactNode }) => <Text size="xl" fw={700} mt="xs" mb="xs">{children}</Text>,
+  h2: ({ children }: { children?: React.ReactNode }) => <Text size="lg" fw={700} mt="xs" mb="xs">{children}</Text>,
+  h3: ({ children }: { children?: React.ReactNode }) => <Text size="md" fw={700} mt="xs" mb="xs">{children}</Text>,
+  h4: ({ children }: { children?: React.ReactNode }) => <Text size="sm" fw={700} mt="xs" mb="4">{children}</Text>,
+  ul: ({ children }: { children?: React.ReactNode }) => (
+    <Box component="ul" style={{ margin: '8px 0', paddingLeft: 20 }}>
+      {children}
+    </Box>
+  ),
+  ol: ({ children }: { children?: React.ReactNode }) => (
+    <Box component="ol" style={{ margin: '8px 0', paddingLeft: 20 }}>
+      {children}
+    </Box>
+  ),
+  li: ({ children }: { children?: React.ReactNode }) => (
+    <Text component="li" size="sm" style={{ marginBottom: 4 }}>
+      {children}
+    </Text>
+  ),
+  table: () => null,
+  thead: () => null,
+  tbody: () => null,
+  tr: () => null,
+  th: () => null,
+  td: () => null,
+  hr: () => (
+    <Box
+      component="hr"
+      style={{
+        border: 'none',
+        borderTop: '1px solid var(--mantine-color-gray-3)',
+        margin: '12px 0',
+      }}
+    />
+  ),
+  blockquote: ({ children }: { children?: React.ReactNode }) => (
+    <Box
+      style={{
+        borderLeft: '3px solid var(--mantine-color-blue-5)',
+        paddingLeft: 12,
+        margin: '8px 0',
+        color: 'var(--mantine-color-dimmed)',
+      }}
+    >
+      {children}
+    </Box>
+  ),
+  a: ({ children, href }: { children?: React.ReactNode; href?: string }) => (
+    <Text
+      component="a"
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      c="blue"
+      inherit
+      style={{ textDecoration: 'underline' }}
+    >
+      {children}
+    </Text>
+  ),
+  p: ({ children }: { children?: React.ReactNode }) => (
+    <Text size="sm" style={{ whiteSpace: 'pre-wrap', marginBottom: 8 }}>
+      {children}
+    </Text>
+  ),
+}
+
 export const MarkdownText = memo(function MarkdownText({ content, isUser }: MarkdownTextProps) {
-  if (isUser || !content) {
+  const safeContent = typeof content === 'string' ? content : ''
+  if (isUser || !safeContent) {
     return (
       <Text size="sm" style={{ whiteSpace: 'pre-wrap', lineHeight: 1.5 }}>
-        {content || ''}
+        {safeContent || ''}
       </Text>
     )
   }
 
-  const lines = content.split('\n')
+  // Clean up inline ```json markers that AI sometimes embeds inside sentences
+  let cleanedContent = safeContent.replace(/```json\s*/gi, '\n').replace(/```/g, '').trim()
+
+  // Find all JSON objects in text and try to render table/chart inline
+  const jsonObjects = extractJsonObjects(cleanedContent)
+  const structuredParts: { type: 'text' | 'structured'; content: string; data?: StructuredData }[] = []
+  let lastIndex = 0
+
+  for (const { json, start, end } of jsonObjects) {
+    const structured = tryParseStructuredData(json)
+    if (structured) {
+      if (start > lastIndex) {
+        const textPart = cleanedContent.slice(lastIndex, start).trim()
+        if (textPart) structuredParts.push({ type: 'text', content: textPart })
+      }
+      structuredParts.push({ type: 'structured', content: json, data: structured })
+      lastIndex = end
+    }
+  }
+
+  if (lastIndex < cleanedContent.length) {
+    const textPart = cleanedContent.slice(lastIndex).trim()
+    if (textPart) structuredParts.push({ type: 'text', content: textPart })
+  }
+
+  // If we found structured data inline, render text + structured parts
+  if (structuredParts.length > 1 || (structuredParts.length === 1 && structuredParts[0].type === 'structured')) {
+    return (
+      <Box style={{ lineHeight: 1.6 }}>
+        {structuredParts.map((part, idx) => {
+          if (part.type === 'structured' && part.data) {
+            return <Box key={idx} my="xs">{renderStructuredData(part.data)}</Box>
+          }
+          return (
+            <Box key={idx} className="markdown-content">
+              <ReactMarkdown
+                rehypePlugins={[rehypeRaw]}
+                components={markdownComponents}
+              >
+                {part.content}
+              </ReactMarkdown>
+            </Box>
+          )
+        })}
+      </Box>
+    )
+  }
+
+  const lines = cleanedContent.split('\n')
   const filteredLines = lines.filter((line) => {
     const trimmed = line.trim()
     if (trimmed.startsWith('|') && trimmed.endsWith('|')) return false
     if (/^\|[\s\-:|]+\|$/.test(trimmed)) return false
     return true
   })
-  const cleanedContent = filteredLines.join('\n')
+  const finalContent = filteredLines.join('\n')
 
-  const trimmed = cleanedContent.trim()
+  const trimmed = finalContent.trim()
   if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
     const structured = tryParseStructuredData(trimmed)
     if (structured) {
@@ -391,103 +636,7 @@ export const MarkdownText = memo(function MarkdownText({ content, isUser }: Mark
     <Box className="markdown-content" style={{ lineHeight: 1.6 }}>
       <ReactMarkdown
         rehypePlugins={[rehypeRaw]}
-        components={{
-          span: ({ children, ...props }) => {
-            const style = sanitizeStyle(props.style)
-            return <span style={style}>{children}</span>
-          },
-          strong: ({ children }) => (
-            <Text component="span" fw={700} inherit>
-              {children}
-            </Text>
-          ),
-          em: ({ children }) => <Text component="em" inherit>{children}</Text>,
-          code: ({ children, className }) => {
-            const isBlock = className?.includes('language-')
-            if (isBlock) {
-              const codeStr = String(children).replace(/\n$/, '')
-              const structured = tryParseStructuredData(codeStr)
-              if (structured) {
-                return renderStructuredData(structured)
-              }
-              return (
-                <Code block style={{ margin: '8px 0', fontSize: '0.85em' }}>
-                  {codeStr}
-                </Code>
-              )
-            }
-            return (
-              <Code style={{ fontSize: '0.85em', padding: '2px 6px' }}>
-                {children}
-              </Code>
-            )
-          },
-          h1: ({ children }) => <Text size="xl" fw={700} mt="xs" mb="xs">{children}</Text>,
-          h2: ({ children }) => <Text size="lg" fw={700} mt="xs" mb="xs">{children}</Text>,
-          h3: ({ children }) => <Text size="md" fw={700} mt="xs" mb="xs">{children}</Text>,
-          h4: ({ children }) => <Text size="sm" fw={700} mt="xs" mb="4">{children}</Text>,
-          ul: ({ children }) => (
-            <Box component="ul" style={{ margin: '8px 0', paddingLeft: 20 }}>
-              {children}
-            </Box>
-          ),
-          ol: ({ children }) => (
-            <Box component="ol" style={{ margin: '8px 0', paddingLeft: 20 }}>
-              {children}
-            </Box>
-          ),
-          li: ({ children }) => (
-            <Text component="li" size="sm" style={{ marginBottom: 4 }}>
-              {children}
-            </Text>
-          ),
-          table: () => null,
-          thead: () => null,
-          tbody: () => null,
-          tr: () => null,
-          th: () => null,
-          td: () => null,
-          hr: () => (
-            <Box
-              component="hr"
-              style={{
-                border: 'none',
-                borderTop: '1px solid var(--mantine-color-gray-3)',
-                margin: '12px 0',
-              }}
-            />
-          ),
-          blockquote: ({ children }) => (
-            <Box
-              style={{
-                borderLeft: '3px solid var(--mantine-color-blue-5)',
-                paddingLeft: 12,
-                margin: '8px 0',
-                color: 'var(--mantine-color-dimmed)',
-              }}
-            >
-              {children}
-            </Box>
-          ),
-          a: ({ children, href }) => (
-            <Text
-              component="a"
-              href={href}
-              target="_blank"
-              rel="noopener noreferrer"
-              c="blue"
-              inherit
-              style={{ textDecoration: 'underline' }}
-            >
-              {children}
-            </Text>
-          ),
-          p: ({ children }) => (
-            <Text size="sm" style={{ whiteSpace: 'pre-wrap', marginBottom: 8 }}>
-              {children}
-            </Text>
-          ),
-        }}
+        components={markdownComponents}
       >
         {cleanedContent}
       </ReactMarkdown>

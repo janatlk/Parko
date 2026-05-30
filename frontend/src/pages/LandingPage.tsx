@@ -159,11 +159,7 @@ export function LandingPage() {
   ]
 
   return (
-    <Box style={{
-      minHeight: '100vh',
-      background: '#000000',
-      color: '#ffffff',
-    }}>
+    <Box bg="dark.9" style={{ minHeight: '100vh', color: '#ffffff' }}>
       <LandingHeader />
 
       {/* Hero Section with Background */}
@@ -192,7 +188,7 @@ export function LandingPage() {
             zIndex: 0,
           }}
         />
-        
+
         {/* Grid Pattern */}
         <Box
           style={{
@@ -222,18 +218,13 @@ export function LandingPage() {
                     root: {
                       border: '1px solid #444444',
                       color: '#888888',
-                    }
+                    },
                   }}
                 >
                   {t('landing.hero_badge')}
                 </Badge>
 
-                <Title
-                  order={1}
-                  size={56}
-                  fw={700}
-                  lh={1.1}
-                >
+                <Title order={1} size={56} fw={700} lh={1.1}>
                   {t('landing.hero_title_part1')}{' '}
                   <Text
                     component="span"
@@ -248,32 +239,19 @@ export function LandingPage() {
                   {t('landing.hero_title_part3')}
                 </Title>
 
-                <Text size="xl" c="#888888" lh={1.6}>
+                <Text size="xl" c="dimmed" lh={1.6}>
                   {t('landing.hero_description')}
                 </Text>
 
                 <Group gap="sm">
-                  <Button
-                    size="lg"
-                    onClick={() => navigate('/login')}
-                    variant="filled"
-                    style={{
-                      background: '#ffffff !important',
-                      color: '#000000 !important',
-                      border: '1px solid #ffffff !important',
-                    }}
-                  >
+                  <Button size="lg" onClick={() => navigate('/login')} variant="filled" color="white" c="dark">
                     {t('landing.btn_start')}
                   </Button>
                   <Button
                     size="lg"
                     onClick={() => navigate('/demo')}
                     variant="outline"
-                    style={{
-                      background: '#000000 !important',
-                      color: '#ffffff !important',
-                      border: '1px solid #444444 !important',
-                    }}
+                    color="gray"
                     rightSection={<IconArrowRight size={18} />}
                   >
                     {t('landing.btn_demo')}
@@ -283,14 +261,18 @@ export function LandingPage() {
                 <Group gap="lg" mt="lg">
                   {stats.map((stat, i) => (
                     <Box key={i}>
-                      <Text size="xl" fw={700} c="#ffffff" lh={1}>{stat.value}</Text>
-                      <Text size="xs" c="#666666" mt={2}>{stat.label}</Text>
+                      <Text size="xl" fw={700} c="white" lh={1}>
+                        {stat.value}
+                      </Text>
+                      <Text size="xs" c="dimmed" mt={2}>
+                        {stat.label}
+                      </Text>
                     </Box>
                   ))}
                 </Group>
               </Stack>
             </Grid.Col>
-            
+
             <Grid.Col span={{ base: 12, md: 6 }}>
               <Box
                 style={{
@@ -309,8 +291,12 @@ export function LandingPage() {
                 />
                 <Box mt="lg">
                   <Group justify="space-between">
-                    <Text c="#888888" size="sm">{t('landing.dashboard_preview_title')}</Text>
-                    <Badge color="green" variant="light">{t('landing.dashboard_realtime')}</Badge>
+                    <Text c="dimmed" size="sm">
+                      {t('landing.dashboard_preview_title')}
+                    </Text>
+                    <Badge color="green" variant="light">
+                      {t('landing.dashboard_realtime')}
+                    </Badge>
                   </Group>
                 </Box>
               </Box>
@@ -320,12 +306,12 @@ export function LandingPage() {
       </Box>
 
       {/* Features Section */}
-      <Box id="features" style={{ padding: '120px 0', background: '#000000' }}>
+      <Box id="features" py={120} bg="dark.9">
         <Container size="lg">
-          <Text c="#666666" tt="uppercase" fw={600} size="sm" mb="xs">
+          <Text c="dimmed" tt="uppercase" fw={600} size="sm" mb="xs">
             {t('landing.features_section_subtitle')}
           </Text>
-          <Title order={2} size={42} fw={600} c="#ffffff" mb="xl">
+          <Title order={2} size={42} fw={600} c="white" mb="xl">
             {t('landing.features_section_title')}
           </Title>
 
@@ -335,29 +321,30 @@ export function LandingPage() {
                 <Paper
                   p="lg"
                   radius="md"
-                  style={{
-                    background: '#0a0a0a',
-                    border: '1px solid #1a1a1a',
-                    transition: 'all 0.3s ease',
-                    height: 'auto',
-                  }}
+                  bg="dark.8"
+                  withBorder
+                  style={{ borderColor: '#1a1a1a', transition: 'all 0.3s ease' }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.background = '#111111'
                     e.currentTarget.style.borderColor = '#444444'
                   }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = ''
+                    e.currentTarget.style.borderColor = ''
+                  }}
                 >
                   <feature.icon size={32} stroke={1.5} color="#ffffff" />
-                  <Text fw={600} size="md" c="#ffffff" mt="md" mb={4}>
+                  <Text fw={600} size="md" c="white" mt="md" mb={4}>
                     {feature.title}
                   </Text>
-                  <Text size="xs" c="#888888" lh={1.5}>
+                  <Text size="xs" c="dimmed" lh={1.5}>
                     {feature.description}
                   </Text>
                   <Group gap="xs" mt="md" align="flex-end">
-                    <Text size="xl" fw={700} c="#ffffff">
+                    <Text size="xl" fw={700} c="white">
                       {feature.stat}
                     </Text>
-                    <Text size="xs" c="#666666">
+                    <Text size="xs" c="dimmed">
                       {feature.statLabel}
                     </Text>
                   </Group>
@@ -369,7 +356,7 @@ export function LandingPage() {
       </Box>
 
       {/* Benefits Section */}
-      <Box style={{ padding: '100px 0', background: '#050505' }}>
+      <Box py={100} bg="#050505">
         <Container size="lg">
           <Grid align="center" gutter="xl">
             <Grid.Col span={{ base: 12, md: 6 }}>
@@ -390,10 +377,10 @@ export function LandingPage() {
               </Box>
             </Grid.Col>
             <Grid.Col span={{ base: 12, md: 6 }}>
-              <Text c="#666666" tt="uppercase" fw={600} size="sm" mb="xs">
+              <Text c="dimmed" tt="uppercase" fw={600} size="sm" mb="xs">
                 {t('landing.benefits_subtitle')}
               </Text>
-              <Title order={2} size={42} fw={600} c="#ffffff" mb="xl">
+              <Title order={2} size={42} fw={600} c="white" mb="xl">
                 {t('landing.benefits_title')}
               </Title>
               <Stack gap="lg">
@@ -414,10 +401,10 @@ export function LandingPage() {
                       <benefit.icon size={24} stroke={1.5} color="#ffffff" />
                     </Box>
                     <div>
-                      <Text fw={600} c="#ffffff" mb={4}>
+                      <Text fw={600} c="white" mb={4}>
                         {benefit.title}
                       </Text>
-                      <Text size="sm" c="#888888">
+                      <Text size="sm" c="dimmed">
                         {benefit.desc}
                       </Text>
                     </div>
@@ -430,12 +417,12 @@ export function LandingPage() {
       </Box>
 
       {/* About Section */}
-      <Box id="about" style={{ padding: '120px 0', background: '#000000' }}>
+      <Box id="about" py={120} bg="dark.9">
         <Container size="lg">
-          <Text c="#666666" tt="uppercase" fw={600} size="sm" mb="xs">
+          <Text c="dimmed" tt="uppercase" fw={600} size="sm" mb="xs">
             {t('landing.about_subtitle')}
           </Text>
-          <Title order={2} size={42} fw={600} c="#ffffff" mb="xl">
+          <Title order={2} size={42} fw={600} c="white" mb="xl">
             {t('landing.about_title')}
           </Title>
 
@@ -457,19 +444,15 @@ export function LandingPage() {
                 desc: t('landing.about_3_desc'),
               },
             ].map((item, i) => (
-              <Paper 
-                key={i} 
-                radius="md" 
-                style={{ 
-                  overflow: 'hidden',
-                  background: '#0a0a0a',
-                  border: '1px solid #1a1a1a',
-                }}
-              >
+              <Paper key={i} radius="md" bg="dark.8" withBorder style={{ borderColor: '#1a1a1a', overflow: 'hidden' }}>
                 <Image src={item.img} h={200} fit="cover" style={{ filter: 'grayscale(100%)' }} />
                 <Box p="lg">
-                  <Text fw={600} c="#ffffff" mb="xs">{item.title}</Text>
-                  <Text size="sm" c="#888888">{item.desc}</Text>
+                  <Text fw={600} c="white" mb="xs">
+                    {item.title}
+                  </Text>
+                  <Text size="sm" c="dimmed">
+                    {item.desc}
+                  </Text>
                 </Box>
               </Paper>
             ))}
@@ -478,12 +461,12 @@ export function LandingPage() {
       </Box>
 
       {/* Pricing Section */}
-      <Box style={{ padding: '120px 0', background: '#050505' }}>
+      <Box py={120} bg="#050505">
         <Container size="lg">
-          <Text c="#666666" tt="uppercase" fw={600} size="sm" mb="xs">
+          <Text c="dimmed" tt="uppercase" fw={600} size="sm" mb="xs">
             {t('landing.pricing_subtitle')}
           </Text>
-          <Title order={2} size={42} fw={600} c="#ffffff" mb="xl" ta="center">
+          <Title order={2} size={42} fw={600} c="white" mb="xl" ta="center">
             {t('landing.pricing_title')}
           </Title>
 
@@ -493,12 +476,9 @@ export function LandingPage() {
                 <Paper
                   p="lg"
                   radius="md"
-                  style={{
-                    background: plan.popular ? '#111111' : '#0a0a0a',
-                    border: plan.popular ? '1px solid #444444' : '1px solid #1a1a1a',
-                    position: 'relative',
-                    height: 'auto',
-                  }}
+                  bg={plan.popular ? '#111111' : 'dark.8'}
+                  withBorder
+                  style={{ borderColor: plan.popular ? '#444444' : '#1a1a1a', position: 'relative' }}
                 >
                   {plan.popular && (
                     <Badge
@@ -514,31 +494,28 @@ export function LandingPage() {
                       {t('landing.popular_badge')}
                     </Badge>
                   )}
-                  <Text size="md" fw={600} c="#ffffff" mb="xs">
+                  <Text size="md" fw={600} c="white" mb="xs">
                     {plan.name}
                   </Text>
                   <Group gap="xs" align="flex-end" mb="lg">
-                    <Text size="xl" fw={700} c="#ffffff">{plan.price}</Text>
-                    <Text c="#666666" mb={4} size="sm">{plan.period}</Text>
+                    <Text size="xl" fw={700} c="white">
+                      {plan.price}
+                    </Text>
+                    <Text c="dimmed" mb={4} size="sm">
+                      {plan.period}
+                    </Text>
                   </Group>
                   <Stack gap="xs" mb="lg">
                     {plan.features.map((feature, j) => (
                       <Group key={j} gap="xs">
                         <IconCheck size={16} color="#444444" />
-                        <Text size="sm" c="#888888">{feature}</Text>
+                        <Text size="sm" c="dimmed">
+                          {feature}
+                        </Text>
                       </Group>
                     ))}
                   </Stack>
-                  <Button
-                    fullWidth
-                    onClick={() => navigate('/register')}
-                    variant="outline"
-                    style={{
-                      background: '#000000 !important',
-                      color: '#ffffff !important',
-                      border: '1px solid #444444 !important',
-                    }}
-                  >
+                  <Button fullWidth onClick={() => navigate('/register')} variant="outline" color="gray">
                     {t('landing.btn_select_plan')}
                   </Button>
                 </Paper>
@@ -549,19 +526,19 @@ export function LandingPage() {
       </Box>
 
       {/* Contact Form Section */}
-      <Box id="contact" style={{ padding: '120px 0', background: '#000000' }}>
+      <Box id="contact" py={120} bg="dark.9">
         <Container size="md">
-          <Text c="#666666" tt="uppercase" fw={600} size="sm" mb="xs">
+          <Text c="dimmed" tt="uppercase" fw={600} size="sm" mb="xs">
             {t('landing.contact_subtitle')}
           </Text>
-          <Title order={2} size={42} fw={600} c="#ffffff" mb="xl">
+          <Title order={2} size={42} fw={600} c="white" mb="xl">
             {t('landing.contact_title')}
           </Title>
 
           <Grid gutter="xl">
             <Grid.Col span={{ base: 12, md: 5 }}>
               <Stack gap="lg">
-                <Text c="#888888" lh={1.6}>
+                <Text c="dimmed" lh={1.6}>
                   {t('landing.contact_description')}
                 </Text>
 
@@ -581,8 +558,10 @@ export function LandingPage() {
                     <IconMail size={24} color="#ffffff" />
                   </Box>
                   <div>
-                    <Text size="sm" c="#666666">{t('landing.contact_email_label')}</Text>
-                    <Text c="#ffffff">info@parko.kg</Text>
+                    <Text size="sm" c="dimmed">
+                      {t('landing.contact_email_label')}
+                    </Text>
+                    <Text c="white">info@parko.kg</Text>
                   </div>
                 </Group>
 
@@ -602,8 +581,10 @@ export function LandingPage() {
                     <IconPhone size={24} color="#ffffff" />
                   </Box>
                   <div>
-                    <Text size="sm" c="#666666">{t('landing.contact_phone_label')}</Text>
-                    <Text c="#ffffff">+996 (555) 123-456</Text>
+                    <Text size="sm" c="dimmed">
+                      {t('landing.contact_phone_label')}
+                    </Text>
+                    <Text c="white">+996 (555) 123-456</Text>
                   </div>
                 </Group>
 
@@ -623,22 +604,17 @@ export function LandingPage() {
                     <IconMapPin size={24} color="#ffffff" />
                   </Box>
                   <div>
-                    <Text size="sm" c="#666666">{t('landing.contact_address_label')}</Text>
-                    <Text c="#ffffff">{t('landing.contact_address')}</Text>
+                    <Text size="sm" c="dimmed">
+                      {t('landing.contact_address_label')}
+                    </Text>
+                    <Text c="white">{t('landing.contact_address')}</Text>
                   </div>
                 </Group>
               </Stack>
             </Grid.Col>
 
             <Grid.Col span={{ base: 12, md: 7 }}>
-              <Paper
-                p="xl"
-                radius="md"
-                style={{
-                  background: '#0a0a0a',
-                  border: '1px solid #1a1a1a',
-                }}
-              >
+              <Paper p="xl" radius="md" bg="dark.8" withBorder style={{ borderColor: '#1a1a1a' }}>
                 <form onSubmit={handleSubmit}>
                   <Stack gap="md">
                     <Grid gutter="md">
@@ -647,17 +623,7 @@ export function LandingPage() {
                           label={t('landing.form_name_label')}
                           placeholder={t('landing.form_name_placeholder')}
                           value={formData.name}
-                          onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                          styles={{
-                            label: { color: '#888888', marginBottom: 8 },
-                            input: {
-                              background: '#111111',
-                              border: '1px solid #222222',
-                              color: '#ffffff',
-                              '&:focus': { borderColor: '#444444' },
-                              '&:hover': { borderColor: '#333333' },
-                            },
-                          }}
+                          onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
                         />
                       </Grid.Col>
                       <Grid.Col span={{ base: 12, sm: 6 }}>
@@ -666,17 +632,7 @@ export function LandingPage() {
                           placeholder={t('landing.form_email_placeholder')}
                           type="email"
                           value={formData.email}
-                          onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                          styles={{
-                            label: { color: '#888888', marginBottom: 8 },
-                            input: {
-                              background: '#111111',
-                              border: '1px solid #222222',
-                              color: '#ffffff',
-                              '&:focus': { borderColor: '#444444' },
-                              '&:hover': { borderColor: '#333333' },
-                            },
-                          }}
+                          onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
                         />
                       </Grid.Col>
                     </Grid>
@@ -686,31 +642,10 @@ export function LandingPage() {
                       placeholder={t('landing.form_message_placeholder')}
                       minRows={4}
                       value={formData.message}
-                      onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
-                      styles={{
-                        label: { color: '#888888', marginBottom: 8 },
-                        input: {
-                          background: '#111111',
-                          border: '1px solid #222222',
-                          color: '#ffffff',
-                          '&:focus': { borderColor: '#444444' },
-                          '&:hover': { borderColor: '#333333' },
-                        },
-                      }}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, message: e.target.value }))}
                     />
 
-                    <Button
-                      type="submit"
-                      size="lg"
-                      loading={isSubmitting}
-                      fullWidth
-                      variant="filled"
-                      style={{
-                        background: '#ffffff !important',
-                        color: '#000000 !important',
-                        border: '1px solid #ffffff !important',
-                      }}
-                    >
+                    <Button type="submit" size="lg" loading={isSubmitting} fullWidth variant="filled" color="white" c="dark">
                       {t('landing.form_submit')}
                     </Button>
                   </Stack>
@@ -724,25 +659,25 @@ export function LandingPage() {
       {/* Footer */}
       <Box bg="#050505" py="xl">
         <Container size="lg">
-          <Divider color="#222222" mb="xl" />
+          <Divider color="dark.6" mb="xl" />
           <Grid justify="space-between">
             <Grid.Col span={{ base: 12, md: 6 }}>
               <Group gap="xs" mb="md">
                 <IconCar size={24} stroke={1.5} color="#666666" />
-                <Text size="lg" fw={700} c="#666666">
+                <Text size="lg" fw={700} c="dimmed">
                   PARKO
                 </Text>
               </Group>
-              <Text size="sm" c="#444444">
+              <Text size="sm" c="dimmed">
                 {t('landing.footer_copyright')}
               </Text>
             </Grid.Col>
             <Grid.Col span={{ base: 12, md: 6 }}>
               <Group justify="flex-end" gap="lg">
-                <Text size="sm" c="#444444" style={{ cursor: 'pointer' }}>
+                <Text size="sm" c="dimmed" style={{ cursor: 'pointer' }}>
                   {t('landing.footer_privacy')}
                 </Text>
-                <Text size="sm" c="#444444" style={{ cursor: 'pointer' }}>
+                <Text size="sm" c="dimmed" style={{ cursor: 'pointer' }}>
                   {t('landing.footer_terms')}
                 </Text>
               </Group>
