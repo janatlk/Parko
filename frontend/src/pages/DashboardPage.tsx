@@ -18,6 +18,7 @@ import { StatsGrid } from '@features/dashboard/ui/StatCard'
 import { CostTrendChart } from '@features/dashboard/ui/CostTrendChart'
 import { FuelEfficiencyChart } from '@features/dashboard/ui/FuelEfficiencyChart'
 import { TopVehiclesChart } from '@features/dashboard/ui/TopVehiclesChart'
+import { DashboardInsights } from '@features/dashboard/ui/DashboardInsights'
 import { ExpiringTable } from '@features/dashboard/ui/ExpiringTable'
 import { ActivityTimeline } from '@features/dashboard/ui/ActivityTimeline'
 import { VehicleRadarChart } from '@features/dashboard/ui/VehicleRadarChart'
@@ -138,6 +139,9 @@ export function DashboardPage() {
 
         {/* Stat Cards */}
         <StatsGrid stats={statCards} />
+
+        {/* AI Insights */}
+        <DashboardInsights />
 
         {/* Main Grid */}
         <Grid gutter="sm" align="stretch">

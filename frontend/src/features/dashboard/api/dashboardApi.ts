@@ -167,3 +167,8 @@ export async function getFuelStatsByMonth(months = 6): Promise<FuelStatsByMonth[
   const { data } = await http.get<FuelStatsByMonth[]>('dashboard/fuel-by-month/', { params: { months } })
   return data
 }
+
+export async function getDashboardInsights(): Promise<{ insights: string[] }> {
+  const { data } = await http.get<{ insights: string[] }>('dashboard/insights/')
+  return data
+}

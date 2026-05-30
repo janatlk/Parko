@@ -1,3 +1,6 @@
+import json
+
+from django.conf import settings
 from django.utils import timezone
 from datetime import timedelta, date
 from django.db.models import Sum, Count, Q, Avg, F
@@ -906,3 +909,128 @@ class DashboardFuelByMonthView(APIView):
             })
 
         return Response(data)
+
+
+class DashboardInsightsView(APIView):
+    """
+    AI-generated insights for the dashboard.
+    Cached for 10 minutes to avoid hitting API limits with many users.
+    GET /api/v1/dashboard/insights/
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        company = request.user.company
+        company_id = company.id
+        cache_key = f'dashboard_insights_{company_id}'
+
+        cached = cache.get(cache_key)
+        if cached is not None:
+            return Response(cached)
+
+        # Gather compact data
+        now = timezone.now()
+        current_month = now.month
+        current_year = now.year
+
+        total_cars = Car.objects.filter(company=company).count()
+        active_cars = Car.objects.filter(company=company, status='ACTIVE').count()
+
+        all_fuel = Fuel.objects.filter(car__company=company, liters__gt=0, monthly_mileage__gt=0)
+        avg_fuel_consumption = 0
+        if all_fuel.exists():
+            agg = all_fuel.aggregate(total_liters=Sum('liters'), total_mileage=Sum('monthly_mileage'))
+            if agg['total_mileage'] and agg['total_mileage'] > 0:
+                avg_fuel_consumption = round((agg['total_liters'] / agg['total_mileage']) * 100, 2)
+
+        fuel_this_month = Fuel.objects.filter(car__company=company, month=current_month, year=current_year)
+        total_fuel_cost = fuel_this_month.aggregate(total=Sum('total_cost'))['total'] or 0
+
+        spare_this_month = Spare.objects.filter(
+            car__company=company, installed_at__year=current_year, installed_at__month=current_month
+        ).aggregate(total=Sum('part_price') + Sum('job_price'))['total'] or 0
+
+        total_operational_cost = float(total_fuel_cost) + float(spare_this_month)
+
+        expiring_count = Insurance.objects.filter(
+            car__company=company, end_date__lte=now.date() + timedelta(days=30), end_date__gte=now.date()
+        ).count()
+
+        # Top vehicle by cost
+        top_vehicle = None
+        cars = Car.objects.filter(company=company)
+        top_vehicles = []
+        for car in cars:
+            fc = Fuel.objects.filter(car=car).aggregate(total=Sum('total_cost'))['total'] or 0
+            sc = Spare.objects.filter(car=car).aggregate(parts=Sum('part_price'), labor=Sum('job_price'))
+            spare = float(sc['parts'] or 0) + float(sc['labor'] or 0)
+            total = float(fc) + spare
+            if total > 0:
+                top_vehicles.append({'name': f"{car.brand} {car.title}", 'total': total})
+        if top_vehicles:
+            top_vehicles.sort(key=lambda x: x['total'], reverse=True)
+            top_vehicle = top_vehicles[0]
+
+        # History trend (last 3 months)
+        history_summary = []
+        for i in range(3):
+            m = current_month - i
+            y = current_year
+            if m <= 0:
+                m += 12
+                y -= 1
+            fc = Fuel.objects.filter(car__company=company, year=y, month=m).aggregate(total=Sum('total_cost'))['total'] or 0
+            history_summary.append(f"{y}-{m:02d}: {fc:.0f}")
+        history_summary.reverse()
+
+        # Build prompt
+        prompt = f"""Ты — аналитик автопарка. На основе данных дашборда сгенерируй 3-5 кратких инсайтов (по 1 предложению каждый) на русском языке. Фокусируйся на аномалиях, трендах и рекомендациях.
+
+ДАННЫЕ:
+- Авто: {total_cars} шт. ({active_cars} активных)
+- Средний расход: {avg_fuel_consumption} л/100км
+- Операционные затраты за месяц: {total_operational_cost:.0f}
+- Истекающие страховки/осмотры: {expiring_count}
+- Самое дорогое авто: {top_vehicle['name'] if top_vehicle else 'N/A'} — {top_vehicle['total']:.0f} с.
+- Тренд затрат (последние 3 мес): {', '.join(history_summary)}
+
+Верни ТОЛЬКО JSON-массив строк. Пример: ["Расход топлива вырос на 15% vs прошлый месяц","Проверьте страховки 3 авто"]"""
+
+        # Call AI
+        ai_settings = getattr(settings, 'AI_SETTINGS', {})
+        api_key = ai_settings.get('api_key', '')
+        model = ai_settings.get('model', 'llama-3.1-8b-instant')
+
+        insights = []
+        if api_key:
+            try:
+                from groq import Groq
+                client = Groq(api_key=api_key)
+                response = client.chat.completions.create(
+                    model=model,
+                    messages=[{"role": "user", "content": prompt}],
+                    temperature=0.4,
+                    max_tokens=512,
+                )
+                raw = response.choices[0].message.content.strip()
+                # Extract JSON array
+                import re
+                match = re.search(r'\[.*?\]', raw, re.DOTALL)
+                if match:
+                    insights = json.loads(match.group())
+                else:
+                    insights = [raw[:200]]
+                if not isinstance(insights, list):
+                    insights = [str(insights)]
+            except Exception:
+                insights = []
+
+        if not insights:
+            insights = [
+                "Недостаточно данных для формирования инсайтов.",
+                "Добавьте больше записей о топливе и ТО для аналитики.",
+            ]
+
+        result = {'insights': insights}
+        cache.set(cache_key, result, 600)  # 10 minutes
+        return Response(result)

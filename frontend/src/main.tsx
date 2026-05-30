@@ -30,7 +30,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
               styles={{
                 notification: {
                   opacity: 0.8,
-                  pointerEvents: 'none',
+                  pointerEvents: 'auto',
                 },
                 root: {
                   pointerEvents: 'none',

@@ -9,6 +9,7 @@ from .views import (
     DashboardActivityFeedView,
     DashboardCostByMonthView,
     DashboardVehicleConsumptionView,
+    DashboardInsightsView,
 )
 
 urlpatterns = [
@@ -20,4 +21,5 @@ urlpatterns = [
     path('activity-feed/', DashboardActivityFeedView.as_view(), name='dashboard-activity-feed'),
     path('cost-by-month/', DashboardCostByMonthView.as_view(), name='dashboard-cost-by-month'),
     path('vehicle-consumption/', DashboardVehicleConsumptionView.as_view(), name='dashboard-vehicle-consumption'),
+    path('insights/', DashboardInsightsView.as_view(), name='dashboard-insights'),
 ]

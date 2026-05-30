@@ -87,7 +87,7 @@ export function AppLayout() {
           <Group gap="sm">
             <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" color="white" />
             <Group gap="xs">
-              <IconCar size={24} stroke={1.8} color="#ffffff" />
+              <img src="/logo.svg" alt="Parko" width={32} height={32} />
               <Text fw={700} size="xl" c="white">Parko</Text>
             </Group>
           </Group>

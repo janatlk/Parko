@@ -26,6 +26,7 @@ import {
 } from 'recharts'
 import { ActionIcon, Box, Code, Group, Paper, Table, Text, Tooltip as MantineTooltip } from '@mantine/core'
 import { IconChartBar, IconDownload, IconTable } from '@tabler/icons-react'
+import { DraggableOverlay } from './DraggableOverlay'
 
 interface MarkdownTextProps {
   content: string
@@ -251,6 +252,31 @@ const StructuredDataTable = memo(function StructuredDataTable({ data }: { data: 
   const title = data.title || 'Table'
   const filenameBase = (data.filename || title || 'ai-table').replace(/[^\w-]+/g, '_')
 
+  const tableContent = (
+    <Table striped highlightOnHover withTableBorder>
+      <Table.Thead>
+        <Table.Tr>
+          {data.headers.map((header, index) => (
+            <Table.Th key={index} style={{ whiteSpace: 'nowrap' }}>
+              {header}
+            </Table.Th>
+          ))}
+        </Table.Tr>
+      </Table.Thead>
+      <Table.Tbody>
+        {data.rows.map((row, rowIndex) => (
+          <Table.Tr key={rowIndex}>
+            {row.map((cell, cellIndex) => (
+              <Table.Td key={cellIndex} style={{ whiteSpace: 'nowrap' }}>
+                {cell === null || cell === undefined ? '—' : String(cell)}
+              </Table.Td>
+            ))}
+          </Table.Tr>
+        ))}
+      </Table.Tbody>
+    </Table>
+  )
+
   return (
     <Paper withBorder p="sm" radius="md" style={{ margin: '12px 0', overflowX: 'auto' }}>
       <Group justify="space-between" mb="sm">
@@ -260,38 +286,22 @@ const StructuredDataTable = memo(function StructuredDataTable({ data }: { data: 
             {title}
           </Text>
         </Group>
-        <MantineTooltip label="Скачать CSV">
-          <ActionIcon
-            variant="subtle"
-            onClick={() => downloadTextFile(`${filenameBase}.csv`, tableToCsv(data), 'text/csv;charset=utf-8')}
-          >
-            <IconDownload size={16} />
-          </ActionIcon>
-        </MantineTooltip>
+        <Group gap={4}>
+          <DraggableOverlay title={title} icon={<IconTable size={16} />}>
+            <Box style={{ overflowX: 'auto' }}>{tableContent}</Box>
+          </DraggableOverlay>
+          <MantineTooltip label="Скачать CSV">
+            <ActionIcon
+              variant="subtle"
+              onClick={() => downloadTextFile(`${filenameBase}.csv`, tableToCsv(data), 'text/csv;charset=utf-8')}
+            >
+              <IconDownload size={16} />
+            </ActionIcon>
+          </MantineTooltip>
+        </Group>
       </Group>
 
-      <Table striped highlightOnHover withTableBorder>
-        <Table.Thead>
-          <Table.Tr>
-            {data.headers.map((header, index) => (
-              <Table.Th key={index} style={{ whiteSpace: 'nowrap' }}>
-                {header}
-              </Table.Th>
-            ))}
-          </Table.Tr>
-        </Table.Thead>
-        <Table.Tbody>
-          {data.rows.map((row, rowIndex) => (
-            <Table.Tr key={rowIndex}>
-              {row.map((cell, cellIndex) => (
-                <Table.Td key={cellIndex} style={{ whiteSpace: 'nowrap' }}>
-                  {cell === null || cell === undefined ? '—' : String(cell)}
-                </Table.Td>
-              ))}
-            </Table.Tr>
-          ))}
-        </Table.Tbody>
-      </Table>
+      {tableContent}
     </Paper>
   )
 })
@@ -331,6 +341,93 @@ const StructuredChart = memo(function StructuredChart({ data }: { data: Structur
     await downloadSvgAsPng(svgElement, `${filenameBase}.png`)
   }
 
+  const chartJSX = (
+    <ResponsiveContainer width="100%" height="100%">
+      {data.chart_type === 'line' ? (
+        <LineChart data={chartRows}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="label" label={data.x_label ? { value: data.x_label, position: 'insideBottom', offset: -4 } : undefined} />
+          <YAxis label={data.y_label ? { value: data.y_label, angle: -90, position: 'insideLeft' } : undefined} />
+          <Tooltip />
+          <Legend />
+          {data.series.map((series, index) => (
+            <Line
+              key={series.name}
+              type="monotone"
+              dataKey={series.name}
+              stroke={series.color || COLORS[index % COLORS.length]}
+              strokeWidth={2}
+              dot={{ r: 3 }}
+            />
+          ))}
+        </LineChart>
+      ) : data.chart_type === 'area' ? (
+        <AreaChart data={chartRows}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="label" label={data.x_label ? { value: data.x_label, position: 'insideBottom', offset: -4 } : undefined} />
+          <YAxis label={data.y_label ? { value: data.y_label, angle: -90, position: 'insideLeft' } : undefined} />
+          <Tooltip />
+          <Legend />
+          {data.series.map((series, index) => (
+            <Area
+              key={series.name}
+              type="monotone"
+              dataKey={series.name}
+              stroke={series.color || COLORS[index % COLORS.length]}
+              fill={series.color || COLORS[index % COLORS.length]}
+              fillOpacity={0.3}
+              strokeWidth={2}
+            />
+          ))}
+        </AreaChart>
+      ) : data.chart_type === 'radar' ? (
+        <RadarChart data={chartRows} outerRadius={100}>
+          <PolarGrid />
+          <PolarAngleAxis dataKey="label" />
+          <PolarRadiusAxis />
+          <Tooltip />
+          <Legend />
+          {data.series.map((series, index) => (
+            <Radar
+              key={series.name}
+              name={series.name}
+              dataKey={series.name}
+              stroke={series.color || COLORS[index % COLORS.length]}
+              fill={series.color || COLORS[index % COLORS.length]}
+              fillOpacity={0.3}
+            />
+          ))}
+        </RadarChart>
+      ) : data.chart_type === 'pie' ? (
+        <PieChart>
+          <Pie data={pieRows} dataKey="value" nameKey="name" outerRadius={100} label>
+            {pieRows.map((entry, index) => (
+              <Cell key={`${entry.name}-${index}`} fill={entry.fill} />
+            ))}
+          </Pie>
+          <Tooltip />
+          <Legend />
+        </PieChart>
+      ) : (
+        <BarChart data={chartRows}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="label" label={data.x_label ? { value: data.x_label, position: 'insideBottom', offset: -4 } : undefined} />
+          <YAxis label={data.y_label ? { value: data.y_label, angle: -90, position: 'insideLeft' } : undefined} />
+          <Tooltip />
+          <Legend />
+          {data.series.map((series, index) => (
+            <Bar
+              key={series.name}
+              dataKey={series.name}
+              fill={series.color || COLORS[index % COLORS.length]}
+              radius={[6, 6, 0, 0]}
+            />
+          ))}
+        </BarChart>
+      )}
+    </ResponsiveContainer>
+  )
+
   return (
     <Paper withBorder p="sm" radius="md" style={{ margin: '12px 0' }}>
       <Group justify="space-between" mb="sm">
@@ -341,6 +438,9 @@ const StructuredChart = memo(function StructuredChart({ data }: { data: Structur
           </Text>
         </Group>
         <Group gap={4}>
+          <DraggableOverlay title={title} icon={<IconChartBar size={16} />}>
+            <Box style={{ width: '100%', height: '100%', minHeight: 400 }}>{chartJSX}</Box>
+          </DraggableOverlay>
           <MantineTooltip label="Скачать CSV">
             <ActionIcon
               variant="subtle"
@@ -358,90 +458,7 @@ const StructuredChart = memo(function StructuredChart({ data }: { data: Structur
       </Group>
 
       <Box ref={wrapperRef} style={{ width: '100%', height: 320 }}>
-        <ResponsiveContainer width="100%" height="100%">
-          {data.chart_type === 'line' ? (
-            <LineChart data={chartRows}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="label" label={data.x_label ? { value: data.x_label, position: 'insideBottom', offset: -4 } : undefined} />
-              <YAxis label={data.y_label ? { value: data.y_label, angle: -90, position: 'insideLeft' } : undefined} />
-              <Tooltip />
-              <Legend />
-              {data.series.map((series, index) => (
-                <Line
-                  key={series.name}
-                  type="monotone"
-                  dataKey={series.name}
-                  stroke={series.color || COLORS[index % COLORS.length]}
-                  strokeWidth={2}
-                  dot={{ r: 3 }}
-                />
-              ))}
-            </LineChart>
-          ) : data.chart_type === 'area' ? (
-            <AreaChart data={chartRows}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="label" label={data.x_label ? { value: data.x_label, position: 'insideBottom', offset: -4 } : undefined} />
-              <YAxis label={data.y_label ? { value: data.y_label, angle: -90, position: 'insideLeft' } : undefined} />
-              <Tooltip />
-              <Legend />
-              {data.series.map((series, index) => (
-                <Area
-                  key={series.name}
-                  type="monotone"
-                  dataKey={series.name}
-                  stroke={series.color || COLORS[index % COLORS.length]}
-                  fill={series.color || COLORS[index % COLORS.length]}
-                  fillOpacity={0.3}
-                  strokeWidth={2}
-                />
-              ))}
-            </AreaChart>
-          ) : data.chart_type === 'radar' ? (
-            <RadarChart data={chartRows} outerRadius={100}>
-              <PolarGrid />
-              <PolarAngleAxis dataKey="label" />
-              <PolarRadiusAxis />
-              <Tooltip />
-              <Legend />
-              {data.series.map((series, index) => (
-                <Radar
-                  key={series.name}
-                  name={series.name}
-                  dataKey={series.name}
-                  stroke={series.color || COLORS[index % COLORS.length]}
-                  fill={series.color || COLORS[index % COLORS.length]}
-                  fillOpacity={0.3}
-                />
-              ))}
-            </RadarChart>
-          ) : data.chart_type === 'pie' ? (
-            <PieChart>
-              <Pie data={pieRows} dataKey="value" nameKey="name" outerRadius={100} label>
-                {pieRows.map((entry, index) => (
-                  <Cell key={`${entry.name}-${index}`} fill={entry.fill} />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          ) : (
-            <BarChart data={chartRows}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="label" label={data.x_label ? { value: data.x_label, position: 'insideBottom', offset: -4 } : undefined} />
-              <YAxis label={data.y_label ? { value: data.y_label, angle: -90, position: 'insideLeft' } : undefined} />
-              <Tooltip />
-              <Legend />
-              {data.series.map((series, index) => (
-                <Bar
-                  key={series.name}
-                  dataKey={series.name}
-                  fill={series.color || COLORS[index % COLORS.length]}
-                  radius={[6, 6, 0, 0]}
-                />
-              ))}
-            </BarChart>
-          )}
-        </ResponsiveContainer>
+        {chartJSX}
       </Box>
     </Paper>
   )

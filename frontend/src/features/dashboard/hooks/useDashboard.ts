@@ -9,6 +9,7 @@ import {
   getFuelStatsByMonth,
   getRecentFuelEntries,
   getDashboardOverview,
+  getDashboardInsights,
 } from '../api/dashboardApi'
 
 export function useDashboardOverview(months = 6, limit = 8) {
@@ -77,5 +78,14 @@ export function useFuelStatsByMonth(months = 6) {
       // Ensure data is sorted by month
       return [...data].sort((a, b) => a.month - b.month)
     },
+  })
+}
+
+export function useDashboardInsights() {
+  return useQuery({
+    queryKey: ['dashboard', 'insights'],
+    queryFn: getDashboardInsights,
+    retry: 1,
+    staleTime: 300_000, // 5 minutes
   })
 }

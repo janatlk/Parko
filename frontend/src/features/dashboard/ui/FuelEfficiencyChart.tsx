@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { Box, Group, SegmentedControl, Text, useMantineColorScheme } from '@mantine/core'
+import { IconChartBar } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
 import {
   Area,
@@ -13,6 +14,7 @@ import {
 } from 'recharts'
 
 import type { HistoryMonth } from '../api/dashboardApi'
+import { DraggableOverlay } from '@features/ai/ui/DraggableOverlay'
 
 const CHART_COLOR_LIGHT = '#228be6'
 const CHART_COLOR_DARK = '#4dabf7'
@@ -39,6 +41,7 @@ export function FuelEfficiencyChart({ data = [] }: FuelEfficiencyChartProps) {
   const goal = getGoal()
   const chartColor = isDark ? CHART_COLOR_DARK : CHART_COLOR_LIGHT
   const refColor = isDark ? '#868e96' : '#adb5bd'
+  const gradientId = `${useId()}-fuelGradient`
 
   const displayData = data.slice(-Number(monthsRange))
 
@@ -67,10 +70,69 @@ export function FuelEfficiencyChart({ data = [] }: FuelEfficiencyChartProps) {
     return null
   }
 
+  const chart = (
+    <AreaChart data={chartData} margin={{ top: 2, right: 2, left: -20, bottom: 0 }}>
+      <defs>
+        <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="5%" stopColor={chartColor} stopOpacity={isDark ? 0.25 : 0.15} />
+          <stop offset="95%" stopColor={chartColor} stopOpacity={0} />
+        </linearGradient>
+      </defs>
+      <CartesianGrid
+        strokeDasharray="3 3"
+        vertical={false}
+        stroke={isDark ? '#2C2E33' : '#e9ecef'}
+      />
+      <XAxis
+        dataKey="name"
+        tick={{ fontSize: 10, fill: isDark ? '#868e96' : '#495057' }}
+        tickLine={false}
+        axisLine={false}
+      />
+      <YAxis
+        tick={{ fontSize: 10, fill: isDark ? '#868e96' : '#495057' }}
+        tickLine={false}
+        axisLine={false}
+        domain={[0, 'auto']}
+      />
+      <Tooltip content={<CustomTooltip />} cursor={{ stroke: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)', strokeWidth: 1 }} />
+      <ReferenceLine
+        y={goal}
+        stroke={refColor}
+        strokeDasharray="4 4"
+        strokeWidth={1}
+        label={{
+          value: `${goal}`,
+          position: 'insideTopRight',
+          fill: refColor,
+          fontSize: 9,
+        }}
+      />
+      <Area
+        type="monotone"
+        dataKey="consumption"
+        stroke={chartColor}
+        strokeWidth={2}
+        fill={`url(#${gradientId})`}
+        dot={false}
+        activeDot={{ r: 4, fill: chartColor, stroke: isDark ? '#1a1b1e' : '#fff', strokeWidth: 2 }}
+      />
+    </AreaChart>
+  )
+
   return (
     <Box>
       <Group justify="space-between" mb="xs">
-        <Text fw={600} size="sm">{t('dashboard.fuel_efficiency')}</Text>
+        <Group gap="xs">
+          <Text fw={600} size="sm">{t('dashboard.fuel_efficiency')}</Text>
+          <DraggableOverlay title={t('dashboard.fuel_efficiency')} icon={<IconChartBar size={16} />}>
+            <Box style={{ width: '100%', height: '100%', minHeight: 400 }}>
+              <ResponsiveContainer width="100%" height="100%">
+                {chart}
+              </ResponsiveContainer>
+            </Box>
+          </DraggableOverlay>
+        </Group>
         <SegmentedControl
           value={monthsRange}
           onChange={setMonthsRange}
@@ -83,53 +145,7 @@ export function FuelEfficiencyChart({ data = [] }: FuelEfficiencyChartProps) {
         />
       </Group>
       <ResponsiveContainer width="100%" height={180}>
-        <AreaChart data={chartData} margin={{ top: 2, right: 2, left: -20, bottom: 0 }}>
-          <defs>
-            <linearGradient id="fuelGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor={chartColor} stopOpacity={isDark ? 0.25 : 0.15} />
-              <stop offset="95%" stopColor={chartColor} stopOpacity={0} />
-            </linearGradient>
-          </defs>
-          <CartesianGrid
-            strokeDasharray="3 3"
-            vertical={false}
-            stroke={isDark ? '#2C2E33' : '#e9ecef'}
-          />
-          <XAxis
-            dataKey="name"
-            tick={{ fontSize: 10, fill: isDark ? '#868e96' : '#495057' }}
-            tickLine={false}
-            axisLine={false}
-          />
-          <YAxis
-            tick={{ fontSize: 10, fill: isDark ? '#868e96' : '#495057' }}
-            tickLine={false}
-            axisLine={false}
-            domain={[0, 'auto']}
-          />
-          <Tooltip content={<CustomTooltip />} cursor={{ stroke: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)', strokeWidth: 1 }} />
-          <ReferenceLine
-            y={goal}
-            stroke={refColor}
-            strokeDasharray="4 4"
-            strokeWidth={1}
-            label={{
-              value: `${goal}`,
-              position: 'insideTopRight',
-              fill: refColor,
-              fontSize: 9,
-            }}
-          />
-          <Area
-            type="monotone"
-            dataKey="consumption"
-            stroke={chartColor}
-            strokeWidth={2}
-            fill="url(#fuelGradient)"
-            dot={false}
-            activeDot={{ r: 4, fill: chartColor, stroke: isDark ? '#1a1b1e' : '#fff', strokeWidth: 2 }}
-          />
-        </AreaChart>
+        {chart}
       </ResponsiveContainer>
     </Box>
   )

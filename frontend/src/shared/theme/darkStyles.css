@@ -1,5 +1,25 @@
 /* Dark Theme Styles for Parko — Mantine-native dark mode with custom enhancements */
 
+/* Prevent double-tap zoom on mobile, keep pinch-to-zoom */
+html {
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  touch-action: manipulation;
+}
+
+a,
+button,
+input,
+textarea,
+select,
+[role='button'],
+label {
+  touch-action: manipulation;
+}
+
 [data-mantine-color-scheme='dark'] {
   /* Navigation Sidebar */
   .app-shell-navbar {
