@@ -1,8 +1,22 @@
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import include, path, re_path
 from django.conf import settings
 from django.conf.urls.static import static
+from django.http import FileResponse, HttpResponse
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+from pathlib import Path
+
+
+def serve_react(request, path=''):
+    """Serve React frontend index.html for all non-API routes."""
+    index_path = Path(settings.STATIC_ROOT) / 'index.html'
+    if index_path.exists():
+        return FileResponse(open(index_path, 'rb'))
+    return HttpResponse(
+        "Frontend not built. Run npm run build and collectstatic.",
+        status=500
+    )
+
 
 urlpatterns = [
     # Django admin
@@ -27,5 +41,10 @@ urlpatterns = [
     path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
 ]
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Media files
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# React frontend catch-all (must be last)
+urlpatterns += [
+    re_path(r'^(?P<path>.*)$', serve_react),
+]

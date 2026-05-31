@@ -1,0 +1,120 @@
+- generic [ref=e2]:
+  - generic [ref=e100]:
+    - complementary [ref=e101]:
+      - generic [ref=e102]:
+        - generic [ref=e103]:
+          - link "Railway Logo" [ref=e334] [cursor=pointer]:
+            - /url: /dashboard
+            - img "Railway Logo" [ref=e335]
+          - button [ref=e110] [cursor=pointer]:
+            - generic [ref=e112]:
+              - generic "janatkk's Projects" [ref=e336]
+              - img [ref=e116]
+        - navigation [ref=e120]:
+          - link [ref=e122] [cursor=pointer]:
+            - /url: /dashboard
+            - img [ref=e125]
+          - link [ref=e128] [cursor=pointer]:
+            - /url: /workspace/templates
+            - img [ref=e131]
+          - link [ref=e136] [cursor=pointer]:
+            - /url: /workspace/usage
+            - img [ref=e139]
+          - link [ref=e142] [cursor=pointer]:
+            - /url: /workspace/people
+            - img [ref=e145]
+          - link [ref=e150] [cursor=pointer]:
+            - /url: /workspace
+            - img [ref=e153]
+        - generic [ref=e157]:
+          - link [ref=e159] [cursor=pointer]:
+            - /url: https://docs.railway.com
+            - generic [ref=e161]:
+              - img [ref=e163]
+              - img [ref=e167]
+          - link [ref=e170] [cursor=pointer]:
+            - /url: https://station.railway.com
+            - generic [ref=e172]:
+              - img [ref=e174]
+              - img [ref=e182]
+          - link [ref=e185] [cursor=pointer]:
+            - /url: https://backboard.railway.com/csc/auth/login?redirect_uri=https%3A%2F%2Fstation-server.railway.com%2Fauth%2Fcallback%3FredirectTo%3D%252Fmy-threads
+            - generic [ref=e187]:
+              - img [ref=e189]
+              - img [ref=e192]
+      - button [ref=e196] [cursor=pointer]:
+        - generic "janatkk" [ref=e337]
+      - button "Expand sidebar" [ref=e338]
+    - generic [ref=e202]:
+      - banner [ref=e203]:
+        - generic [ref=e204]:
+          - button "1" [ref=e339] [cursor=pointer]:
+            - generic [ref=e206]:
+              - img [ref=e208]
+              - generic [ref=e210]: "1"
+          - button "Trial expired" [ref=e340] [cursor=pointer]:
+            - generic [ref=e213]:
+              - img [ref=e215]
+              - paragraph [ref=e217]: Trial expired
+      - main [ref=e219]:
+        - generic [ref=e221]:
+          - generic [ref=e222]:
+            - heading "Projects" [level=1] [ref=e341]
+            - button "New" [ref=e342] [cursor=pointer]:
+              - img [ref=e226]
+              - generic [ref=e228]: New
+          - generic [ref=e231]:
+            - generic [ref=e232]:
+              - generic [ref=e233]: Trial Ended
+              - generic [ref=e234]: "|"
+              - generic [ref=e235]: Thanks for trying Railway! Upgrade now to continue using the platform.
+            - link "Upgrade now" [ref=e343] [cursor=pointer]:
+              - /url: /workspace/plans
+          - generic [ref=e237]:
+            - generic [ref=e238]:
+              - generic [ref=e239]:
+                - button "1 Project" [ref=e344] [cursor=pointer]:
+                  - img [ref=e243]
+                  - text: 1 Project
+                - generic [ref=e246]:
+                  - generic [ref=e247]: Project sort
+                  - generic [ref=e248]:
+                    - combobox "Project sort" [ref=e345] [cursor=pointer]:
+                      - 'option "Sort By: Recent Activity" [selected]'
+                      - 'option "Sort By: Creation Date"'
+                      - 'option "Sort By: Alphabetical"'
+                    - generic:
+                      - generic:
+                        - img
+              - group "View display" [ref=e346]:
+                - radio [checked] [ref=e252] [cursor=pointer]:
+                  - img [ref=e256]
+                - radio [ref=e258] [cursor=pointer]:
+                  - img [ref=e261]
+            - generic [ref=e265]:
+              - link "View Project" [ref=e347] [cursor=pointer]:
+                - /url: /project/98b5cdd3-f530-4177-a8e0-ca32cac65c1c?
+                - generic [ref=e267]: View Project
+              - generic:
+                - generic:
+                  - generic:
+                    - generic: luminous-possibility
+                - generic:
+                  - generic:
+                    - link [ref=e268] [cursor=pointer]:
+                      - /url: /project/98b5cdd3-f530-4177-a8e0-ca32cac65c1c/service/412075e6-bd45-4a04-97a7-a9847a783289?
+                      - img [ref=e271]
+                    - generic:
+                      - generic:
+                        - generic: production
+                        - generic: ·
+                        - generic: 0/1 service online
+  - generic [ref=e353]:
+    - img [ref=e355]
+    - generic [ref=e358]:
+      - generic [ref=e359]:
+        - paragraph [ref=e360]: All good, please continue
+        - link "Dismiss" [ref=e361] [cursor=pointer]:
+          - /url: ""
+          - img [ref=e363]
+      - paragraph [ref=e365]: Thank you for agreeing with our Terms of Service. You may now proceed with your deployment!

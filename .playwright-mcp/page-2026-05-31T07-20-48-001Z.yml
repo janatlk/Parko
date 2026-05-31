@@ -1,0 +1,346 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e63]:
+    - banner [ref=e64]:
+      - generic [ref=e65]:
+        - generic [ref=e67]:
+          - img "Parko" [ref=e68]
+          - paragraph [ref=e69]: Parko
+        - generic [ref=e71]:
+          - radiogroup [ref=e73]:
+            - generic [ref=e75]:
+              - radio "Светлая"
+              - generic [ref=e78] [cursor=pointer]:
+                - img [ref=e79]
+                - generic [ref=e82]: Светлая
+            - generic [ref=e83]:
+              - radio "Тёмная" [checked]
+              - generic [ref=e86] [cursor=pointer]:
+                - img [ref=e87]
+                - generic [ref=e89]: Тёмная
+          - generic [ref=e91]:
+            - img [ref=e93]
+            - textbox [ref=e98] [cursor=pointer]: RU
+            - generic:
+              - img
+          - button "Выйти" [ref=e99] [cursor=pointer]:
+            - generic [ref=e100]:
+              - img [ref=e102]
+              - generic [ref=e106]: Выйти
+    - navigation [ref=e107]:
+      - generic [ref=e108]:
+        - generic [ref=e110]: AD
+        - generic [ref=e111]:
+          - paragraph [ref=e112]: admin
+          - paragraph [ref=e113]: Demo Company
+        - generic [ref=e115]: COMPANY_ADMIN
+      - generic [ref=e116]:
+        - link "Дашборд" [ref=e117] [cursor=pointer]:
+          - /url: /dashboard
+          - img [ref=e119]
+          - generic [ref=e123]: Дашборд
+        - separator [ref=e124]:
+          - generic [ref=e125]: Управление данными
+        - generic [ref=e126]:
+          - img [ref=e128]
+          - paragraph [ref=e132]: Основные таблицы
+        - link "Автомобили" [ref=e133] [cursor=pointer]:
+          - /url: /cars
+          - img [ref=e135]
+          - generic [ref=e139]: Автомобили
+        - link "Топливо" [ref=e140] [cursor=pointer]:
+          - /url: /fuel
+          - img [ref=e142]
+          - generic [ref=e146]: Топливо
+        - link "Запчасти" [ref=e147] [cursor=pointer]:
+          - /url: /spares
+          - img [ref=e149]
+          - generic [ref=e156]: Запчасти
+        - link "Страховки" [ref=e157] [cursor=pointer]:
+          - /url: /insurances
+          - img [ref=e159]
+          - generic [ref=e161]: Страховки
+        - link "Техосмотры" [ref=e162] [cursor=pointer]:
+          - /url: /inspections
+          - img [ref=e164]
+          - generic [ref=e168]: Техосмотры
+        - link "Пользователи" [ref=e169] [cursor=pointer]:
+          - /url: /users
+          - img [ref=e171]
+          - generic [ref=e176]: Пользователи
+        - separator [ref=e177]
+        - link "Отчёты" [ref=e178] [cursor=pointer]:
+          - /url: /reports
+          - img [ref=e180]
+          - generic [ref=e183]: Отчёты
+        - link "Таблицы" [ref=e184] [cursor=pointer]:
+          - /url: /custom-tables
+          - img [ref=e186]
+          - generic [ref=e188]: Таблицы
+        - link "AI Ассистент" [ref=e189] [cursor=pointer]:
+          - /url: /ai
+          - img [ref=e191]
+          - generic [ref=e198]: AI Ассистент
+        - link "Профиль" [ref=e199] [cursor=pointer]:
+          - /url: /profile
+          - img [ref=e201]
+          - generic [ref=e204]: Профиль
+    - main [ref=e205]:
+      - generic [ref=e207]:
+        - generic [ref=e209]:
+          - heading "Дашборд" [level=3] [ref=e210]
+          - paragraph [ref=e211]: Добро пожаловать в Parko
+        - generic [ref=e212]:
+          - generic [ref=e214]:
+            - generic [ref=e215]:
+              - paragraph [ref=e216]: Активные
+              - paragraph [ref=e217]: 16 / 17
+            - img [ref=e219]
+          - generic [ref=e223]:
+            - generic [ref=e224]:
+              - generic [ref=e225]:
+                - paragraph [ref=e226]: Расходы на топливо
+                - paragraph [ref=e227]: 60 000 KGS
+                - generic [ref=e228]:
+                  - img [ref=e229]
+                  - paragraph [ref=e232]: +184.4%
+              - img [ref=e234]
+            - application [ref=e241]
+          - generic [ref=e249]:
+            - generic [ref=e250]:
+              - generic [ref=e251]:
+                - paragraph [ref=e252]: Средний расход
+                - paragraph [ref=e253]: 13.9 л/100км
+              - img [ref=e255]
+            - application [ref=e260]
+          - generic [ref=e268]:
+            - generic [ref=e269]:
+              - generic [ref=e270]:
+                - paragraph [ref=e271]: Общие расходы
+                - paragraph [ref=e272]: 90 646 KGS
+                - generic [ref=e273]:
+                  - img [ref=e274]
+                  - paragraph [ref=e277]: +310.2%
+              - img [ref=e279]
+            - application [ref=e289]
+        - generic [ref=e297]:
+          - generic [ref=e298]:
+            - img [ref=e299]
+            - paragraph [ref=e302]: AI-инсайты
+          - generic [ref=e303]:
+            - generic [ref=e304]:
+              - paragraph [ref=e305]: "1."
+              - paragraph [ref=e306]: Расход топлива средний составляет 13,94 л/100км, что превышает норму
+            - generic [ref=e307]:
+              - paragraph [ref=e308]: "2."
+              - paragraph [ref=e309]: Операционные затраты за месяц составляют 90 646, что на 333% выше, чем в марте
+            - generic [ref=e310]:
+              - paragraph [ref=e311]: "3."
+              - paragraph [ref=e312]: Проверьте страховки/осмотры автомобилей, так как нет истекающих сроков
+            - generic [ref=e313]:
+              - paragraph [ref=e314]: "4."
+              - paragraph [ref=e315]: Стоимость самого дорогого автомобиля составляет 50 000 с
+            - generic [ref=e316]:
+              - paragraph [ref=e317]: "5."
+              - paragraph [ref=e318]: Тренд затрат за последние 3 месяца демонстрирует значительный рост (+173% vs март)
+        - generic [ref=e320]:
+          - generic [ref=e323]:
+            - generic [ref=e324]:
+              - generic [ref=e325]:
+                - paragraph [ref=e326]: Тренд расходов
+                - button [ref=e327] [cursor=pointer]:
+                  - img [ref=e329]
+              - radiogroup [ref=e334]:
+                - generic [ref=e336]:
+                  - radio "3m"
+                  - generic [ref=e337] [cursor=pointer]: 3m
+                - generic [ref=e338]:
+                  - radio "6m" [checked]
+                  - generic [ref=e339] [cursor=pointer]: 6m
+                - generic [ref=e340]:
+                  - radio "12m"
+                  - generic [ref=e341] [cursor=pointer]: 12m
+            - application [ref=e344]:
+              - generic [ref=e355]:
+                - generic [ref=e356]:
+                  - generic [ref=e358]: Nov
+                  - generic [ref=e360]: Dec
+                  - generic [ref=e362]: Jan
+                  - generic [ref=e364]: Mar
+                  - generic [ref=e366]: Apr
+                  - generic [ref=e368]: May
+                - generic [ref=e369]:
+                  - generic [ref=e371]: "0"
+                  - generic [ref=e373]: 30k
+                  - generic [ref=e375]: 60k
+                  - generic [ref=e377]: 90k
+                  - generic [ref=e379]: 120k
+          - generic [ref=e382]:
+            - generic [ref=e383]:
+              - generic [ref=e384]:
+                - paragraph [ref=e385]: Эффективность топлива
+                - button [ref=e386] [cursor=pointer]:
+                  - img [ref=e388]
+              - radiogroup [ref=e393]:
+                - generic [ref=e395]:
+                  - radio "3m"
+                  - generic [ref=e396] [cursor=pointer]: 3m
+                - generic [ref=e397]:
+                  - radio "6m" [checked]
+                  - generic [ref=e398] [cursor=pointer]: 6m
+                - generic [ref=e399]:
+                  - radio "12m"
+                  - generic [ref=e400] [cursor=pointer]: 12m
+            - application [ref=e403]:
+              - generic [ref=e414]:
+                - generic [ref=e415]:
+                  - generic [ref=e417]: Nov
+                  - generic [ref=e419]: Dec
+                  - generic [ref=e421]: Jan
+                  - generic [ref=e423]: Mar
+                  - generic [ref=e425]: Apr
+                  - generic [ref=e427]: May
+                - generic [ref=e428]:
+                  - generic [ref=e430]: "0"
+                  - generic [ref=e432]: "6"
+                  - generic [ref=e434]: "12"
+                  - generic [ref=e436]: "18"
+                  - generic [ref=e438]: "24"
+                - generic [ref=e439]: "15"
+          - generic [ref=e442]:
+            - paragraph [ref=e443]: Сравнение авто
+            - application [ref=e446]:
+              - generic [ref=e464]:
+                - generic [ref=e467]:
+                  - generic [ref=e469]: Топливо
+                  - generic [ref=e471]: ТО
+                  - generic [ref=e473]: Прочее
+                  - generic [ref=e475]: Средний расход
+                - generic [ref=e477]:
+                  - generic [ref=e479]: "0"
+                  - generic [ref=e481]: "35"
+                  - generic [ref=e483]: "70"
+                  - generic [ref=e485]: "105"
+            - generic [ref=e486]:
+              - paragraph [ref=e489]: AK64401KG
+              - paragraph [ref=e492]: PP77401KG
+              - paragraph [ref=e495]: "58482"
+          - generic [ref=e498]:
+            - paragraph [ref=e499]: Топ авто по стоимости
+            - application [ref=e502]:
+              - generic [ref=e534]:
+                - generic [ref=e535]:
+                  - generic [ref=e537]: "0"
+                  - generic [ref=e539]: 30k
+                  - generic [ref=e541]: 60k
+                  - generic [ref=e543]: 90k
+                  - generic [ref=e545]: 120k
+                - generic [ref=e546]:
+                  - generic [ref=e548]: 01KG789OI
+                  - generic [ref=e550]: KJ5678
+                  - generic [ref=e552]: OO345
+                  - generic [ref=e554]: 01KG452OU
+                  - generic [ref=e556]: AA642401KG
+                  - generic [ref=e558]: "58482"
+                  - generic [ref=e560]: PP77401KG
+                  - generic [ref=e562]: AK64401KG
+          - generic [ref=e565]:
+            - paragraph [ref=e566]: Последняя активность
+            - generic [ref=e567]:
+              - generic [ref=e568] [cursor=pointer]:
+                - img [ref=e570]
+                - generic [ref=e572]:
+                  - paragraph [ref=e573]: "Maintenance: Шина"
+                  - paragraph [ref=e574]: AK64401KG • 5d ago
+                  - paragraph [ref=e575]: 1 200 KGS
+              - generic [ref=e576] [cursor=pointer]:
+                - img [ref=e578]
+                - generic [ref=e580]:
+                  - paragraph [ref=e581]: "Maintenance: Фильтр масла"
+                  - paragraph [ref=e582]: 01KG789OI • 6d ago
+                  - paragraph [ref=e583]: 700 KGS
+              - generic [ref=e584] [cursor=pointer]:
+                - img [ref=e586]
+                - generic [ref=e588]:
+                  - paragraph [ref=e589]: "Maintenance: Колесо"
+                  - paragraph [ref=e590]: 123 • 24 мая
+                  - paragraph [ref=e591]: 1 500 KGS
+              - generic [ref=e592] [cursor=pointer]:
+                - img [ref=e594]
+                - generic [ref=e596]:
+                  - paragraph [ref=e597]: "Maintenance: Тормозные колодки"
+                  - paragraph [ref=e598]: 58482 • 23 мая
+                  - paragraph [ref=e599]: 3 000 KGS
+              - generic [ref=e600] [cursor=pointer]:
+                - img [ref=e602]
+                - generic [ref=e604]:
+                  - paragraph [ref=e605]: "Maintenance: Коробка передач"
+                  - paragraph [ref=e606]: 58482 • 22 мая
+                  - paragraph [ref=e607]: 8 000 KGS
+              - generic [ref=e608] [cursor=pointer]:
+                - img [ref=e610]
+                - generic [ref=e612]:
+                  - paragraph [ref=e613]: "Fuel: May 2026"
+                  - paragraph [ref=e614]: 01KG789OI • 22 мая
+          - generic [ref=e617]:
+            - generic [ref=e618]:
+              - paragraph [ref=e619]: Истекают скоро
+              - generic [ref=e621]: "4"
+            - table [ref=e622]:
+              - rowgroup [ref=e623]:
+                - row "Автомобиль Тип Осталось Стоимость" [ref=e624]:
+                  - columnheader "Автомобиль" [ref=e625]
+                  - columnheader "Тип" [ref=e626]
+                  - columnheader "Осталось" [ref=e627]
+                  - columnheader "Стоимость" [ref=e628]
+              - rowgroup [ref=e629]:
+                - row "AK64401KG Страховки Истекло 417 дн. назад 0 с." [ref=e630] [cursor=pointer]:
+                  - cell "AK64401KG" [ref=e631]:
+                    - paragraph [ref=e632]: AK64401KG
+                  - cell "Страховки" [ref=e633]:
+                    - paragraph [ref=e634]: Страховки
+                  - cell "Истекло 417 дн. назад" [ref=e635]:
+                    - generic [ref=e636]:
+                      - generic [ref=e638]: Истекло
+                      - paragraph [ref=e639]: 417 дн. назад
+                  - cell "0 с." [ref=e640]:
+                    - paragraph [ref=e641]: 0 с.
+                - row "AK64401KG Страховки Истекло 122 дн. назад 123 с." [ref=e642] [cursor=pointer]:
+                  - cell "AK64401KG" [ref=e643]:
+                    - paragraph [ref=e644]: AK64401KG
+                  - cell "Страховки" [ref=e645]:
+                    - paragraph [ref=e646]: Страховки
+                  - cell "Истекло 122 дн. назад" [ref=e647]:
+                    - generic [ref=e648]:
+                      - generic [ref=e650]: Истекло
+                      - paragraph [ref=e651]: 122 дн. назад
+                  - cell "123 с." [ref=e652]:
+                    - paragraph [ref=e653]: 123 с.
+                - row "01KG789OI Страховки Истекло 19 дн. назад 2 332 с." [ref=e654] [cursor=pointer]:
+                  - cell "01KG789OI" [ref=e655]:
+                    - paragraph [ref=e656]: 01KG789OI
+                  - cell "Страховки" [ref=e657]:
+                    - paragraph [ref=e658]: Страховки
+                  - cell "Истекло 19 дн. назад" [ref=e659]:
+                    - generic [ref=e660]:
+                      - generic [ref=e662]: Истекло
+                      - paragraph [ref=e663]: 19 дн. назад
+                  - cell "2 332 с." [ref=e664]:
+                    - paragraph [ref=e665]: 2 332 с.
+                - row "123 Страховки Истекло 17 дн. назад 321 с." [ref=e666] [cursor=pointer]:
+                  - cell "123" [ref=e667]:
+                    - paragraph [ref=e668]: "123"
+                  - cell "Страховки" [ref=e669]:
+                    - paragraph [ref=e670]: Страховки
+                  - cell "Истекло 17 дн. назад" [ref=e671]:
+                    - generic [ref=e672]:
+                      - generic [ref=e674]: Истекло
+                      - paragraph [ref=e675]: 17 дн. назад
+                  - cell "321 с." [ref=e676]:
+                    - paragraph [ref=e677]: 321 с.
+  - alert [ref=e678]:
+    - generic [ref=e679]:
+      - generic [ref=e680]: Успешно
+      - generic [ref=e681]: Вы успешно вошли в систему
+    - button [ref=e682] [cursor=pointer]:
+      - img [ref=e683]
+  - generic [ref=e685]: 01KG789OI

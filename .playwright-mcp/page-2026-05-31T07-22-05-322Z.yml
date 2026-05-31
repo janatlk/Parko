@@ -1,0 +1,104 @@
+- generic [ref=e5]:
+  - banner [ref=e6]:
+    - generic [ref=e7]:
+      - generic [ref=e9]:
+        - img "Parko" [ref=e10]
+        - paragraph [ref=e11]: Parko
+      - generic [ref=e13]:
+        - radiogroup [ref=e15]:
+          - generic [ref=e17]:
+            - radio "Светлая"
+            - generic [ref=e20] [cursor=pointer]:
+              - img [ref=e21]
+              - generic [ref=e24]: Светлая
+          - generic [ref=e25]:
+            - radio "Тёмная" [checked]
+            - generic [ref=e28] [cursor=pointer]:
+              - img [ref=e29]
+              - generic [ref=e31]: Тёмная
+        - generic [ref=e33]:
+          - img [ref=e35]
+          - textbox [ref=e40] [cursor=pointer]: RU
+          - generic:
+            - img
+        - button "Выйти" [ref=e41] [cursor=pointer]:
+          - generic [ref=e42]:
+            - img [ref=e44]
+            - generic [ref=e48]: Выйти
+  - navigation [ref=e49]:
+    - generic [ref=e50]:
+      - generic [ref=e52]: AD
+      - generic [ref=e53]:
+        - paragraph [ref=e54]: admin
+        - paragraph [ref=e55]: Demo Company
+      - generic [ref=e57]: COMPANY_ADMIN
+    - generic [ref=e58]:
+      - link "Дашборд" [ref=e59] [cursor=pointer]:
+        - /url: /dashboard
+        - img [ref=e61]
+        - generic [ref=e65]: Дашборд
+      - separator [ref=e66]:
+        - generic [ref=e67]: Управление данными
+      - generic [ref=e68]:
+        - img [ref=e70]
+        - paragraph [ref=e74]: Основные таблицы
+      - link "Автомобили" [ref=e75] [cursor=pointer]:
+        - /url: /cars
+        - img [ref=e77]
+        - generic [ref=e81]: Автомобили
+      - link "Топливо" [ref=e82] [cursor=pointer]:
+        - /url: /fuel
+        - img [ref=e84]
+        - generic [ref=e88]: Топливо
+      - link "Запчасти" [ref=e89] [cursor=pointer]:
+        - /url: /spares
+        - img [ref=e91]
+        - generic [ref=e98]: Запчасти
+      - link "Страховки" [ref=e99] [cursor=pointer]:
+        - /url: /insurances
+        - img [ref=e101]
+        - generic [ref=e103]: Страховки
+      - link "Техосмотры" [ref=e104] [cursor=pointer]:
+        - /url: /inspections
+        - img [ref=e106]
+        - generic [ref=e110]: Техосмотры
+      - link "Пользователи" [ref=e111] [cursor=pointer]:
+        - /url: /users
+        - img [ref=e113]
+        - generic [ref=e118]: Пользователи
+      - separator [ref=e119]
+      - link "Отчёты" [ref=e120] [cursor=pointer]:
+        - /url: /reports
+        - img [ref=e122]
+        - generic [ref=e125]: Отчёты
+      - link "Таблицы" [ref=e126] [cursor=pointer]:
+        - /url: /custom-tables
+        - img [ref=e128]
+        - generic [ref=e130]: Таблицы
+      - link "AI Ассистент" [ref=e131] [cursor=pointer]:
+        - /url: /ai
+        - img [ref=e133]
+        - generic [ref=e140]: AI Ассистент
+      - link "Профиль" [ref=e141] [cursor=pointer]:
+        - /url: /profile
+        - img [ref=e143]
+        - generic [ref=e146]: Профиль
+  - main [ref=e147]:
+    - generic [ref=e149]:
+      - generic [ref=e150]:
+        - generic [ref=e151]:
+          - heading "ДТП" [level=3] [ref=e152]
+          - paragraph [ref=e153]: учёт всех дтп в компании
+        - button "Добавить" [ref=e154] [cursor=pointer]:
+          - generic [ref=e155]:
+            - img [ref=e157]
+            - generic [ref=e158]: Добавить
+      - generic [ref=e159]:
+        - table [ref=e160]:
+          - rowgroup [ref=e161]:
+            - row "Авто Дата" [ref=e162]:
+              - columnheader "Авто" [ref=e163]
+              - columnheader "Дата" [ref=e164]
+              - columnheader [ref=e165]
+          - rowgroup
+        - paragraph [ref=e167]: Нет записей

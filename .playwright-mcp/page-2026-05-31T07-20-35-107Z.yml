@@ -1,0 +1,33 @@
+- generic [ref=e3]:
+  - generic [ref=e5]:
+    - generic [ref=e6] [cursor=pointer]:
+      - button [ref=e7]:
+        - img [ref=e9]
+      - img [ref=e12]
+      - paragraph [ref=e16]: PARKO
+    - generic [ref=e17] [cursor=pointer]: ← На главную
+  - generic [ref=e18]:
+    - generic [ref=e19]:
+      - img [ref=e22]
+      - heading "Вход" [level=2] [ref=e26]
+      - paragraph [ref=e27]: Войдите в свой аккаунт
+    - generic [ref=e30]:
+      - generic [ref=e31]:
+        - generic [ref=e32]: Логин *
+        - generic [ref=e33]:
+          - img [ref=e35]
+          - textbox "Логин" [ref=e38]:
+            - /placeholder: Введите логин
+      - generic [ref=e39]:
+        - generic [ref=e40]: Пароль *
+        - generic [ref=e41]:
+          - img [ref=e43]
+          - textbox "Пароль" [ref=e48]:
+            - /placeholder: Введите пароль
+          - button [ref=e50] [cursor=pointer]:
+            - img [ref=e52]
+      - button "Войти" [ref=e54] [cursor=pointer]:
+        - generic [ref=e56]: Войти
+    - generic [ref=e58]:
+      - paragraph [ref=e59]: "Демо доступ:"
+      - generic [ref=e62]: admin / admin123

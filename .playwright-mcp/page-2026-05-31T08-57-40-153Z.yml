@@ -1,0 +1,81 @@
+- generic [ref=e16]:
+  - banner [ref=e18]:
+    - generic [ref=e19]:
+      - link "Railway Logo" [ref=e20] [cursor=pointer]:
+        - /url: /dashboard
+        - img "Railway Logo" [ref=e22]
+      - generic [ref=e25]:
+        - button "luminous-possibility" [ref=e28] [cursor=pointer]:
+          - generic "janatkk's Projects" [ref=e29]
+          - generic [ref=e31]: luminous-possibility
+          - img [ref=e33]
+        - button "production" [ref=e37] [cursor=pointer]:
+          - generic [ref=e38]: production
+          - img [ref=e40]
+    - navigation [ref=e42]:
+      - generic [ref=e44]:
+        - button "Toggle activity" [ref=e46] [cursor=pointer]:
+          - img [ref=e48]
+        - button "1" [ref=e50] [cursor=pointer]:
+          - generic [ref=e51]:
+            - img [ref=e53]
+            - generic [ref=e55]: "1"
+        - button "Trial expired" [ref=e57] [cursor=pointer]:
+          - generic [ref=e58]:
+            - img [ref=e60]
+            - paragraph [ref=e62]: Trial expired
+        - button "Agent" [ref=e64] [cursor=pointer]:
+          - img [ref=e66]
+          - text: Agent
+  - generic [ref=e68]:
+    - navigation "Project navigation" [ref=e69]:
+      - generic [ref=e70]:
+        - link "Architecture" [ref=e73] [cursor=pointer]:
+          - /url: /project/98b5cdd3-f530-4177-a8e0-ca32cac65c1c?environmentId=44b0d7f0-bebd-4050-8507-9467b064c583
+          - img [ref=e75]
+        - link "Observability" [ref=e81] [cursor=pointer]:
+          - /url: /project/98b5cdd3-f530-4177-a8e0-ca32cac65c1c/observability?environmentId=44b0d7f0-bebd-4050-8507-9467b064c583
+          - img [ref=e83]
+        - link "Logs" [ref=e86] [cursor=pointer]:
+          - /url: /project/98b5cdd3-f530-4177-a8e0-ca32cac65c1c/logs?environmentId=44b0d7f0-bebd-4050-8507-9467b064c583
+          - img [ref=e88]
+        - link "Settings" [ref=e92] [cursor=pointer]:
+          - /url: /project/98b5cdd3-f530-4177-a8e0-ca32cac65c1c/settings?environmentId=44b0d7f0-bebd-4050-8507-9467b064c583
+          - img [ref=e94]
+      - button [ref=e97] [cursor=pointer]:
+        - generic "janatkk" [ref=e99]
+    - region [ref=e105]:
+      - generic [ref=e110]:
+        - img [ref=e111]
+        - generic [ref=e112]:
+          - generic [ref=e114]:
+            - generic:
+              - img
+              - button "Pitaka-Django Service is offline" [ref=e115]:
+                - link "Pitaka-Django Service is offline" [ref=e118] [cursor=pointer]:
+                  - /url: /project/98b5cdd3-f530-4177-a8e0-ca32cac65c1c/service/412075e6-bd45-4a04-97a7-a9847a783289?environmentId=44b0d7f0-bebd-4050-8507-9467b064c583
+                  - generic [ref=e119]:
+                    - img [ref=e121]
+                    - paragraph [ref=e124]: Pitaka-Django
+                  - paragraph [ref=e125]: Service is offline
+          - toolbar "Canvas options" [ref=e127]:
+            - button "Canvas settings" [ref=e128] [cursor=pointer]:
+              - img [ref=e130]
+            - group "canvas action" [ref=e140]:
+              - button "Zoom in" [ref=e141] [cursor=pointer]:
+                - img [ref=e143]
+              - button "Zoom out" [ref=e145] [cursor=pointer]:
+                - img [ref=e147]
+              - button "Center canvas" [ref=e148] [cursor=pointer]:
+                - img [ref=e150]
+            - group "canvas action" [ref=e155]:
+              - button "Undo" [ref=e156] [cursor=pointer]:
+                - img [ref=e158]
+              - button "Redo" [ref=e161] [cursor=pointer]:
+                - img [ref=e163]
+            - button "Visibility layers" [ref=e166] [cursor=pointer]:
+              - img [ref=e168]
+          - button "Add" [ref=e173] [cursor=pointer]:
+            - img [ref=e175]
+            - generic [ref=e177]: Add
+          - img [ref=e178]

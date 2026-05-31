@@ -1,0 +1,795 @@
+INFO 2026-05-31 02:33:32,590 autoreload Watching for file changes with StatReloader
+WARNING 2026-05-31 02:33:33,802 log Unauthorized: /api/v1/
+WARNING 2026-05-31 02:33:33,802 basehttp "GET /api/v1/ HTTP/1.1" 401 264
+WARNING 2026-05-31 02:34:36,503 log Unauthorized: /api/v1/
+WARNING 2026-05-31 02:34:36,504 basehttp "GET /api/v1/ HTTP/1.1" 401 264
+WARNING 2026-05-31 02:36:26,818 log Unauthorized: /api/v1/
+WARNING 2026-05-31 02:36:26,819 basehttp "GET /api/v1/ HTTP/1.1" 401 264
+INFO 2026-05-31 02:38:39,810 basehttp "POST /api/v1/auth/login/ HTTP/1.1" 200 854
+INFO 2026-05-31 02:38:39,949 basehttp "GET /api/v1/auth/me/ HTTP/1.1" 200 256
+INFO 2026-05-31 02:38:40,434 basehttp "GET /api/v1/dashboard/overview/?months=12&limit=8 HTTP/1.1" 200 6467
+INFO 2026-05-31 02:38:42,528 basehttp "POST /api/v1/auth/logout/ HTTP/1.1" 204 0
+INFO 2026-05-31 02:38:52,727 basehttp "POST /api/v1/auth/login/ HTTP/1.1" 200 854
+INFO 2026-05-31 02:38:52,760 basehttp "GET /api/v1/auth/me/ HTTP/1.1" 200 256
+INFO 2026-05-31 02:39:39,265 basehttp "PATCH /api/v1/auth/me/ HTTP/1.1" 200 255
+INFO 2026-05-31 02:39:45,391 basehttp "PATCH /api/v1/auth/me/ HTTP/1.1" 200 254
+INFO 2026-05-31 02:40:02,507 basehttp "GET /api/v1/dashboard/overview/?months=12&limit=8 HTTP/1.1" 200 6467
+INFO 2026-05-31 02:40:08,403 basehttp "GET /api/v1/cars/?page=1&page_size=10 HTTP/1.1" 200 1122
+INFO 2026-05-31 02:40:13,523 basehttp "GET /api/v1/fuel/?page=1&car=52 HTTP/1.1" 200 120
+INFO 2026-05-31 02:40:13,537 basehttp "GET /api/v1/insurances/?page=1&car=52 HTTP/1.1" 200 260
+INFO 2026-05-31 02:40:13,538 basehttp "GET /api/v1/inspections/?page=1&car=52 HTTP/1.1" 200 213
+INFO 2026-05-31 02:40:13,538 basehttp "GET /api/v1/spares/?page=1&car=52 HTTP/1.1" 200 358
+INFO 2026-05-31 02:40:13,543 basehttp "GET /api/v1/cars/52/photos/ HTTP/1.1" 200 147
+INFO 2026-05-31 02:40:13,544 basehttp "GET /api/v1/cars/52/ HTTP/1.1" 200 357
+INFO 2026-05-31 02:40:13,889 basehttp "GET /media/car_photos/image.jpg HTTP/1.1" 200 1536962
+INFO 2026-05-31 02:40:33,980 basehttp "GET /api/v1/cars/?page=1 HTTP/1.1" 200 1109
+INFO 2026-05-31 02:40:33,992 basehttp "GET /api/v1/fuel/?page=1&page_size=10 HTTP/1.1" 200 1752
+INFO 2026-05-31 02:40:42,620 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 1860
+INFO 2026-05-31 02:40:42,620 basehttp "GET /api/v1/ai/suggestions/ HTTP/1.1" 200 456
+INFO 2026-05-31 02:40:44,582 services AI Settings - Provider: groq, Model: llama-3.1-8b-instant, API Key: gsk_MOVS22...SfHO
+INFO 2026-05-31 02:40:46,116 services Groq client initialized for user 1
+INFO 2026-05-31 02:40:46,118 services Making Groq API call for user 1, model: llama-3.1-8b-instant, messages: 3
+INFO 2026-05-31 02:40:47,950 _client HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO 2026-05-31 02:40:47,985 services Groq API response received for user 1
+INFO 2026-05-31 02:40:47,985 services Tokens - prompt: 5632, completion: 308
+INFO 2026-05-31 02:40:47,985 services AI response for user 1: 854 chars
+INFO 2026-05-31 02:40:48,010 basehttp "POST /api/v1/ai/chat/ HTTP/1.1" 200 2452
+INFO 2026-05-31 02:40:48,162 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 2040
+INFO 2026-05-31 02:40:53,106 basehttp "GET /api/v1/cars/?page=1&page_size=10 HTTP/1.1" 200 1122
+INFO 2026-05-31 02:41:06,060 services AI Settings - Provider: groq, Model: llama-3.1-8b-instant, API Key: gsk_MOVS22...SfHO
+INFO 2026-05-31 02:41:06,803 services Groq client initialized for user 1
+INFO 2026-05-31 02:41:06,806 services Making Groq API call for user 1, model: llama-3.1-8b-instant, messages: 3
+INFO 2026-05-31 02:41:08,819 _client HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO 2026-05-31 02:41:08,821 services Groq API response received for user 1
+INFO 2026-05-31 02:41:08,821 services Tokens - prompt: 5642, completion: 703
+INFO 2026-05-31 02:41:08,821 services AI response for user 1: 2363 chars
+INFO 2026-05-31 02:41:08,852 basehttp "POST /api/v1/ai/chat/ HTTP/1.1" 200 7178
+INFO 2026-05-31 02:41:08,930 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 2257
+INFO 2026-05-31 03:01:28,708 basehttp "GET /api/v1/auth/me/ HTTP/1.1" 200 254
+INFO 2026-05-31 03:01:28,845 basehttp "GET /api/v1/ai/suggestions/ HTTP/1.1" 200 470
+INFO 2026-05-31 03:01:28,853 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 2257
+INFO 2026-05-31 03:01:30,310 basehttp "GET /api/v1/auth/me/ HTTP/1.1" 200 254
+INFO 2026-05-31 03:01:30,408 basehttp "GET /api/v1/ai/suggestions/ HTTP/1.1" 200 438
+INFO 2026-05-31 03:01:30,412 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 2257
+INFO 2026-05-31 03:01:34,680 basehttp "GET /api/v1/ai/conversations/92/ HTTP/1.1" 200 3855
+INFO 2026-05-31 03:01:52,706 basehttp "GET /api/v1/cars/?page=1&page_size=10 HTTP/1.1" 200 1122
+INFO 2026-05-31 03:02:03,158 basehttp "PATCH /api/v1/auth/me/ HTTP/1.1" 200 255
+INFO 2026-05-31 03:02:10,459 basehttp "PATCH /api/v1/auth/me/ HTTP/1.1" 200 254
+INFO 2026-05-31 03:02:15,103 basehttp "GET /api/v1/dashboard/overview/?months=12&limit=8 HTTP/1.1" 200 6467
+INFO 2026-05-31 03:21:06,880 basehttp "GET /api/v1/auth/me/ HTTP/1.1" 200 254
+INFO 2026-05-31 03:21:07,292 basehttp "GET /api/v1/dashboard/overview/?months=12&limit=8 HTTP/1.1" 200 6467
+INFO 2026-05-31 03:21:40,138 basehttp "GET /api/v1/ai/suggestions/ HTTP/1.1" 200 456
+INFO 2026-05-31 03:21:40,143 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 2257
+INFO 2026-05-31 03:21:56,558 services AI Settings - Provider: groq, Model: llama-3.1-8b-instant, API Key: gsk_MOVS22...SfHO
+INFO 2026-05-31 03:21:57,109 services Groq client initialized for user 1
+INFO 2026-05-31 03:21:57,112 services Making Groq API call for user 1, model: llama-3.1-8b-instant, messages: 3
+INFO 2026-05-31 03:21:58,864 _client HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO 2026-05-31 03:21:58,865 services Groq API response received for user 1
+INFO 2026-05-31 03:21:58,865 services Tokens - prompt: 5630, completion: 226
+INFO 2026-05-31 03:21:58,865 services AI response for user 1: 487 chars
+INFO 2026-05-31 03:21:58,886 basehttp "POST /api/v1/ai/chat/ HTTP/1.1" 200 1622
+INFO 2026-05-31 03:21:58,951 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 2441
+INFO 2026-05-31 03:22:08,716 basehttp "GET /api/v1/ai/conversations/92/ HTTP/1.1" 200 3855
+INFO 2026-05-31 03:23:07,275 basehttp "GET /api/v1/ai/conversations/93/ HTTP/1.1" 200 1044
+INFO 2026-05-31 03:29:07,495 basehttp "GET /api/v1/auth/me/ HTTP/1.1" 200 254
+INFO 2026-05-31 03:29:07,670 basehttp "GET /api/v1/ai/suggestions/ HTTP/1.1" 200 461
+INFO 2026-05-31 03:29:07,674 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 2441
+INFO 2026-05-31 03:29:10,097 basehttp "GET /api/v1/ai/conversations/93/ HTTP/1.1" 200 1044
+INFO 2026-05-31 03:29:23,967 basehttp "PATCH /api/v1/auth/me/ HTTP/1.1" 200 255
+INFO 2026-05-31 03:29:27,628 basehttp "PATCH /api/v1/auth/me/ HTTP/1.1" 200 254
+INFO 2026-05-31 03:29:30,166 basehttp "GET /api/v1/dashboard/overview/?months=12&limit=8 HTTP/1.1" 200 6467
+INFO 2026-05-31 03:29:56,477 basehttp "GET /api/v1/cars/?page=1 HTTP/1.1" 200 1109
+INFO 2026-05-31 03:29:56,491 basehttp "GET /api/v1/saved/ HTTP/1.1" 200 1131
+INFO 2026-05-31 03:29:56,520 basehttp "GET /api/v1/export-log/ HTTP/1.1" 200 2500
+INFO 2026-05-31 03:30:03,085 views_unified GenerateReportView POST request received from user: admin
+INFO 2026-05-31 03:30:03,085 views_unified Report params: type=fuel_consumption, from=2026-05-01, to=2026-05-31, car_ids=None
+INFO 2026-05-31 03:30:03,090 views_unified User company: 1 - Demo Company
+INFO 2026-05-31 03:30:03,090 views_unified Generating report: fuel_consumption
+INFO 2026-05-31 03:30:03,090 views_unified Params: from_date=2026-05-01, to_date=2026-05-31, car_ids=None
+INFO 2026-05-31 03:30:03,103 views_unified Report generated successfully
+INFO 2026-05-31 03:30:03,103 views_unified Report data type: <class 'dict'>
+INFO 2026-05-31 03:30:03,103 views_unified Report data keys: ['report_type', 'from_date', 'to_date', 'data', 'summary', 'charts']
+INFO 2026-05-31 03:30:03,103 views_unified Charts count: 3
+INFO 2026-05-31 03:30:03,103 views_unified Data items count: 22
+INFO 2026-05-31 03:30:03,103 views_unified Returning JSON response (default)
+INFO 2026-05-31 03:30:03,103 views_unified Response data keys: ['report_type', 'from_date', 'to_date', 'data', 'summary', 'charts']
+INFO 2026-05-31 03:30:03,104 basehttp "POST /api/v1/generate/ HTTP/1.1" 200 4706
+INFO 2026-05-31 03:30:20,420 basehttp "GET /api/v1/email-settings/ HTTP/1.1" 200 101
+INFO 2026-05-31 03:30:28,290 views Getting data for saved report: 17
+INFO 2026-05-31 03:30:28,399 views Report data keys: ['report_type', 'from_date', 'to_date', 'data', 'summary', 'charts']
+INFO 2026-05-31 03:30:28,400 basehttp "GET /api/v1/saved/17/data/ HTTP/1.1" 200 5452
+INFO 2026-05-31 03:30:34,841 basehttp "GET /api/v1/cars/?page=1 HTTP/1.1" 200 1109
+INFO 2026-05-31 03:30:34,846 basehttp "GET /api/v1/fuel/?page=1&page_size=10 HTTP/1.1" 200 1752
+INFO 2026-05-31 03:30:37,485 basehttp "GET /api/v1/cars/?page=1&page_size=10 HTTP/1.1" 200 1122
+INFO 2026-05-31 03:34:36,430 basehttp "GET /api/v1/auth/me/ HTTP/1.1" 200 254
+INFO 2026-05-31 03:34:36,588 basehttp "GET /api/v1/ai/suggestions/ HTTP/1.1" 200 448
+INFO 2026-05-31 03:34:36,595 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 2441
+C:\Parko\backend\.venv\Lib\site-packages\rest_framework\pagination.py:207: UnorderedObjectListWarning: Pagination may yield inconsistent results with an unordered object_list: <class 'accounts.models.User'> QuerySet.
+  paginator = self.django_paginator_class(queryset, page_size)
+INFO 2026-05-31 03:34:42,017 basehttp "GET /api/v1/users/?page=1 HTTP/1.1" 200 1303
+INFO 2026-05-31 03:34:45,921 basehttp "GET /api/v1/cars/?page=1 HTTP/1.1" 200 1109
+INFO 2026-05-31 03:34:45,931 basehttp "GET /api/v1/fuel/?page=1&page_size=10 HTTP/1.1" 200 1752
+INFO 2026-05-31 03:37:27,550 basehttp "GET /api/v1/auth/me/ HTTP/1.1" 200 254
+INFO 2026-05-31 03:37:27,695 basehttp "GET /api/v1/cars/?page=1 HTTP/1.1" 200 1109
+INFO 2026-05-31 03:37:27,700 basehttp "GET /api/v1/fuel/?page=1&page_size=10 HTTP/1.1" 200 1752
+INFO 2026-05-31 03:37:35,249 basehttp "GET /api/v1/inspections/?page=1&page_size=10 HTTP/1.1" 200 758
+INFO 2026-05-31 03:37:44,623 basehttp "GET /api/v1/cars/?page=1&page_size=10 HTTP/1.1" 200 1122
+INFO 2026-05-31 03:38:15,512 basehttp "GET /api/v1/dashboard/overview/?months=12&limit=8 HTTP/1.1" 200 6467
+INFO 2026-05-31 03:38:22,951 basehttp "GET /api/v1/cars/?page=1&page_size=10 HTTP/1.1" 200 1122
+INFO 2026-05-31 03:38:26,625 basehttp "GET /api/v1/ai/suggestions/ HTTP/1.1" 200 438
+INFO 2026-05-31 03:38:26,631 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 2441
+INFO 2026-05-31 03:38:31,106 basehttp "GET /api/v1/cars/?page=1 HTTP/1.1" 200 1109
+INFO 2026-05-31 03:38:31,113 basehttp "GET /api/v1/export-log/ HTTP/1.1" 200 2500
+INFO 2026-05-31 03:38:31,118 basehttp "GET /api/v1/saved/ HTTP/1.1" 200 1131
+WARNING 2026-05-31 03:42:44,642 log Unauthorized: /api/v1/auth/me/
+WARNING 2026-05-31 03:42:44,643 basehttp "GET /api/v1/auth/me/ HTTP/1.1" 401 795
+INFO 2026-05-31 03:42:44,664 basehttp "POST /api/v1/auth/refresh/ HTTP/1.1" 200 322
+INFO 2026-05-31 03:42:44,720 basehttp "GET /api/v1/auth/me/ HTTP/1.1" 200 254
+INFO 2026-05-31 03:42:44,851 basehttp "GET /api/v1/dashboard/overview/?months=12&limit=8 HTTP/1.1" 200 6467
+INFO 2026-05-31 03:46:08,259 autoreload C:\Parko\backend\dashboard\views.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+
+You have 1 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): accounts.
+Run 'python manage.py migrate' to apply them.
+May 31, 2026 - 02:33:32
+Django version 4.2.27, using settings 'config.settings.dev'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CTRL-BREAK.
+
+INFO 2026-05-31 03:46:09,270 autoreload Watching for file changes with StatReloader
+INFO 2026-05-31 03:46:21,559 autoreload C:\Parko\backend\dashboard\views.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+
+You have 1 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): accounts.
+Run 'python manage.py migrate' to apply them.
+May 31, 2026 - 03:46:09
+Django version 4.2.27, using settings 'config.settings.dev'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CTRL-BREAK.
+
+INFO 2026-05-31 03:46:22,469 autoreload Watching for file changes with StatReloader
+INFO 2026-05-31 03:46:28,936 autoreload C:\Parko\backend\dashboard\urls.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+
+You have 1 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): accounts.
+Run 'python manage.py migrate' to apply them.
+May 31, 2026 - 03:46:22
+Django version 4.2.27, using settings 'config.settings.dev'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CTRL-BREAK.
+
+INFO 2026-05-31 03:46:29,821 autoreload Watching for file changes with StatReloader
+INFO 2026-05-31 03:46:35,132 autoreload C:\Parko\backend\dashboard\urls.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+
+You have 1 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): accounts.
+Run 'python manage.py migrate' to apply them.
+May 31, 2026 - 03:46:30
+Django version 4.2.27, using settings 'config.settings.dev'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CTRL-BREAK.
+
+INFO 2026-05-31 03:46:36,035 autoreload Watching for file changes with StatReloader
+INFO 2026-05-31 03:50:15,230 basehttp "GET /api/v1/auth/me/ HTTP/1.1" 200 254
+INFO 2026-05-31 03:50:15,675 basehttp "GET /api/v1/dashboard/overview/?months=12&limit=8 HTTP/1.1" 200 6467
+INFO 2026-05-31 03:50:17,854 _client HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO 2026-05-31 03:50:17,893 basehttp "GET /api/v1/dashboard/insights/ HTTP/1.1" 200 613
+INFO 2026-05-31 03:54:09,051 basehttp "GET /api/v1/auth/me/ HTTP/1.1" 200 254
+INFO 2026-05-31 03:54:09,174 basehttp "GET /api/v1/dashboard/overview/?months=12&limit=8 HTTP/1.1" 200 6467
+INFO 2026-05-31 03:54:09,530 basehttp "GET /api/v1/dashboard/insights/ HTTP/1.1" 200 613
+INFO 2026-05-31 04:07:45,621 basehttp "GET /api/v1/auth/me/ HTTP/1.1" 200 254
+INFO 2026-05-31 04:07:46,025 basehttp "GET /api/v1/dashboard/overview/?months=12&limit=8 HTTP/1.1" 200 6467
+INFO 2026-05-31 04:07:47,595 _client HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO 2026-05-31 04:07:47,610 basehttp "GET /api/v1/dashboard/insights/ HTTP/1.1" 200 931
+INFO 2026-05-31 04:08:03,067 basehttp "GET /api/v1/cars/7/photos/ HTTP/1.1" 200 30
+INFO 2026-05-31 04:08:03,069 basehttp "GET /api/v1/fuel/?page=1&car=7 HTTP/1.1" 200 779
+INFO 2026-05-31 04:08:03,076 basehttp "GET /api/v1/inspections/?page=1&car=7 HTTP/1.1" 200 234
+INFO 2026-05-31 04:08:03,079 basehttp "GET /api/v1/insurances/?page=1&car=7 HTTP/1.1" 200 575
+INFO 2026-05-31 04:08:03,079 basehttp "GET /api/v1/spares/?page=1&car=7 HTTP/1.1" 200 367
+INFO 2026-05-31 04:08:03,084 basehttp "GET /api/v1/cars/7/ HTTP/1.1" 200 377
+INFO 2026-05-31 04:08:07,855 basehttp "GET /api/v1/insurances/?page=1&page_size=10 HTTP/1.1" 200 1339
+INFO 2026-05-31 04:08:07,856 basehttp "GET /api/v1/cars/?page=1 HTTP/1.1" 200 1109
+INFO 2026-05-31 04:08:11,473 basehttp "GET /api/v1/insurances/?page=1&page_size=10&car=45 HTTP/1.1" 200 266
+INFO 2026-05-31 04:08:13,378 basehttp "GET /api/v1/insurances/?page=1&page_size=10&car=26 HTTP/1.1" 200 120
+INFO 2026-05-31 04:08:26,630 basehttp "GET /api/v1/inspections/?page=1&page_size=10 HTTP/1.1" 200 758
+INFO 2026-05-31 04:08:27,602 autoreload C:\Parko\backend\config\settings\base.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+
+You have 1 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): accounts.
+Run 'python manage.py migrate' to apply them.
+May 31, 2026 - 03:46:36
+Django version 4.2.27, using settings 'config.settings.dev'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CTRL-BREAK.
+
+INFO 2026-05-31 04:08:28,684 autoreload Watching for file changes with StatReloader
+INFO 2026-05-31 04:08:34,911 basehttp "GET /api/v1/cars/?page=1&page_size=10 HTTP/1.1" 200 1122
+INFO 2026-05-31 04:08:55,108 autoreload C:\Parko\backend\custom_tables\models.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+
+You have 1 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): accounts.
+Run 'python manage.py migrate' to apply them.
+May 31, 2026 - 04:08:29
+Django version 4.2.27, using settings 'config.settings.dev'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CTRL-BREAK.
+
+INFO 2026-05-31 04:08:56,023 autoreload Watching for file changes with StatReloader
+INFO 2026-05-31 04:09:35,090 basehttp "GET /api/v1/cars/18/photos/ HTTP/1.1" 200 30
+INFO 2026-05-31 04:09:35,101 basehttp "GET /api/v1/inspections/?page=1&car=18 HTTP/1.1" 200 120
+INFO 2026-05-31 04:09:35,105 basehttp "GET /api/v1/fuel/?page=1&car=18 HTTP/1.1" 200 434
+INFO 2026-05-31 04:09:35,105 basehttp "GET /api/v1/insurances/?page=1&car=18 HTTP/1.1" 200 120
+INFO 2026-05-31 04:09:35,112 basehttp "GET /api/v1/spares/?page=1&car=18 HTTP/1.1" 200 945
+INFO 2026-05-31 04:09:35,121 basehttp "GET /api/v1/cars/18/ HTTP/1.1" 200 371
+INFO 2026-05-31 04:09:44,315 basehttp "GET /api/v1/cars/?page=1 HTTP/1.1" 200 1109
+INFO 2026-05-31 04:09:44,326 basehttp "GET /api/v1/spares/?page=1&page_size=10 HTTP/1.1" 200 1509
+INFO 2026-05-31 04:09:50,768 basehttp "GET /api/v1/spares/?page=2&page_size=10 HTTP/1.1" 200 420
+INFO 2026-05-31 04:10:04,156 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 2441
+INFO 2026-05-31 04:10:04,185 basehttp "GET /api/v1/ai/suggestions/ HTTP/1.1" 200 449
+INFO 2026-05-31 04:10:10,936 autoreload C:\Parko\backend\config\urls.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+
+You have 1 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): accounts.
+Run 'python manage.py migrate' to apply them.
+May 31, 2026 - 04:08:56
+Django version 4.2.27, using settings 'config.settings.dev'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CTRL-BREAK.
+
+INFO 2026-05-31 04:10:11,855 autoreload Watching for file changes with StatReloader
+INFO 2026-05-31 04:10:17,632 services AI Settings - Provider: groq, Model: llama-3.1-8b-instant, API Key: gsk_MOVS22...SfHO
+INFO 2026-05-31 04:10:18,894 services Groq client initialized for user 1
+INFO 2026-05-31 04:10:18,897 services Making Groq API call for user 1, model: llama-3.1-8b-instant, messages: 3
+INFO 2026-05-31 04:10:19,062 autoreload C:\Parko\backend\custom_tables\apps.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+
+You have 1 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): accounts.
+Run 'python manage.py migrate' to apply them.
+May 31, 2026 - 04:10:12
+Django version 4.2.27, using settings 'config.settings.dev'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CTRL-BREAK.
+
+INFO 2026-05-31 04:10:19,934 autoreload Watching for file changes with StatReloader
+INFO 2026-05-31 04:10:27,507 autoreload C:\Parko\backend\custom_tables\admin.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+
+You have 1 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): accounts.
+Run 'python manage.py migrate' to apply them.
+May 31, 2026 - 04:10:20
+Django version 4.2.27, using settings 'config.settings.dev'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CTRL-BREAK.
+
+INFO 2026-05-31 04:10:28,433 autoreload Watching for file changes with StatReloader
+INFO 2026-05-31 04:10:29,310 services AI Settings - Provider: groq, Model: llama-3.1-8b-instant, API Key: gsk_MOVS22...SfHO
+INFO 2026-05-31 04:10:29,927 services Groq client initialized for user 1
+INFO 2026-05-31 04:10:29,928 services Making Groq API call for user 1, model: llama-3.1-8b-instant, messages: 3
+INFO 2026-05-31 04:10:32,340 _client HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO 2026-05-31 04:10:32,360 services Groq API response received for user 1
+INFO 2026-05-31 04:10:32,360 services Tokens - prompt: 5622, completion: 10
+INFO 2026-05-31 04:10:32,360 services AI response for user 1: 30 chars
+INFO 2026-05-31 04:10:32,388 basehttp "POST /api/v1/ai/chat/ HTTP/1.1" 200 394
+INFO 2026-05-31 04:10:32,450 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 2807
+INFO 2026-05-31 04:10:47,838 services AI Settings - Provider: groq, Model: llama-3.1-8b-instant, API Key: gsk_MOVS22...SfHO
+INFO 2026-05-31 04:10:48,425 services Groq client initialized for user 1
+INFO 2026-05-31 04:10:48,427 services Making Groq API call for user 1, model: llama-3.1-8b-instant, messages: 5
+INFO 2026-05-31 04:10:49,367 _client HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO 2026-05-31 04:10:49,368 services Groq API response received for user 1
+INFO 2026-05-31 04:10:49,368 services Tokens - prompt: 5664, completion: 69
+INFO 2026-05-31 04:10:49,368 services AI response for user 1: 242 chars
+INFO 2026-05-31 04:10:49,391 basehttp "POST /api/v1/ai/chat/ HTTP/1.1" 200 1452
+INFO 2026-05-31 04:10:49,501 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 2807
+INFO 2026-05-31 04:11:00,324 services AI Settings - Provider: groq, Model: llama-3.1-8b-instant, API Key: gsk_MOVS22...SfHO
+INFO 2026-05-31 04:11:00,806 services Groq client initialized for user 1
+INFO 2026-05-31 04:11:00,808 services Making Groq API call for user 1, model: llama-3.1-8b-instant, messages: 7
+INFO 2026-05-31 04:11:01,934 _client HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO 2026-05-31 04:11:01,935 services Groq API response received for user 1
+INFO 2026-05-31 04:11:01,935 services Tokens - prompt: 5738, completion: 17
+INFO 2026-05-31 04:11:01,935 services AI response for user 1: 59 chars
+INFO 2026-05-31 04:11:01,958 basehttp "POST /api/v1/ai/chat/ HTTP/1.1" 200 1414
+INFO 2026-05-31 04:11:02,100 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 2807
+INFO 2026-05-31 04:11:12,180 basehttp "GET /api/v1/ai/conversations/56/ HTTP/1.1" 200 443
+INFO 2026-05-31 04:11:12,978 basehttp "DELETE /api/v1/ai/conversations/56/delete/ HTTP/1.1" 200 44
+INFO 2026-05-31 04:11:13,011 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 2660
+INFO 2026-05-31 04:11:14,274 basehttp "GET /api/v1/ai/conversations/58/ HTTP/1.1" 200 1604
+INFO 2026-05-31 04:11:14,850 basehttp "DELETE /api/v1/ai/conversations/58/delete/ HTTP/1.1" 200 44
+INFO 2026-05-31 04:11:14,892 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 2455
+INFO 2026-05-31 04:11:16,888 basehttp "GET /api/v1/ai/conversations/61/ HTTP/1.1" 200 3130
+INFO 2026-05-31 04:11:20,493 basehttp "GET /api/v1/ai/conversations/61/ HTTP/1.1" 200 3130
+INFO 2026-05-31 04:11:21,107 basehttp "DELETE /api/v1/ai/conversations/61/delete/ HTTP/1.1" 200 44
+INFO 2026-05-31 04:11:21,156 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 2263
+INFO 2026-05-31 04:11:22,658 basehttp "GET /api/v1/ai/conversations/63/ HTTP/1.1" 200 4503
+INFO 2026-05-31 04:11:24,042 basehttp "DELETE /api/v1/ai/conversations/63/delete/ HTTP/1.1" 200 44
+INFO 2026-05-31 04:11:24,068 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 2066
+INFO 2026-05-31 04:11:24,803 basehttp "GET /api/v1/ai/conversations/65/ HTTP/1.1" 200 5158
+INFO 2026-05-31 04:11:26,186 basehttp "GET /api/v1/ai/conversations/65/ HTTP/1.1" 200 5158
+INFO 2026-05-31 04:11:26,892 basehttp "DELETE /api/v1/ai/conversations/65/delete/ HTTP/1.1" 200 44
+INFO 2026-05-31 04:11:26,993 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 1883
+INFO 2026-05-31 04:11:28,607 basehttp "GET /api/v1/ai/conversations/68/ HTTP/1.1" 200 1231
+INFO 2026-05-31 04:11:29,182 basehttp "DELETE /api/v1/ai/conversations/68/delete/ HTTP/1.1" 200 44
+INFO 2026-05-31 04:11:29,207 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 1593
+INFO 2026-05-31 04:11:30,836 basehttp "GET /api/v1/ai/conversations/66/ HTTP/1.1" 200 1432
+INFO 2026-05-31 04:11:31,453 basehttp "DELETE /api/v1/ai/conversations/66/delete/ HTTP/1.1" 200 44
+INFO 2026-05-31 04:11:31,509 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 1392
+INFO 2026-05-31 13:07:12,048 autoreload C:\Parko\backend\ai\tools.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+
+You have 1 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): accounts.
+Run 'python manage.py migrate' to apply them.
+May 31, 2026 - 04:10:28
+Django version 4.2.27, using settings 'config.settings.dev'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CTRL-BREAK.
+
+INFO 2026-05-31 13:07:13,059 autoreload Watching for file changes with StatReloader
+INFO 2026-05-31 13:07:51,769 autoreload C:\Parko\backend\ai\tools.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+May 31, 2026 - 13:07:13
+Django version 4.2.27, using settings 'config.settings.dev'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CTRL-BREAK.
+
+INFO 2026-05-31 13:07:52,700 autoreload Watching for file changes with StatReloader
+INFO 2026-05-31 13:08:06,182 autoreload C:\Parko\backend\ai\services.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+May 31, 2026 - 13:07:53
+Django version 4.2.27, using settings 'config.settings.dev'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CTRL-BREAK.
+
+INFO 2026-05-31 13:08:07,103 autoreload Watching for file changes with StatReloader
+INFO 2026-05-31 13:08:22,784 autoreload C:\Parko\backend\ai\services.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+May 31, 2026 - 13:08:07
+Django version 4.2.27, using settings 'config.settings.dev'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CTRL-BREAK.
+
+INFO 2026-05-31 13:08:23,672 autoreload Watching for file changes with StatReloader
+INFO 2026-05-31 13:08:51,946 autoreload C:\Parko\backend\ai\services.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+May 31, 2026 - 13:08:24
+Django version 4.2.27, using settings 'config.settings.dev'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CTRL-BREAK.
+
+INFO 2026-05-31 13:08:52,857 autoreload Watching for file changes with StatReloader
+INFO 2026-05-31 13:09:07,371 autoreload C:\Parko\backend\ai\services.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+May 31, 2026 - 13:08:53
+Django version 4.2.27, using settings 'config.settings.dev'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CTRL-BREAK.
+
+INFO 2026-05-31 13:09:08,269 autoreload Watching for file changes with StatReloader
+WARNING 2026-05-31 13:11:44,086 log Unauthorized: /api/v1/custom-tables/tables/
+WARNING 2026-05-31 13:11:44,086 basehttp "GET /api/v1/custom-tables/tables/ HTTP/1.1" 401 264
+WARNING 2026-05-31 13:12:39,321 log Unauthorized: /api/v1/auth/me/
+WARNING 2026-05-31 13:12:39,322 basehttp "GET /api/v1/auth/me/ HTTP/1.1" 401 795
+INFO 2026-05-31 13:12:39,416 basehttp "POST /api/v1/auth/refresh/ HTTP/1.1" 200 322
+INFO 2026-05-31 13:12:39,440 basehttp "GET /api/v1/auth/me/ HTTP/1.1" 200 254
+INFO 2026-05-31 13:12:39,872 basehttp "GET /api/v1/ai/suggestions/ HTTP/1.1" 200 491
+INFO 2026-05-31 13:12:39,876 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 1392
+INFO 2026-05-31 13:12:48,593 basehttp "GET /api/v1/dashboard/overview/?months=12&limit=8 HTTP/1.1" 200 6467
+INFO 2026-05-31 13:12:51,361 _client HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO 2026-05-31 13:12:51,402 basehttp "GET /api/v1/dashboard/insights/ HTTP/1.1" 200 681
+INFO 2026-05-31 13:15:54,822 basehttp "GET /api/v1/auth/me/ HTTP/1.1" 200 254
+INFO 2026-05-31 13:15:54,910 basehttp "GET /api/v1/custom-tables/tables/ HTTP/1.1" 200 120
+INFO 2026-05-31 13:15:58,192 basehttp "GET /api/v1/auth/me/ HTTP/1.1" 200 254
+INFO 2026-05-31 13:15:59,439 basehttp "GET /api/v1/dashboard/overview/?months=12&limit=8 HTTP/1.1" 200 6467
+INFO 2026-05-31 13:15:59,683 basehttp "GET /api/v1/dashboard/insights/ HTTP/1.1" 200 681
+WARNING 2026-05-31 13:16:05,497 log Unauthorized: /api/v1/custom-tables/tables/
+WARNING 2026-05-31 13:16:05,498 basehttp "GET /api/v1/custom-tables/tables/ HTTP/1.1" 401 795
+INFO 2026-05-31 13:16:10,282 basehttp "GET /api/v1/custom-tables/tables/ HTTP/1.1" 200 120
+INFO 2026-05-31 13:16:59,934 basehttp "POST /api/v1/custom-tables/tables/ HTTP/1.1" 201 326
+INFO 2026-05-31 13:17:00,010 basehttp "GET /api/v1/custom-tables/tables/ HTTP/1.1" 200 333
+INFO 2026-05-31 13:17:01,824 basehttp "GET /api/v1/custom-tables/tables/1/ HTTP/1.1" 200 326
+INFO 2026-05-31 13:17:01,862 basehttp "GET /api/v1/custom-tables/records/?table=1 HTTP/1.1" 200 120
+INFO 2026-05-31 13:17:01,866 basehttp "GET /api/v1/cars/?page=1 HTTP/1.1" 200 1109
+INFO 2026-05-31 13:17:30,616 basehttp "GET /api/v1/auth/me/ HTTP/1.1" 200 254
+INFO 2026-05-31 13:17:30,724 basehttp "GET /api/v1/custom-tables/tables/1/ HTTP/1.1" 200 326
+INFO 2026-05-31 13:17:30,725 basehttp "GET /api/v1/custom-tables/records/?table=1 HTTP/1.1" 200 120
+INFO 2026-05-31 13:17:30,728 basehttp "GET /api/v1/cars/?page=1 HTTP/1.1" 200 1109
+INFO 2026-05-31 13:17:38,106 basehttp "GET /api/v1/custom-tables/tables/ HTTP/1.1" 200 333
+INFO 2026-05-31 13:20:03,006 basehttp "GET /api/v1/custom-tables/tables/ HTTP/1.1" 200 333
+INFO 2026-05-31 13:20:08,150 basehttp "GET /api/v1/cars/?page=1&page_size=10 HTTP/1.1" 200 1122
+INFO 2026-05-31 13:20:10,521 basehttp "GET /api/v1/dashboard/overview/?months=12&limit=8 HTTP/1.1" 200 6467
+INFO 2026-05-31 13:20:10,778 basehttp "GET /api/v1/dashboard/insights/ HTTP/1.1" 200 681
+INFO 2026-05-31 13:20:46,178 basehttp "POST /api/v1/auth/login/ HTTP/1.1" 200 852
+INFO 2026-05-31 13:20:46,194 basehttp "GET /api/v1/auth/me/ HTTP/1.1" 200 254
+INFO 2026-05-31 13:20:46,419 basehttp "GET /api/v1/dashboard/overview/?months=12&limit=8 HTTP/1.1" 200 6467
+INFO 2026-05-31 13:20:46,947 basehttp "GET /api/v1/dashboard/insights/ HTTP/1.1" 200 681
+INFO 2026-05-31 13:20:53,280 basehttp "GET /api/v1/auth/me/ HTTP/1.1" 200 254
+INFO 2026-05-31 13:20:53,290 basehttp "GET /api/v1/auth/me/ HTTP/1.1" 200 254
+INFO 2026-05-31 13:20:53,415 basehttp "GET /api/v1/custom-tables/tables/ HTTP/1.1" 200 333
+INFO 2026-05-31 13:21:47,277 basehttp "GET /api/v1/auth/me/ HTTP/1.1" 200 254
+INFO 2026-05-31 13:21:47,290 basehttp "GET /api/v1/auth/me/ HTTP/1.1" 200 254
+INFO 2026-05-31 13:21:47,417 basehttp "GET /api/v1/custom-tables/tables/ HTTP/1.1" 200 333
+INFO 2026-05-31 13:22:03,353 basehttp "GET /api/v1/custom-tables/tables/1/ HTTP/1.1" 200 326
+INFO 2026-05-31 13:22:03,360 basehttp "GET /api/v1/custom-tables/records/?table=1 HTTP/1.1" 200 120
+INFO 2026-05-31 13:22:03,363 basehttp "GET /api/v1/cars/?page=1 HTTP/1.1" 200 1109
+INFO 2026-05-31 13:22:41,433 basehttp "GET /api/v1/custom-tables/tables/ HTTP/1.1" 200 333
+INFO 2026-05-31 13:22:49,785 basehttp "GET /api/v1/custom-tables/tables/1/ HTTP/1.1" 200 326
+INFO 2026-05-31 13:22:49,795 basehttp "GET /api/v1/custom-tables/records/?table=1 HTTP/1.1" 200 120
+INFO 2026-05-31 13:22:49,799 basehttp "GET /api/v1/cars/?page=1 HTTP/1.1" 200 1109
+INFO 2026-05-31 13:23:03,262 basehttp "POST /api/v1/custom-tables/records/ HTTP/1.1" 201 184
+INFO 2026-05-31 13:23:03,293 basehttp "GET /api/v1/custom-tables/records/?table=1 HTTP/1.1" 200 333
+INFO 2026-05-31 13:23:31,976 basehttp "GET /api/v1/auth/me/ HTTP/1.1" 200 254
+INFO 2026-05-31 13:23:32,083 basehttp "GET /api/v1/custom-tables/tables/1/ HTTP/1.1" 200 326
+INFO 2026-05-31 13:23:32,086 basehttp "GET /api/v1/custom-tables/records/?table=1 HTTP/1.1" 200 333
+INFO 2026-05-31 13:23:32,089 basehttp "GET /api/v1/cars/?page=1 HTTP/1.1" 200 1109
+INFO 2026-05-31 13:26:03,541 basehttp "GET /api/v1/custom-tables/tables/1/ HTTP/1.1" 200 326
+INFO 2026-05-31 13:26:03,558 basehttp "GET /api/v1/custom-tables/records/?table=1 HTTP/1.1" 200 333
+INFO 2026-05-31 13:26:03,574 basehttp "GET /api/v1/cars/?page=1 HTTP/1.1" 200 1109
+INFO 2026-05-31 13:26:50,613 basehttp "GET /api/v1/cars/?page=1 HTTP/1.1" 200 1109
+INFO 2026-05-31 13:27:16,423 autoreload C:\Parko\backend\ai\tools.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+May 31, 2026 - 13:09:08
+Django version 4.2.27, using settings 'config.settings.dev'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CTRL-BREAK.
+
+INFO 2026-05-31 13:27:17,392 autoreload Watching for file changes with StatReloader
+INFO 2026-05-31 13:27:33,141 autoreload C:\Parko\backend\ai\tools.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+May 31, 2026 - 13:27:17
+Django version 4.2.27, using settings 'config.settings.dev'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CTRL-BREAK.
+
+INFO 2026-05-31 13:27:34,060 autoreload Watching for file changes with StatReloader
+INFO 2026-05-31 13:27:59,197 autoreload C:\Parko\backend\ai\services.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+May 31, 2026 - 13:27:34
+Django version 4.2.27, using settings 'config.settings.dev'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CTRL-BREAK.
+
+INFO 2026-05-31 13:28:00,118 autoreload Watching for file changes with StatReloader
+INFO 2026-05-31 13:28:11,222 autoreload C:\Parko\backend\ai\services.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+May 31, 2026 - 13:28:00
+Django version 4.2.27, using settings 'config.settings.dev'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CTRL-BREAK.
+
+INFO 2026-05-31 13:28:12,162 autoreload Watching for file changes with StatReloader
+INFO 2026-05-31 13:28:31,282 autoreload C:\Parko\backend\ai\services.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+May 31, 2026 - 13:28:12
+Django version 4.2.27, using settings 'config.settings.dev'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CTRL-BREAK.
+
+INFO 2026-05-31 13:28:32,198 autoreload Watching for file changes with StatReloader
+INFO 2026-05-31 13:29:02,811 autoreload C:\Parko\backend\ai\tools.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+May 31, 2026 - 13:28:32
+Django version 4.2.27, using settings 'config.settings.dev'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CTRL-BREAK.
+
+INFO 2026-05-31 13:29:03,709 autoreload Watching for file changes with StatReloader
+INFO 2026-05-31 13:29:12,550 autoreload C:\Parko\backend\ai\tools.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+May 31, 2026 - 13:29:04
+Django version 4.2.27, using settings 'config.settings.dev'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CTRL-BREAK.
+
+INFO 2026-05-31 13:29:13,459 autoreload Watching for file changes with StatReloader
+INFO 2026-05-31 13:29:39,429 autoreload C:\Parko\backend\ai\services.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+May 31, 2026 - 13:29:13
+Django version 4.2.27, using settings 'config.settings.dev'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CTRL-BREAK.
+
+INFO 2026-05-31 13:29:40,346 autoreload Watching for file changes with StatReloader
+INFO 2026-05-31 13:32:01,160 basehttp "GET /api/v1/auth/me/ HTTP/1.1" 200 254
+INFO 2026-05-31 13:32:01,296 basehttp "GET /api/v1/cars/?page=1 HTTP/1.1" 200 1109
+INFO 2026-05-31 13:32:01,304 basehttp "GET /api/v1/custom-tables/tables/1/ HTTP/1.1" 200 326
+INFO 2026-05-31 13:32:01,305 basehttp "GET /api/v1/custom-tables/records/?table=1 HTTP/1.1" 200 333
+INFO 2026-05-31 13:32:04,504 basehttp "GET /api/v1/custom-tables/tables/ HTTP/1.1" 200 333
+INFO 2026-05-31 13:33:56,017 basehttp "POST /api/v1/custom-tables/tables/ HTTP/1.1" 201 588
+INFO 2026-05-31 13:33:56,129 basehttp "GET /api/v1/custom-tables/tables/ HTTP/1.1" 200 505
+INFO 2026-05-31 13:33:57,827 basehttp "GET /api/v1/custom-tables/tables/2/ HTTP/1.1" 200 588
+INFO 2026-05-31 13:33:57,844 basehttp "GET /api/v1/custom-tables/records/?table=2 HTTP/1.1" 200 120
+INFO 2026-05-31 13:33:57,847 basehttp "GET /api/v1/cars/?page=1 HTTP/1.1" 200 1109
+INFO 2026-05-31 13:34:16,291 basehttp "POST /api/v1/custom-tables/records/ HTTP/1.1" 201 246
+INFO 2026-05-31 13:34:16,317 basehttp "GET /api/v1/custom-tables/records/?table=2 HTTP/1.1" 200 408
+INFO 2026-05-31 13:34:22,029 basehttp "GET /api/v1/auth/me/ HTTP/1.1" 200 254
+INFO 2026-05-31 13:34:22,130 basehttp "GET /api/v1/cars/?page=1 HTTP/1.1" 200 1109
+INFO 2026-05-31 13:34:26,722 basehttp "GET /api/v1/cars/?page=1&page_size=10 HTTP/1.1" 200 1122
+INFO 2026-05-31 13:34:28,669 basehttp "GET /api/v1/custom-tables/tables/ HTTP/1.1" 200 505
+INFO 2026-05-31 13:35:24,070 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 1392
+INFO 2026-05-31 13:35:24,074 basehttp "GET /api/v1/ai/suggestions/ HTTP/1.1" 200 464
+INFO 2026-05-31 13:35:34,448 services AI Settings - Provider: groq, Model: llama-3.1-8b-instant, API Key: gsk_MOVS22...SfHO
+INFO 2026-05-31 13:35:35,614 services Groq client initialized for user 1
+INFO 2026-05-31 13:35:35,616 services Making Groq API call for user 1, model: llama-3.1-8b-instant, messages: 3
+INFO 2026-05-31 13:35:36,880 _client HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO 2026-05-31 13:35:36,903 services Groq API response received for user 1
+INFO 2026-05-31 13:35:36,903 services Tokens - prompt: 6059, completion: 94
+INFO 2026-05-31 13:35:36,903 services AI response for user 1: 256 chars
+INFO 2026-05-31 13:35:36,928 basehttp "POST /api/v1/ai/chat/ HTTP/1.1" 200 1146
+INFO 2026-05-31 13:35:37,108 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 1573
+INFO 2026-05-31 13:35:56,436 services AI Settings - Provider: groq, Model: llama-3.1-8b-instant, API Key: gsk_MOVS22...SfHO
+INFO 2026-05-31 13:35:56,929 services Groq client initialized for user 1
+INFO 2026-05-31 13:35:56,931 services Making Groq API call for user 1, model: llama-3.1-8b-instant, messages: 5
+INFO 2026-05-31 13:35:57,835 _client HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO 2026-05-31 13:35:57,837 services Groq API response received for user 1
+INFO 2026-05-31 13:35:57,837 services Tokens - prompt: 6172, completion: 74
+INFO 2026-05-31 13:35:57,837 services AI response for user 1: 202 chars
+INFO 2026-05-31 13:35:57,852 basehttp "POST /api/v1/ai/chat/ HTTP/1.1" 200 1588
+INFO 2026-05-31 13:35:57,991 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 1573
+INFO 2026-05-31 13:36:31,010 services AI Settings - Provider: groq, Model: llama-3.1-8b-instant, API Key: gsk_MOVS22...SfHO
+INFO 2026-05-31 13:36:31,564 services Groq client initialized for user 1
+INFO 2026-05-31 13:36:31,567 services Making Groq API call for user 1, model: llama-3.1-8b-instant, messages: 7
+INFO 2026-05-31 13:36:32,666 _client HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO 2026-05-31 13:36:32,667 services Groq API response received for user 1
+INFO 2026-05-31 13:36:32,667 services Tokens - prompt: 6272, completion: 152
+INFO 2026-05-31 13:36:32,667 services AI response for user 1: 540 chars
+INFO 2026-05-31 13:36:32,690 basehttp "POST /api/v1/ai/chat/ HTTP/1.1" 200 3202
+INFO 2026-05-31 13:36:32,794 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 1573
+ERROR 2026-05-31 13:36:34,367 tools Error adding custom table for user 1: CustomTable() got unexpected keyword arguments: 'settings'
+INFO 2026-05-31 13:36:34,386 basehttp "POST /api/v1/ai/execute/ HTTP/1.1" 200 183
+INFO 2026-05-31 13:38:02,458 autoreload C:\Parko\backend\ai\tools.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+May 31, 2026 - 13:29:40
+Django version 4.2.27, using settings 'config.settings.dev'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CTRL-BREAK.
+
+INFO 2026-05-31 13:38:03,451 autoreload Watching for file changes with StatReloader
+INFO 2026-05-31 13:39:06,469 autoreload C:\Parko\backend\ai\tools.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+May 31, 2026 - 13:38:03
+Django version 4.2.27, using settings 'config.settings.dev'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CTRL-BREAK.
+
+INFO 2026-05-31 13:39:07,378 autoreload Watching for file changes with StatReloader
+INFO 2026-05-31 13:39:18,419 autoreload C:\Parko\backend\ai\services.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+May 31, 2026 - 13:39:07
+Django version 4.2.27, using settings 'config.settings.dev'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CTRL-BREAK.
+
+INFO 2026-05-31 13:39:19,326 autoreload Watching for file changes with StatReloader
+INFO 2026-05-31 13:39:36,154 autoreload C:\Parko\backend\ai\services.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+May 31, 2026 - 13:39:19
+Django version 4.2.27, using settings 'config.settings.dev'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CTRL-BREAK.
+
+INFO 2026-05-31 13:39:37,082 autoreload Watching for file changes with StatReloader
+INFO 2026-05-31 13:41:47,197 basehttp "GET /api/v1/auth/me/ HTTP/1.1" 200 254
+INFO 2026-05-31 13:41:47,341 basehttp "GET /api/v1/cars/?page=1 HTTP/1.1" 200 1109
+INFO 2026-05-31 13:41:47,350 basehttp "GET /api/v1/custom-tables/records/?table=2 HTTP/1.1" 200 408
+INFO 2026-05-31 13:41:47,350 basehttp "GET /api/v1/custom-tables/tables/2/ HTTP/1.1" 200 588
+INFO 2026-05-31 13:41:47,439 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 1573
+INFO 2026-05-31 13:41:47,441 basehttp "GET /api/v1/ai/suggestions/ HTTP/1.1" 200 488
+INFO 2026-05-31 13:41:51,503 basehttp "GET /api/v1/ai/conversations/96/ HTTP/1.1" 200 2565
+INFO 2026-05-31 13:42:06,368 services AI Settings - Provider: groq, Model: llama-3.1-8b-instant, API Key: gsk_MOVS22...SfHO
+INFO 2026-05-31 13:42:07,367 services Groq client initialized for user 1
+INFO 2026-05-31 13:42:07,369 services Making Groq API call for user 1, model: llama-3.1-8b-instant, messages: 3
+INFO 2026-05-31 13:42:08,897 _client HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO 2026-05-31 13:42:08,919 services Groq API response received for user 1
+INFO 2026-05-31 13:42:08,919 services Tokens - prompt: 6105, completion: 66
+INFO 2026-05-31 13:42:08,919 services AI response for user 1: 231 chars
+INFO 2026-05-31 13:42:08,944 basehttp "POST /api/v1/ai/chat/ HTTP/1.1" 200 1024
+INFO 2026-05-31 13:42:09,094 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 1758
+INFO 2026-05-31 13:42:12,746 basehttp "POST /api/v1/ai/execute/ HTTP/1.1" 200 143
+INFO 2026-05-31 13:42:24,151 services AI Settings - Provider: groq, Model: llama-3.1-8b-instant, API Key: gsk_MOVS22...SfHO
+INFO 2026-05-31 13:42:24,752 services Groq client initialized for user 1
+INFO 2026-05-31 13:42:24,754 services Making Groq API call for user 1, model: llama-3.1-8b-instant, messages: 6
+INFO 2026-05-31 13:42:25,600 _client HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO 2026-05-31 13:42:25,601 services Groq API response received for user 1
+INFO 2026-05-31 13:42:25,601 services Tokens - prompt: 6186, completion: 13
+INFO 2026-05-31 13:42:25,601 services AI response for user 1: 28 chars
+INFO 2026-05-31 13:42:25,624 basehttp "POST /api/v1/ai/chat/ HTTP/1.1" 200 1084
+INFO 2026-05-31 13:42:25,776 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 1758
+INFO 2026-05-31 13:42:33,332 basehttp "GET /api/v1/custom-tables/tables/ HTTP/1.1" 200 505
+INFO 2026-05-31 13:42:34,815 basehttp "GET /api/v1/custom-tables/tables/1/ HTTP/1.1" 200 326
+INFO 2026-05-31 13:42:34,827 basehttp "GET /api/v1/custom-tables/records/?table=1 HTTP/1.1" 200 333
+INFO 2026-05-31 13:42:34,830 basehttp "GET /api/v1/cars/?page=1 HTTP/1.1" 200 1109
+INFO 2026-05-31 13:42:37,001 basehttp "GET /api/v1/custom-tables/tables/2/ HTTP/1.1" 200 588
+INFO 2026-05-31 13:42:37,009 basehttp "GET /api/v1/custom-tables/records/?table=2 HTTP/1.1" 200 408
+INFO 2026-05-31 13:42:49,174 basehttp "PATCH /api/v1/custom-tables/records/2/ HTTP/1.1" 200 246
+INFO 2026-05-31 13:42:49,200 basehttp "GET /api/v1/custom-tables/records/?table=2 HTTP/1.1" 200 408
+INFO 2026-05-31 13:43:07,995 services AI Settings - Provider: groq, Model: llama-3.1-8b-instant, API Key: gsk_MOVS22...SfHO
+INFO 2026-05-31 13:43:08,568 services Groq client initialized for user 1
+INFO 2026-05-31 13:43:08,569 services Making Groq API call for user 1, model: llama-3.1-8b-instant, messages: 3
+INFO 2026-05-31 13:43:09,879 _client HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO 2026-05-31 13:43:09,880 services Groq API response received for user 1
+INFO 2026-05-31 13:43:09,881 services Tokens - prompt: 6107, completion: 197
+INFO 2026-05-31 13:43:09,881 services AI response for user 1: 532 chars
+INFO 2026-05-31 13:43:09,910 basehttp "POST /api/v1/ai/chat/ HTTP/1.1" 200 1928
+INFO 2026-05-31 13:43:10,032 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 1950
+INFO 2026-05-31 13:43:33,031 services AI Settings - Provider: groq, Model: llama-3.1-8b-instant, API Key: gsk_MOVS22...SfHO
+INFO 2026-05-31 13:43:33,563 services Groq client initialized for user 1
+INFO 2026-05-31 13:43:33,565 services Making Groq API call for user 1, model: llama-3.1-8b-instant, messages: 5
+INFO 2026-05-31 13:43:34,484 _client HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO 2026-05-31 13:43:34,485 services Groq API response received for user 1
+INFO 2026-05-31 13:43:34,485 services Tokens - prompt: 6317, completion: 76
+INFO 2026-05-31 13:43:34,485 services AI response for user 1: 199 chars
+INFO 2026-05-31 13:43:34,498 basehttp "POST /api/v1/ai/chat/ HTTP/1.1" 200 1940
+INFO 2026-05-31 13:43:34,584 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 1950
+INFO 2026-05-31 13:43:59,027 services AI Settings - Provider: groq, Model: llama-3.1-8b-instant, API Key: gsk_MOVS22...SfHO
+INFO 2026-05-31 13:43:59,574 services Groq client initialized for user 1
+INFO 2026-05-31 13:43:59,577 services Making Groq API call for user 1, model: llama-3.1-8b-instant, messages: 7
+INFO 2026-05-31 13:44:00,649 _client HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO 2026-05-31 13:44:00,650 services Groq API response received for user 1
+INFO 2026-05-31 13:44:00,651 services Tokens - prompt: 6431, completion: 155
+INFO 2026-05-31 13:44:00,651 services AI response for user 1: 501 chars
+INFO 2026-05-31 13:44:00,666 basehttp "POST /api/v1/ai/chat/ HTTP/1.1" 200 3456
+INFO 2026-05-31 13:44:00,804 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 1950
+INFO 2026-05-31 13:44:02,964 basehttp "POST /api/v1/ai/execute/ HTTP/1.1" 200 159
+INFO 2026-05-31 13:44:06,064 basehttp "GET /api/v1/custom-tables/tables/ HTTP/1.1" 200 730
+INFO 2026-05-31 13:44:07,568 basehttp "GET /api/v1/custom-tables/tables/3/ HTTP/1.1" 200 538
+INFO 2026-05-31 13:44:07,597 basehttp "GET /api/v1/custom-tables/records/?table=3 HTTP/1.1" 200 120
+INFO 2026-05-31 13:44:07,600 basehttp "GET /api/v1/cars/?page=1 HTTP/1.1" 200 1109
+INFO 2026-05-31 13:47:39,834 autoreload C:\Parko\backend\ai\views.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+May 31, 2026 - 13:39:37
+Django version 4.2.27, using settings 'config.settings.dev'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CTRL-BREAK.
+
+INFO 2026-05-31 13:47:40,807 autoreload Watching for file changes with StatReloader
+INFO 2026-05-31 13:49:19,878 basehttp "GET /api/v1/custom-tables/tables/1/ HTTP/1.1" 200 326
+INFO 2026-05-31 13:49:19,894 basehttp "GET /api/v1/custom-tables/records/?table=1 HTTP/1.1" 200 333
+INFO 2026-05-31 13:49:19,907 basehttp "GET /api/v1/cars/?page=1 HTTP/1.1" 200 1109
+INFO 2026-05-31 13:51:59,696 basehttp "GET /api/v1/auth/me/ HTTP/1.1" 200 254
+INFO 2026-05-31 13:51:59,845 basehttp "GET /api/v1/custom-tables/tables/2/ HTTP/1.1" 200 588
+INFO 2026-05-31 13:51:59,851 basehttp "GET /api/v1/cars/?page=1 HTTP/1.1" 200 1109
+INFO 2026-05-31 13:51:59,851 basehttp "GET /api/v1/custom-tables/records/?table=2 HTTP/1.1" 200 408
+INFO 2026-05-31 13:51:59,962 basehttp "GET /api/v1/custom-tables/tables/3/ HTTP/1.1" 200 538
+INFO 2026-05-31 13:51:59,965 basehttp "GET /api/v1/custom-tables/records/?table=3 HTTP/1.1" 200 120
+INFO 2026-05-31 13:52:01,883 basehttp "GET /api/v1/custom-tables/tables/ HTTP/1.1" 200 730
+INFO 2026-05-31 13:52:10,757 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 1950
+INFO 2026-05-31 13:52:10,795 basehttp "GET /api/v1/ai/suggestions/ HTTP/1.1" 200 46
+INFO 2026-05-31 13:52:45,236 services AI Settings - Provider: groq, Model: llama-3.1-8b-instant, API Key: gsk_MOVS22...SfHO
+INFO 2026-05-31 13:52:46,369 services Groq client initialized for user 1
+INFO 2026-05-31 13:52:46,371 services Making Groq API call for user 1, model: llama-3.1-8b-instant, messages: 3
+INFO 2026-05-31 13:52:48,523 _client HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO 2026-05-31 13:52:48,544 services Groq API response received for user 1
+INFO 2026-05-31 13:52:48,544 services Tokens - prompt: 6189, completion: 419
+INFO 2026-05-31 13:52:48,544 services AI response for user 1: 1581 chars
+INFO 2026-05-31 13:52:48,559 basehttp "POST /api/v1/ai/chat/ HTTP/1.1" 200 4918
+INFO 2026-05-31 13:52:48,786 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 2171
+INFO 2026-05-31 13:53:11,384 basehttp "POST /api/v1/ai/execute/ HTTP/1.1" 200 159
+INFO 2026-05-31 13:53:13,726 basehttp "GET /api/v1/custom-tables/tables/ HTTP/1.1" 200 1001
+INFO 2026-05-31 13:53:15,087 basehttp "GET /api/v1/custom-tables/tables/4/ HTTP/1.1" 200 700
+INFO 2026-05-31 13:53:15,118 basehttp "GET /api/v1/custom-tables/records/?table=4 HTTP/1.1" 200 120
+INFO 2026-05-31 13:53:15,122 basehttp "GET /api/v1/cars/?page=1 HTTP/1.1" 200 1109
+INFO 2026-05-31 13:53:32,313 basehttp "GET /api/v1/ai/conversations/99/ HTTP/1.1" 200 2860
+INFO 2026-05-31 13:53:38,306 basehttp "POST /api/v1/ai/execute/ HTTP/1.1" 200 168
+INFO 2026-05-31 13:53:43,827 basehttp "POST /api/v1/ai/execute/ HTTP/1.1" 200 168
+INFO 2026-05-31 13:54:12,303 services AI Settings - Provider: groq, Model: llama-3.1-8b-instant, API Key: gsk_MOVS22...SfHO
+INFO 2026-05-31 13:54:12,854 services Groq client initialized for user 1
+INFO 2026-05-31 13:54:12,856 services Making Groq API call for user 1, model: llama-3.1-8b-instant, messages: 8
+INFO 2026-05-31 13:54:14,217 _client HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO 2026-05-31 13:54:14,218 services Groq API response received for user 1
+INFO 2026-05-31 13:54:14,218 services Tokens - prompt: 6769, completion: 313
+INFO 2026-05-31 13:54:14,218 services AI response for user 1: 1128 chars
+INFO 2026-05-31 13:54:14,241 basehttp "POST /api/v1/ai/chat/ HTTP/1.1" 200 6609
+INFO 2026-05-31 13:54:14,391 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 2171
+INFO 2026-05-31 13:54:27,630 basehttp "POST /api/v1/ai/execute/ HTTP/1.1" 200 194
+INFO 2026-05-31 13:54:30,123 basehttp "GET /api/v1/custom-tables/tables/ HTTP/1.1" 200 1338
+INFO 2026-05-31 13:54:31,201 basehttp "GET /api/v1/custom-tables/tables/5/ HTTP/1.1" 200 867
+INFO 2026-05-31 13:54:31,214 basehttp "GET /api/v1/custom-tables/records/?table=5 HTTP/1.1" 200 120
+INFO 2026-05-31 13:54:31,218 basehttp "GET /api/v1/cars/?page=1 HTTP/1.1" 200 1109
+INFO 2026-05-31 13:55:09,742 basehttp "GET /api/v1/export-log/ HTTP/1.1" 200 2500
+INFO 2026-05-31 13:55:09,759 basehttp "GET /api/v1/cars/?page=1 HTTP/1.1" 200 1109
+INFO 2026-05-31 13:55:09,765 basehttp "GET /api/v1/saved/ HTTP/1.1" 200 1131
+C:\Parko\backend\.venv\Lib\site-packages\rest_framework\pagination.py:207: UnorderedObjectListWarning: Pagination may yield inconsistent results with an unordered object_list: <class 'accounts.models.User'> QuerySet.
+  paginator = self.django_paginator_class(queryset, page_size)
+INFO 2026-05-31 13:55:14,759 basehttp "GET /api/v1/users/?page=1 HTTP/1.1" 200 1303
+INFO 2026-05-31 13:56:32,173 autoreload C:\Parko\backend\ai\tools.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+May 31, 2026 - 13:47:41
+Django version 4.2.27, using settings 'config.settings.dev'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CTRL-BREAK.
+
+INFO 2026-05-31 13:56:33,189 autoreload Watching for file changes with StatReloader
+INFO 2026-05-31 13:56:46,509 autoreload C:\Parko\backend\ai\services.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+May 31, 2026 - 13:56:33
+Django version 4.2.27, using settings 'config.settings.dev'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CTRL-BREAK.
+
+INFO 2026-05-31 13:56:47,393 autoreload Watching for file changes with StatReloader
+INFO 2026-05-31 13:57:20,531 autoreload C:\Parko\backend\ai\services.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+May 31, 2026 - 13:56:47
+Django version 4.2.27, using settings 'config.settings.dev'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CTRL-BREAK.
+
+INFO 2026-05-31 13:57:21,470 autoreload Watching for file changes with StatReloader
+INFO 2026-05-31 14:06:50,550 basehttp "GET /api/v1/auth/me/ HTTP/1.1" 200 254
+INFO 2026-05-31 14:06:50,682 basehttp "GET /api/v1/cars/?page=1 HTTP/1.1" 200 1109
+INFO 2026-05-31 14:06:50,693 basehttp "GET /api/v1/custom-tables/tables/2/ HTTP/1.1" 200 588
+INFO 2026-05-31 14:06:50,693 basehttp "GET /api/v1/custom-tables/records/?table=2 HTTP/1.1" 200 408
+INFO 2026-05-31 14:06:53,516 basehttp "GET /api/v1/ai/suggestions/ HTTP/1.1" 200 46
+INFO 2026-05-31 14:06:53,522 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 2171
+INFO 2026-05-31 14:07:10,059 basehttp "GET /api/v1/ai/conversations/99/ HTTP/1.1" 200 5185
+INFO 2026-05-31 14:07:12,355 basehttp "GET /api/v1/dashboard/overview/?months=12&limit=8 HTTP/1.1" 200 6467
+INFO 2026-05-31 14:07:14,092 basehttp "GET /api/v1/ai/conversations/99/ HTTP/1.1" 200 5185
+INFO 2026-05-31 14:07:14,936 _client HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO 2026-05-31 14:07:14,972 basehttp "GET /api/v1/dashboard/insights/ HTTP/1.1" 200 1059
+WARNING 2026-05-31 14:33:34,373 log Unauthorized: /api/v1/auth/me/
+WARNING 2026-05-31 14:33:34,374 basehttp "GET /api/v1/auth/me/ HTTP/1.1" 401 795
+INFO 2026-05-31 14:33:34,482 basehttp "POST /api/v1/auth/refresh/ HTTP/1.1" 200 322
+INFO 2026-05-31 14:33:34,498 basehttp "GET /api/v1/auth/me/ HTTP/1.1" 200 254
+INFO 2026-05-31 14:33:34,700 basehttp "GET /api/v1/ai/conversations/99/ HTTP/1.1" 200 5185
+INFO 2026-05-31 14:33:34,705 basehttp "GET /api/v1/ai/suggestions/ HTTP/1.1" 200 46
+INFO 2026-05-31 14:33:34,708 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 2171

@@ -1,0 +1,3 @@
+[     247ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=48886ff8:20102
+[  280305ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/src/pages/CustomTableDetailPage.tsx?t=1780212387199:0
+[  280357ms] [ERROR] [hmr] Failed to reload /src/pages/CustomTableDetailPage.tsx. This could be due to syntax errors or importing non-existent modules. (see errors above) @ http://localhost:5173/@vite/client:175

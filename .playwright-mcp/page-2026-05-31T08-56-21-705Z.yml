@@ -1,0 +1,69 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - link "Skip to content" [ref=e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner [ref=e6]
+  - main [ref=e9]:
+    - generic [ref=e10]:
+      - generic [ref=e12]:
+        - img "Railway App logo" [ref=e14]
+        - paragraph [ref=e15]:
+          - text: Sign in to
+          - strong [ref=e16]: GitHub
+          - text: to continue to
+          - strong [ref=e17]: Railway App
+      - generic [ref=e18]:
+        - generic [ref=e21]:
+          - button "Dismiss this message" [active] [ref=e22] [cursor=pointer]:
+            - img [ref=e23]
+          - alert [ref=e25]: Incorrect username or password.
+        - generic [ref=e27]:
+          - generic [ref=e28]:
+            - generic [ref=e29]: Username or email address
+            - textbox "Username or email address" [ref=e30]: janatlk
+          - generic [ref=e31]:
+            - generic [ref=e32]: Password
+            - textbox "Password" [ref=e33]
+            - link "Forgot password?" [ref=e34] [cursor=pointer]:
+              - /url: /password_reset
+          - button "Sign in" [ref=e36] [cursor=pointer]
+        - generic [ref=e37]:
+          - generic [ref=e39]: or
+          - button "Continue with Google" [ref=e41] [cursor=pointer]:
+            - generic [ref=e42]:
+              - generic:
+                - img:
+                  - img
+              - generic [ref=e43]: Continue with Google
+          - button "Continue with Apple" [ref=e45] [cursor=pointer]:
+            - generic [ref=e46]:
+              - generic:
+                - img:
+                  - img
+              - generic [ref=e47]: Continue with Apple
+      - generic [ref=e48]:
+        - paragraph [ref=e50]:
+          - text: New to GitHub?
+          - link "Create an account" [ref=e51] [cursor=pointer]:
+            - /url: /join?return_to=%2Flogin%2Foauth%2Fauthorize%3Fclient_id%3DIv1.f1f9f244b29a3433%26code_challenge%3D0o8YTq5MzoZRcj6QcOpS4hVP4KkN2MnVe9Em6U-tdTY%26code_challenge_method%3DS256%26redirect_uri%3Dhttps%253A%252F%252Fbackboard.railway.com%252Flogin%252Fgithub%252Fcallback%26state%3DbmV4dD0lMkZkYXNoYm9hcmQmcG9zdGhvZ1Nlc3Npb25JZD0wMTllN2QzYS1kNmI1LTc3ODMtYWNhZC01YjM5NTRkZjMzNzYmcmVmZXJlcj1odHRwcyUzQSUyRiUyRnJhaWx3YXkuY29tJTJGJnJlZGlyZWN0VXJsPWh0dHBzJTNBJTJGJTJGYmFja2JvYXJkLnJhaWx3YXkuY29tJTJGbG9naW4lMkZnaXRodWIlMkZjYWxsYmFjayZub25jZT02YTM2ZDNkMi0yMzZmLTRhNTQtOWUxYS04MTFjOGIxNjBhZGE%253D&source=oauth
+        - paragraph [ref=e53]:
+          - button "Sign in with a passkey" [ref=e54] [cursor=pointer]:
+            - generic [ref=e56]: Sign in with a passkey
+  - contentinfo [ref=e57]:
+    - list [ref=e58]:
+      - listitem [ref=e59]:
+        - link "Terms" [ref=e60] [cursor=pointer]:
+          - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+      - listitem [ref=e61]:
+        - link "Privacy" [ref=e62] [cursor=pointer]:
+          - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+      - listitem [ref=e63]:
+        - link "Docs" [ref=e64] [cursor=pointer]:
+          - /url: https://docs.github.com
+      - listitem [ref=e65]:
+        - link "Contact GitHub Support" [ref=e66] [cursor=pointer]:
+          - /url: https://support.github.com
+      - listitem [ref=e67]:
+        - button "Manage cookies" [ref=e69] [cursor=pointer]
+      - listitem [ref=e70]:
+        - button "Do not share my personal information" [ref=e72] [cursor=pointer]

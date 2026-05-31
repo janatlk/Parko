@@ -1,0 +1,147 @@
+- generic:
+  - generic:
+    - generic:
+      - generic:
+        - generic:
+          - banner:
+            - generic:
+              - link:
+                - /url: /dashboard
+                - generic:
+                  - img
+              - generic:
+                - generic:
+                  - button:
+                    - generic: luminous-possibility
+                    - generic:
+                      - img
+                - generic:
+                  - button:
+                    - generic: production
+                    - generic:
+                      - img
+            - navigation:
+              - generic:
+                - generic:
+                  - generic:
+                    - button:
+                      - generic:
+                        - img
+                  - button:
+                    - generic:
+                      - generic:
+                        - img
+                      - generic: "1"
+                  - button:
+                    - generic:
+                      - generic:
+                        - img
+                      - paragraph: Trial expired
+                  - button:
+                    - generic:
+                      - img
+                    - text: Agent
+        - generic:
+          - navigation:
+            - generic:
+              - generic:
+                - link:
+                  - /url: /project/98b5cdd3-f530-4177-a8e0-ca32cac65c1c?environmentId=44b0d7f0-bebd-4050-8507-9467b064c583
+                  - generic:
+                    - img
+              - generic:
+                - link:
+                  - /url: /project/98b5cdd3-f530-4177-a8e0-ca32cac65c1c/observability?environmentId=44b0d7f0-bebd-4050-8507-9467b064c583
+                  - generic:
+                    - img
+              - generic:
+                - link:
+                  - /url: /project/98b5cdd3-f530-4177-a8e0-ca32cac65c1c/logs?environmentId=44b0d7f0-bebd-4050-8507-9467b064c583
+                  - generic:
+                    - img
+              - generic:
+                - link:
+                  - /url: /project/98b5cdd3-f530-4177-a8e0-ca32cac65c1c/settings?environmentId=44b0d7f0-bebd-4050-8507-9467b064c583
+                  - generic:
+                    - img
+            - generic:
+              - button
+          - generic:
+            - generic:
+              - generic:
+                - generic:
+                  - region:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - img
+                              - generic:
+                                - generic:
+                                  - generic:
+                                    - generic:
+                                      - img
+                                      - button [ref=e183]:
+                                        - link [ref=e184] [cursor=pointer]:
+                                          - /url: /project/98b5cdd3-f530-4177-a8e0-ca32cac65c1c/service/412075e6-bd45-4a04-97a7-a9847a783289?environmentId=44b0d7f0-bebd-4050-8507-9467b064c583
+                                          - generic [ref=e119]:
+                                            - img [ref=e121]
+                                            - paragraph [ref=e124]: Pitaka-Django
+                                          - paragraph [ref=e125]: Service is offline
+                                - toolbar [ref=e185]:
+                                  - button [ref=e186] [cursor=pointer]:
+                                    - img [ref=e130]
+                                  - group [ref=e187]:
+                                    - button [ref=e188] [cursor=pointer]:
+                                      - img [ref=e143]
+                                    - button [ref=e189] [cursor=pointer]:
+                                      - img [ref=e147]
+                                    - button [ref=e190] [cursor=pointer]:
+                                      - img [ref=e150]
+                                  - group [ref=e191]:
+                                    - button [ref=e192] [cursor=pointer]:
+                                      - img [ref=e158]
+                                    - button [ref=e193] [cursor=pointer]:
+                                      - img [ref=e163]
+                                  - button [ref=e194] [cursor=pointer]:
+                                    - img [ref=e168]
+                                - button [ref=e195] [cursor=pointer]:
+                                  - img [ref=e175]
+                                  - generic [ref=e177]: Add
+                                - img
+  - dialog [ref=e197]:
+    - button "Close" [active] [ref=e198] [cursor=pointer]:
+      - img [ref=e200]
+    - generic [ref=e202]:
+      - generic [ref=e203]:
+        - img "Upgrade to Hobby"
+      - generic [ref=e204]:
+        - generic [ref=e205]:
+          - paragraph [ref=e206]: Thanks for trying Railway
+          - paragraph [ref=e207]: Your trial has expired. Please select a plan to continue using Railway.
+        - generic [ref=e208]:
+          - paragraph [ref=e209]: Hobby plan benefits
+          - generic [ref=e210]:
+            - generic [ref=e211]:
+              - img [ref=e213]
+              - paragraph [ref=e217]: Up to 48 vCPU / 48 GB RAM per service
+            - generic [ref=e218]:
+              - img [ref=e220]
+              - paragraph [ref=e224]: Up to 6 replicas, at 8 vCPU / 8 GB RAM per replica
+            - generic [ref=e225]:
+              - img [ref=e227]
+              - paragraph [ref=e230]: 7-day log history
+            - generic [ref=e231]:
+              - img [ref=e233]
+              - paragraph [ref=e236]: Global regions
+            - generic [ref=e237]:
+              - img [ref=e239]
+              - paragraph [ref=e242]: Community support
+        - generic [ref=e243]:
+          - link "Upgrade to Hobby" [ref=e244] [cursor=pointer]:
+            - /url: /workspace/upgrade
+            - generic [ref=e245]: Upgrade to Hobby
+          - link "View Plans & Pricing" [ref=e246] [cursor=pointer]:
+            - /url: /workspace/plans#upgrade-options
+            - text: View Plans & Pricing↗

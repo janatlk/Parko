@@ -1,0 +1,48 @@
+import os
+from .base import *
+
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-render-fallback-key-change-me')
+
+DEBUG = False
+
+ALLOWED_HOSTS = ['*']
+
+# Database - SQLite for demo (ephemeral on Render free tier)
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
+
+# Static files
+STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Media files
+MEDIA_URL = 'media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+# WhiteNoise middleware for serving static files
+MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# CORS - allow all for demo
+CORS_ALLOW_ALL_ORIGINS = True
+
+# Security settings (relaxed for demo)
+SECURE_SSL_REDIRECT = False
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
+
+# AI settings from environment
+AI_SETTINGS = {
+    'provider': 'groq',
+    'api_key': os.environ.get('GROQ_API_KEY', ''),
+    'model': 'llama-3.1-8b-instant',
+}
+
+# Email settings (optional)
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
