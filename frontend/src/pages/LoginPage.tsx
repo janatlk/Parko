@@ -13,13 +13,11 @@ import {
   TextInput,
   Title,
   Box,
-  ThemeIcon,
   ActionIcon,
   Anchor,
   Badge,
 } from '@mantine/core'
 import {
-  IconCar,
   IconUser,
   IconLock,
   IconAlertCircle,
@@ -134,7 +132,7 @@ export function LoginPage() {
             >
               <IconArrowLeft size={24} stroke={1.5} />
             </ActionIcon>
-            <IconCar size={32} stroke={1.5} color="#ffffff" />
+            <img src={`${import.meta.env.BASE_URL}logo.svg`} alt="Parko" width={32} height={32} />
             <Text size="xl" fw={700} c="white" style={{ letterSpacing: '1px' }}>
               PARKO
             </Text>
@@ -150,9 +148,7 @@ export function LoginPage() {
       <Container size={420} pt={140} pb={60}>
         <Box ta="center" mb="xl">
           <Group justify="center" gap="xs" mb="md">
-            <ThemeIcon variant="light" size="xl" radius="xl" color="gray" bg="dark.8">
-              <IconCar size={32} stroke={1.5} color="#ffffff" />
-            </ThemeIcon>
+            <img src={`${import.meta.env.BASE_URL}logo.svg`} alt="Parko" width={40} height={40} />
           </Group>
           <Title order={2} fw={700} c="white">
             {t('auth.title')}

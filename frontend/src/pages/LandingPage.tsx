@@ -663,7 +663,7 @@ export function LandingPage() {
           <Grid justify="space-between">
             <Grid.Col span={{ base: 12, md: 6 }}>
               <Group gap="xs" mb="md">
-                <IconCar size={24} stroke={1.5} color="#666666" />
+                <img src={`${import.meta.env.BASE_URL}logo.svg`} alt="Parko" width={24} height={24} />
                 <Text size="lg" fw={700} c="dimmed">
                   PARKO
                 </Text>
