@@ -10,6 +10,7 @@ from django.db import models
 
 from accounts.models import UserRole
 from fleet.models import Car, Fuel, Spare, Insurance, Inspection, CarStatus
+from custom_tables.models import CustomTable, CustomRecord
 
 logger = logging.getLogger(__name__)
 
@@ -594,6 +595,186 @@ def tool_update_inspection(user, company, record_id, data):
         return {'success': False, 'error': str(e)}
 
 
+def tool_list_custom_tables(user, company, filters=None):
+    """List custom tables for the company."""
+    _check_admin(user)
+    qs = CustomTable.objects.filter(company=company).order_by('-created_at')
+    if filters and filters.get('name'):
+        qs = qs.filter(name__icontains=filters['name'])
+    data = []
+    for table in qs:
+        data.append({
+            'id': table.id,
+            'name': table.name,
+            'description': table.description,
+            'icon': table.icon,
+            'record_count': table.records.count(),
+            'columns': [c.get('name') for c in table.schema.get('columns', [])],
+        })
+    return {'success': True, 'data': {'tables': data, 'total': len(data)}}
+
+
+def tool_add_custom_table(user, company, data):
+    """Add a new custom table. data: name, description, icon, columns"""
+    _check_admin(user)
+    required = ['name', 'columns']
+    for field in required:
+        if not data.get(field):
+            return {'success': False, 'error': f"Required field missing: {field}"}
+
+    name = data['name'].strip()
+    if CustomTable.objects.filter(company=company, name=name).exists():
+        return {'success': False, 'error': f"Custom table '{name}' already exists."}
+
+    columns = data['columns']
+    if not isinstance(columns, list) or len(columns) == 0:
+        return {'success': False, 'error': "columns must be a non-empty list."}
+
+    schema_columns = []
+    for col in columns:
+        if isinstance(col, str):
+            schema_columns.append({'name': col, 'type': 'text', 'required': False})
+        elif isinstance(col, dict):
+            schema_columns.append({
+                'name': col.get('name', 'Unnamed'),
+                'type': col.get('type', 'text'),
+                'required': col.get('required', False),
+            })
+        else:
+            return {'success': False, 'error': f"Invalid column format: {col}"}
+
+    try:
+        table = CustomTable.objects.create(
+            company=company,
+            name=name,
+            description=data.get('description', ''),
+            icon=data.get('icon', 'table'),
+            schema={'columns': schema_columns},
+            settings=data.get('settings', {}),
+        )
+        return {
+            'success': True,
+            'data': {
+                'id': table.id,
+                'name': table.name,
+                'description': table.description,
+                'columns': schema_columns,
+            },
+            'message': f"Custom table '{table.name}' created successfully.",
+        }
+    except Exception as e:
+        logger.error(f"Error adding custom table for user {user.id}: {e}")
+        return {'success': False, 'error': str(e)}
+
+
+def tool_add_custom_record(user, company, data):
+    """Add a record to a custom table. data: table_id, (car_id), record_data"""
+    _check_admin(user)
+    required = ['table_id', 'record_data']
+    for field in required:
+        if field not in data or data[field] is None:
+            return {'success': False, 'error': f"Required field missing: {field}"}
+
+    table_id = data['table_id']
+    try:
+        table = CustomTable.objects.get(id=table_id, company=company)
+    except CustomTable.DoesNotExist:
+        return {'success': False, 'error': f"Custom table #{table_id} not found."}
+
+    car = None
+    if data.get('car_id'):
+        car_id = _parse_car_id(data['car_id'])
+        if isinstance(car_id, int):
+            car = _get_company_car(company, car_id)
+
+    try:
+        record = CustomRecord.objects.create(
+            table=table,
+            car=car,
+            data=data['record_data'],
+        )
+        return {
+            'success': True,
+            'data': {
+                'id': record.id,
+                'table_id': table.id,
+                'table_name': table.name,
+                'car': str(car) if car else None,
+                'data': record.data,
+            },
+            'message': f"Record added to '{table.name}'.",
+        }
+    except Exception as e:
+        logger.error(f"Error adding custom record for user {user.id}: {e}")
+        return {'success': False, 'error': str(e)}
+
+
+def tool_update_custom_record(user, company, record_id, data):
+    """Update a custom record. data: (table_id), (car_id), record_data"""
+    _check_admin(user)
+    try:
+        record = CustomRecord.objects.get(id=record_id, table__company=company)
+    except CustomRecord.DoesNotExist:
+        return {'success': False, 'error': f"Custom record #{record_id} not found."}
+
+    if 'table_id' in data:
+        try:
+            record.table = CustomTable.objects.get(id=data['table_id'], company=company)
+        except CustomTable.DoesNotExist:
+            return {'success': False, 'error': f"Custom table #{data['table_id']} not found."}
+
+    if 'car_id' in data and data['car_id'] is not None:
+        car_id = _parse_car_id(data['car_id'])
+        if isinstance(car_id, int):
+            car = _get_company_car(company, car_id)
+            if car:
+                record.car = car
+            else:
+                record.car = None
+        else:
+            record.car = None
+    elif 'car_id' in data and data['car_id'] is None:
+        record.car = None
+
+    if 'record_data' in data:
+        record.data = data['record_data']
+
+    try:
+        record.save()
+        return {
+            'success': True,
+            'data': {
+                'id': record.id,
+                'table_id': record.table.id,
+                'table_name': record.table.name,
+                'car': str(record.car) if record.car else None,
+                'data': record.data,
+            },
+            'message': f"Custom record #{record.id} updated successfully.",
+        }
+    except Exception as e:
+        logger.error(f"Error updating custom record #{record_id} for user {user.id}: {e}")
+        return {'success': False, 'error': str(e)}
+
+
+def tool_delete_custom_record(user, company, record_id):
+    """Delete a custom record by ID."""
+    _check_admin(user)
+    try:
+        record = CustomRecord.objects.get(id=record_id, table__company=company)
+        table_name = record.table.name
+        record.delete()
+        return {
+            'success': True,
+            'message': f"Record deleted from '{table_name}'.",
+        }
+    except CustomRecord.DoesNotExist:
+        return {'success': False, 'error': f"Custom record #{record_id} not found."}
+    except Exception as e:
+        logger.error(f"Error deleting custom record #{record_id} for user {user.id}: {e}")
+        return {'success': False, 'error': str(e)}
+
+
 # Registry of all tool functions for dynamic lookup
 TOOL_REGISTRY = {
     'tool_list_cars': tool_list_cars,
@@ -609,4 +790,9 @@ TOOL_REGISTRY = {
     'tool_add_inspection': tool_add_inspection,
     'tool_update_inspection': tool_update_inspection,
     'tool_delete_record': tool_delete_record,
+    'tool_list_custom_tables': tool_list_custom_tables,
+    'tool_add_custom_table': tool_add_custom_table,
+    'tool_add_custom_record': tool_add_custom_record,
+    'tool_update_custom_record': tool_update_custom_record,
+    'tool_delete_custom_record': tool_delete_custom_record,
 }

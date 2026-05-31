@@ -35,12 +35,14 @@ Parko is a multi-tenant SaaS fleet management platform. Companies track:
 - Insurance policies with validity dates
 - Technical inspections ("ТО" = техосмотр = inspection)
 - Dashboard analytics and reports
+- Custom tables (user-defined tables with flexible columns: text, number, price, date, photo, select)
 
 IMPORTANT SYNONYMS:
 - "ТО" always means техосмотр / technical inspection (use tool_add_inspection or tool_update_inspection)
 - "запчасти" means spare parts / maintenance (use tool_add_spare or tool_update_spare)
 - "страховка" means insurance (use tool_add_insurance or tool_update_insurance)
 - "бензин", "дизель", "топливо" all mean fuel
+- "custom table", "пользовательская таблица", "кастомная таблица" means custom table (use tool_add_custom_table, tool_add_custom_record, etc.)
 
 RESPONSE STYLE:
 - For simple questions ("how many cars?") → answer in 1-2 sentences with key numbers bolded.
@@ -159,6 +161,11 @@ AVAILABLE ACTIONS:
 - tool_update_inspection: record_id, (car_id, number, inspected_at, cost)
 - tool_delete_record: params {model_name in ["fuel","spare","insurance","inspection"], record_id}
 - tool_list_cars: (status, brand, search)
+- tool_list_custom_tables: (name)
+- tool_add_custom_table: name, columns (array of {name, type, required}), (description, icon, settings)
+- tool_add_custom_record: table_id, record_data (dict of column values), (car_id)
+- tool_update_custom_record: record_id, (table_id, car_id, record_data)
+- tool_delete_custom_record: record_id
 
 HOW TO PARSE USER INPUT:
 
@@ -212,6 +219,8 @@ RELEVANT_KEYWORDS = [
     'how many', 'how much', 'what', 'when', 'where', 'which', 'who',
     'статистик', 'аналитик', 'сводк', 'итог',
     'statistic', 'analytic', 'summary', 'total',
+    'custom table', 'custom tables', 'пользовательская таблица', 'кастомная таблица',
+    'своя таблица', 'таблица', 'table',
     # Greetings (allow so the bot can introduce itself)
     'привет', 'здравствуй', 'hello', 'hi', 'салам',
 ]
@@ -414,6 +423,32 @@ def collect_company_context(user) -> str:
     acc_count = Accumulator.objects.filter(car__company=company).count()
     parts.append(f"Tires: {tire_count} | Accumulators: {acc_count}")
     parts.append("")
+
+    # Custom tables
+    from custom_tables.models import CustomTable, CustomRecord
+    custom_tables = CustomTable.objects.filter(company=company).order_by('-created_at')
+    if custom_tables.exists():
+        parts.append(f"Custom tables: {custom_tables.count()}")
+        for table in custom_tables:
+            cols = [c.get('name') for c in table.schema.get('columns', [])]
+            record_count = CustomRecord.objects.filter(table=table).count()
+            parts.append(
+                f"  table_id={table.id} name='{table.name}' cols={cols} records={record_count}"
+            )
+    else:
+        parts.append("Custom tables: 0")
+    parts.append("")
+
+    # Recent custom records
+    recent_custom = CustomRecord.objects.filter(table__company=company).select_related('table', 'car').order_by('-created_at')[:10]
+    if recent_custom:
+        parts.append("Recent custom records:")
+        for rec in recent_custom:
+            car_info = f" car={rec.car.numplate}" if rec.car else ""
+            parts.append(
+                f"  record_id={rec.id} table_id={rec.table_id} table='{rec.table.name}'{car_info} data={rec.data}"
+            )
+        parts.append("")
 
     # Monthly fuel breakdown (for analytics)
     monthly_fuel_rows = (
@@ -680,6 +715,88 @@ TOOL_DEFINITIONS = [
             }
         }
     },
+    {
+        "type": "function",
+        "function": {
+            "name": "tool_list_custom_tables",
+            "description": "List custom tables for the company. Optional filter by name.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "name": {"type": "string", "description": "Filter by table name (partial match)"}
+                }
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "tool_add_custom_table",
+            "description": "Create a new custom table with flexible columns",
+            "parameters": {
+                "type": "object",
+                "required": ["name", "columns"],
+                "properties": {
+                    "name": {"type": "string", "description": "Table name"},
+                    "description": {"type": "string", "description": "Table description"},
+                    "icon": {"type": "string", "description": "Icon name (default: table)"},
+                    "columns": {
+                        "type": "array",
+                        "description": "Array of column definitions. Each item: string name OR object {name, type, required}",
+                        "items": {"type": "object", "properties": {"name": {"type": "string"}, "type": {"type": "string", "enum": ["text", "number", "price", "date", "photo", "select"]}, "required": {"type": "boolean"}}}
+                    },
+                    "settings": {"type": "object", "description": "Table settings (color, showTotals, etc.)"}
+                }
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "tool_add_custom_record",
+            "description": "Add a record to a custom table",
+            "parameters": {
+                "type": "object",
+                "required": ["table_id", "record_data"],
+                "properties": {
+                    "table_id": {"type": "integer", "description": "Custom table ID"},
+                    "car_id": {"type": "integer", "description": "Optional vehicle ID to link"},
+                    "record_data": {"type": "object", "description": "Dict of column_name: value pairs"}
+                }
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "tool_update_custom_record",
+            "description": "Update an existing custom record",
+            "parameters": {
+                "type": "object",
+                "required": ["record_id"],
+                "properties": {
+                    "record_id": {"type": "integer", "description": "Record ID to update"},
+                    "table_id": {"type": "integer", "description": "Move to a different table"},
+                    "car_id": {"type": "integer", "description": "Link to a vehicle (null to unlink)"},
+                    "record_data": {"type": "object", "description": "Dict of column_name: value pairs to update"}
+                }
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "tool_delete_custom_record",
+            "description": "Delete a custom record by ID",
+            "parameters": {
+                "type": "object",
+                "required": ["record_id"],
+                "properties": {
+                    "record_id": {"type": "integer", "description": "Custom record ID to delete"}
+                }
+            }
+        }
+    },
 ]
 
 
@@ -714,6 +831,18 @@ def _execute_tool(user, company, tool_name, arguments):
             model_name = arguments.get('model_name')
             record_id = arguments.get('record_id')
             result = tool_fn(user, company, model_name=model_name, record_id=record_id)
+        elif tool_name == 'tool_list_custom_tables':
+            result = tool_fn(user, company, filters=arguments)
+        elif tool_name == 'tool_add_custom_table':
+            result = tool_fn(user, company, data=arguments)
+        elif tool_name == 'tool_add_custom_record':
+            result = tool_fn(user, company, data=arguments)
+        elif tool_name == 'tool_update_custom_record':
+            record_id = arguments.pop('record_id')
+            result = tool_fn(user, company, record_id=record_id, data=arguments)
+        elif tool_name == 'tool_delete_custom_record':
+            record_id = arguments.get('record_id')
+            result = tool_fn(user, company, record_id=record_id)
         else:
             result = {"success": False, "error": f"Tool {tool_name} not implemented"}
 
