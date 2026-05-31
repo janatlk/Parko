@@ -131,8 +131,8 @@ export function FuelPage() {
             columns={[
               { key: 'car', title: t('fuel.table.car'), width: 160 },
               { key: 'date', title: t('fuel.table.date'), width: 120 },
-              { key: 'odometer', title: t('fuel.table.odometer'), width: 120 },
               { key: 'liters', title: t('fuel.table.liters'), width: 100 },
+              { key: 'odometer', title: t('fuel.table.odometer'), width: 120 },
               { key: 'mileage', title: t('fuel.table.mileage'), width: 120 },
               { key: 'consumption', title: t('fuel.table.consumption'), width: 130 },
               { key: 'cost', title: t('fuel.table.total_cost'), width: 120 },
