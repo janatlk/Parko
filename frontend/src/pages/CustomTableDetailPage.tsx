@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   ActionIcon,
@@ -20,7 +20,7 @@ import {
   Title,
 } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
-import { IconAlertTriangle, IconEdit, IconPlus, IconTrash } from '@tabler/icons-react'
+import { IconAlertTriangle, IconArrowLeft, IconEdit, IconPlus, IconTrash } from '@tabler/icons-react'
 import { DateInput } from '@mantine/dates'
 
 import {
@@ -35,6 +35,7 @@ import type { ColumnSchema } from '@features/custom_tables/api/customTablesApi'
 
 export function CustomTableDetailPage() {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const { id } = useParams<{ id: string }>()
   const tableId = Number(id)
   const [opened, { open, close }] = useDisclosure(false)
@@ -111,14 +112,19 @@ export function CustomTableDetailPage() {
     <Container size="fluid" px="sm" py="sm">
       <Stack gap="sm">
         <Group justify="space-between">
-          <div>
-            <Title order={3}>{table.name}</Title>
-            {table.description && (
-              <Text size="xs" c="dimmed">
-                {table.description}
-              </Text>
-            )}
-          </div>
+          <Group gap="xs">
+            <Button variant="subtle" size="xs" leftSection={<IconArrowLeft size={16} />} onClick={() => navigate('/custom-tables')}>
+              {t('common.back', 'Назад')}
+            </Button>
+            <div>
+              <Title order={3}>{table.name}</Title>
+              {table.description && (
+                <Text size="xs" c="dimmed">
+                  {table.description}
+                </Text>
+              )}
+            </div>
+          </Group>
           <Button size="xs" leftSection={<IconPlus size={16} />} onClick={open}>
             {t('common.add', 'Добавить')}
           </Button>

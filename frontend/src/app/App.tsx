@@ -43,8 +43,8 @@ export function App() {
         <Route path="/reports" element={<ReportsPage />} />
         <Route path="/ai" element={<AIPage />} />
         <Route path="/custom-tables" element={<CustomTablesPage />} />
-        <Route path="/custom-tables/:id" element={<CustomTableDetailPage />} />
         <Route path="/custom-tables/new" element={<CustomTableBuilderPage />} />
+        <Route path="/custom-tables/:id" element={<CustomTableDetailPage />} />
         <Route path="/profile" element={<ProfilePage />} />
       </Route>
       <Route path="*" element={<NotFoundPage />} />

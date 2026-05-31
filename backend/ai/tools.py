@@ -3,6 +3,7 @@ AI tool functions that the AI assistant can call.
 Each function validates permissions, ensures company data isolation,
 and returns a structured result dict.
 """
+import json
 import logging
 import re
 
@@ -610,8 +611,61 @@ def tool_list_custom_tables(user, company, filters=None):
             'icon': table.icon,
             'record_count': table.records.count(),
             'columns': [c.get('name') for c in table.schema.get('columns', [])],
+            'column_types': {c.get('name'): c.get('type') for c in table.schema.get('columns', [])},
         })
     return {'success': True, 'data': {'tables': data, 'total': len(data)}}
+
+
+def tool_list_custom_records(user, company, table_id, filters=None):
+    """List records from a specific custom table."""
+    _check_admin(user)
+    try:
+        table = CustomTable.objects.get(id=table_id, company=company)
+    except CustomTable.DoesNotExist:
+        return {'success': False, 'error': f"Custom table #{table_id} not found."}
+
+    qs = CustomRecord.objects.filter(table=table).select_related('car').order_by('-created_at')
+    if filters and filters.get('search'):
+        search = filters['search'].lower()
+        # Simple search in data JSON values
+        filtered = []
+        for record in qs:
+            data_str = json.dumps(record.data, ensure_ascii=False).lower()
+            car_str = str(record.car or '').lower()
+            if search in data_str or search in car_str:
+                filtered.append(record)
+        qs = filtered
+        total = len(qs)
+        # Apply limit
+        limit = filters.get('limit', 50)
+        qs = qs[:limit]
+    else:
+        total = qs.count()
+        limit = filters.get('limit', 50) if filters else 50
+        qs = qs[:limit]
+
+    data = []
+    for record in qs:
+        data.append({
+            'id': record.id,
+            'table_id': table.id,
+            'table_name': table.name,
+            'car': str(record.car) if record.car else None,
+            'data': record.data,
+            'created_at': str(record.created_at),
+        })
+    return {
+        'success': True,
+        'data': {
+            'records': data,
+            'total': total,
+            'table': {
+                'id': table.id,
+                'name': table.name,
+                'columns': table.schema.get('columns', []),
+            },
+        },
+    }
 
 
 def tool_add_custom_table(user, company, data):
@@ -757,6 +811,59 @@ def tool_update_custom_record(user, company, record_id, data):
         return {'success': False, 'error': str(e)}
 
 
+def tool_update_custom_table(user, company, table_id, data):
+    """Update a custom table schema (name, description, columns, settings)."""
+    _check_admin(user)
+    try:
+        table = CustomTable.objects.get(id=table_id, company=company)
+    except CustomTable.DoesNotExist:
+        return {'success': False, 'error': f"Custom table #{table_id} not found."}
+
+    if 'name' in data and data['name']:
+        new_name = data['name'].strip()
+        if new_name != table.name and CustomTable.objects.filter(company=company, name=new_name).exists():
+            return {'success': False, 'error': f"Custom table '{new_name}' already exists."}
+        table.name = new_name
+
+    if 'description' in data:
+        table.description = data.get('description', '')
+    if 'icon' in data:
+        table.icon = data.get('icon', 'table')
+    if 'settings' in data:
+        table.settings = data.get('settings', {})
+
+    if 'columns' in data and isinstance(data['columns'], list):
+        schema_columns = []
+        for col in data['columns']:
+            if isinstance(col, str):
+                schema_columns.append({'name': col, 'type': 'text', 'required': False})
+            elif isinstance(col, dict):
+                schema_columns.append({
+                    'name': col.get('name', 'Unnamed'),
+                    'type': col.get('type', 'text'),
+                    'required': col.get('required', False),
+                })
+            else:
+                return {'success': False, 'error': f"Invalid column format: {col}"}
+        table.schema = {'columns': schema_columns}
+
+    try:
+        table.save()
+        return {
+            'success': True,
+            'data': {
+                'id': table.id,
+                'name': table.name,
+                'description': table.description,
+                'columns': table.schema.get('columns', []),
+            },
+            'message': f"Custom table '{table.name}' updated successfully.",
+        }
+    except Exception as e:
+        logger.error(f"Error updating custom table #{table_id} for user {user.id}: {e}")
+        return {'success': False, 'error': str(e)}
+
+
 def tool_delete_custom_record(user, company, record_id):
     """Delete a custom record by ID."""
     _check_admin(user)
@@ -795,4 +902,6 @@ TOOL_REGISTRY = {
     'tool_add_custom_record': tool_add_custom_record,
     'tool_update_custom_record': tool_update_custom_record,
     'tool_delete_custom_record': tool_delete_custom_record,
+    'tool_list_custom_records': tool_list_custom_records,
+    'tool_update_custom_table': tool_update_custom_table,
 }

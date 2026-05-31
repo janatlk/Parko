@@ -42,7 +42,8 @@ IMPORTANT SYNONYMS:
 - "запчасти" means spare parts / maintenance (use tool_add_spare or tool_update_spare)
 - "страховка" means insurance (use tool_add_insurance or tool_update_insurance)
 - "бензин", "дизель", "топливо" all mean fuel
-- "custom table", "пользовательская таблица", "кастомная таблица" means custom table (use tool_add_custom_table, tool_add_custom_record, etc.)
+- "custom table", "пользовательская таблица", "кастомная таблица" means custom table
+- To answer questions about data in custom tables, FIRST use tool_list_custom_tables to find the table, THEN use tool_list_custom_records to read its data
 
 RESPONSE STYLE:
 - For simple questions ("how many cars?") → answer in 1-2 sentences with key numbers bolded.
@@ -161,8 +162,10 @@ AVAILABLE ACTIONS:
 - tool_update_inspection: record_id, (car_id, number, inspected_at, cost)
 - tool_delete_record: params {model_name in ["fuel","spare","insurance","inspection"], record_id}
 - tool_list_cars: (status, brand, search)
-- tool_list_custom_tables: (name)
+- tool_list_custom_tables: (name) — list user's custom tables
+- tool_list_custom_records: table_id, (search, limit) — read data from a custom table to answer questions
 - tool_add_custom_table: name, columns (array of {name, type, required}), (description, icon, settings)
+- tool_update_custom_table: table_id, (name, columns, description, icon, settings) — modify schema of existing table
 - tool_add_custom_record: table_id, record_data (dict of column values), (car_id)
 - tool_update_custom_record: record_id, (table_id, car_id, record_data)
 - tool_delete_custom_record: record_id
@@ -430,25 +433,23 @@ def collect_company_context(user) -> str:
     if custom_tables.exists():
         parts.append(f"Custom tables: {custom_tables.count()}")
         for table in custom_tables:
-            cols = [c.get('name') for c in table.schema.get('columns', [])]
+            cols = table.schema.get('columns', [])
+            col_names = [c.get('name') for c in cols]
+            col_types = {c.get('name'): c.get('type') for c in cols}
             record_count = CustomRecord.objects.filter(table=table).count()
             parts.append(
-                f"  table_id={table.id} name='{table.name}' cols={cols} records={record_count}"
+                f"  table_id={table.id} name='{table.name}' cols={col_names} types={col_types} records={record_count}"
             )
+            # Include a few sample records so AI can answer data questions
+            samples = CustomRecord.objects.filter(table=table).select_related('car').order_by('-created_at')[:5]
+            if samples:
+                parts.append(f"    Sample records from '{table.name}':")
+                for rec in samples:
+                    car_info = f" car={rec.car.numplate}" if rec.car else ""
+                    parts.append(f"      record_id={rec.id}{car_info} data={rec.data}")
     else:
         parts.append("Custom tables: 0")
     parts.append("")
-
-    # Recent custom records
-    recent_custom = CustomRecord.objects.filter(table__company=company).select_related('table', 'car').order_by('-created_at')[:10]
-    if recent_custom:
-        parts.append("Recent custom records:")
-        for rec in recent_custom:
-            car_info = f" car={rec.car.numplate}" if rec.car else ""
-            parts.append(
-                f"  record_id={rec.id} table_id={rec.table_id} table='{rec.table.name}'{car_info} data={rec.data}"
-            )
-        parts.append("")
 
     # Monthly fuel breakdown (for analytics)
     monthly_fuel_rows = (
@@ -719,7 +720,7 @@ TOOL_DEFINITIONS = [
         "type": "function",
         "function": {
             "name": "tool_list_custom_tables",
-            "description": "List custom tables for the company. Optional filter by name.",
+            "description": "List custom tables for the company. Use this to discover what custom tables exist before querying or adding data.",
             "parameters": {
                 "type": "object",
                 "properties": {
@@ -731,8 +732,24 @@ TOOL_DEFINITIONS = [
     {
         "type": "function",
         "function": {
+            "name": "tool_list_custom_records",
+            "description": "Read records from a specific custom table. Use this to answer questions about data stored in custom tables (e.g., 'how many accidents this month', 'total expenses from my table').",
+            "parameters": {
+                "type": "object",
+                "required": ["table_id"],
+                "properties": {
+                    "table_id": {"type": "integer", "description": "Custom table ID"},
+                    "search": {"type": "string", "description": "Optional search term to filter records"},
+                    "limit": {"type": "integer", "description": "Maximum records to return (default 50)"}
+                }
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
             "name": "tool_add_custom_table",
-            "description": "Create a new custom table with flexible columns",
+            "description": "Create a new custom table with flexible columns. AI should infer appropriate column types from user request (e.g., date column for event tables, price/number for financial tables).",
             "parameters": {
                 "type": "object",
                 "required": ["name", "columns"],
@@ -742,10 +759,33 @@ TOOL_DEFINITIONS = [
                     "icon": {"type": "string", "description": "Icon name (default: table)"},
                     "columns": {
                         "type": "array",
-                        "description": "Array of column definitions. Each item: string name OR object {name, type, required}",
+                        "description": "Array of column definitions {name, type, required}. AI should choose types intelligently: date for dates, price/number for money, select for categories, text for notes.",
                         "items": {"type": "object", "properties": {"name": {"type": "string"}, "type": {"type": "string", "enum": ["text", "number", "price", "date", "photo", "select"]}, "required": {"type": "boolean"}}}
                     },
                     "settings": {"type": "object", "description": "Table settings (color, showTotals, etc.)"}
+                }
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "tool_update_custom_table",
+            "description": "Update an existing custom table schema. Use to add/remove columns or rename a table.",
+            "parameters": {
+                "type": "object",
+                "required": ["table_id"],
+                "properties": {
+                    "table_id": {"type": "integer", "description": "Table ID to update"},
+                    "name": {"type": "string", "description": "New table name"},
+                    "description": {"type": "string", "description": "New description"},
+                    "icon": {"type": "string", "description": "New icon name"},
+                    "columns": {
+                        "type": "array",
+                        "description": "Full new column list (replaces existing columns)",
+                        "items": {"type": "object", "properties": {"name": {"type": "string"}, "type": {"type": "string", "enum": ["text", "number", "price", "date", "photo", "select"]}, "required": {"type": "boolean"}}}
+                    },
+                    "settings": {"type": "object", "description": "Table settings"}
                 }
             }
         }
@@ -833,8 +873,14 @@ def _execute_tool(user, company, tool_name, arguments):
             result = tool_fn(user, company, model_name=model_name, record_id=record_id)
         elif tool_name == 'tool_list_custom_tables':
             result = tool_fn(user, company, filters=arguments)
+        elif tool_name == 'tool_list_custom_records':
+            table_id = arguments.pop('table_id')
+            result = tool_fn(user, company, table_id=table_id, filters=arguments)
         elif tool_name == 'tool_add_custom_table':
             result = tool_fn(user, company, data=arguments)
+        elif tool_name == 'tool_update_custom_table':
+            table_id = arguments.pop('table_id')
+            result = tool_fn(user, company, table_id=table_id, data=arguments)
         elif tool_name == 'tool_add_custom_record':
             result = tool_fn(user, company, data=arguments)
         elif tool_name == 'tool_update_custom_record':
