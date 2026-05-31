@@ -1,0 +1,1213 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - banner [ref=e4]:
+        - generic [ref=e5]:
+          - link "Render" [ref=e7] [cursor=pointer]:
+            - /url: /
+            - img "Render" [ref=e8]
+          - button "M My Workspace" [ref=e12] [cursor=pointer]:
+            - generic [ref=e13]:
+              - generic [ref=e14]: M
+              - generic "My Workspace" [ref=e15]
+              - img [ref=e16]
+        - generic [ref=e20]:
+          - navigation [ref=e21]:
+            - list [ref=e22]:
+              - listitem [ref=e23]:
+                - link "My project" [ref=e24] [cursor=pointer]:
+                  - /url: /project/prj-d8dvm477f7vs73clijo0
+                  - img [ref=e25]
+                  - generic [ref=e29]: My project
+                - button [ref=e32] [cursor=pointer]:
+                  - img [ref=e33]
+                - text: /
+              - listitem [ref=e35]:
+                - link "Production" [ref=e36] [cursor=pointer]:
+                  - /url: /project/prj-d8dvm477f7vs73clijo0/environment/evm-d8dvm477f7vs73clijog
+                  - img [ref=e37]
+                  - generic [ref=e50]: Production
+                - button [ref=e53] [cursor=pointer]:
+                  - img [ref=e54]
+                - text: /
+              - listitem [ref=e56]:
+                - link "Parko" [ref=e57] [cursor=pointer]:
+                  - /url: /web/srv-d8dvm43bc2fs73c4mpqg
+                  - img [ref=e58]
+                  - generic [ref=e60]: Parko
+                - button [ref=e63] [cursor=pointer]:
+                  - img [ref=e64]
+          - button "Search Ctrl + K" [ref=e67] [cursor=pointer]:
+            - img [ref=e69]
+            - text: Search
+            - generic [ref=e71]:
+              - img [ref=e72]
+              - generic [ref=e74]: Ctrl
+              - generic [ref=e75]: +
+              - generic [ref=e76]: K
+              - generic [ref=e77]: K
+        - generic [ref=e78]:
+          - button "New" [ref=e80] [cursor=pointer]:
+            - generic [ref=e81]:
+              - img [ref=e82]
+              - generic [ref=e84]: New
+          - button "Upgrade" [ref=e86] [cursor=pointer]:
+            - generic [ref=e87]:
+              - img [ref=e88]
+              - generic [ref=e90]: Upgrade
+          - button "Help" [ref=e92] [cursor=pointer]:
+            - img "Help" [ref=e93]
+          - button "j" [ref=e98] [cursor=pointer]:
+            - generic [ref=e100]: j
+      - generic [ref=e101]:
+        - navigation [ref=e102]:
+          - separator [ref=e103]
+          - generic [ref=e104]:
+            - generic [ref=e105]:
+              - link "Environment" [ref=e106] [cursor=pointer]:
+                - /url: /project/prj-d8dvm477f7vs73clijo0/environment/evm-d8dvm477f7vs73clijog
+                - img [ref=e107]
+                - generic [ref=e109]: Environment
+              - generic [ref=e110]:
+                - img [ref=e111]
+                - generic [ref=e113]: Parko
+            - generic [ref=e114]:
+              - list [ref=e115]:
+                - listitem [ref=e116]:
+                  - link "Events" [ref=e117] [cursor=pointer]:
+                    - /url: /web/srv-d8dvm43bc2fs73c4mpqg/events
+                    - img [ref=e118]
+                    - generic [ref=e125]: Events
+                - listitem [ref=e126]:
+                  - link "Settings" [ref=e127] [cursor=pointer]:
+                    - /url: /web/srv-d8dvm43bc2fs73c4mpqg/settings
+                    - img [ref=e128]
+                    - generic [ref=e131]: Settings
+              - generic [ref=e132]:
+                - generic [ref=e133]: Monitor
+                - list "Monitor" [ref=e134]:
+                  - listitem [ref=e135]:
+                    - link "Logs" [ref=e136] [cursor=pointer]:
+                      - /url: /web/srv-d8dvm43bc2fs73c4mpqg/logs
+                      - img [ref=e137]
+                      - generic [ref=e142]: Logs
+                  - listitem [ref=e143]:
+                    - link "Metrics" [ref=e144] [cursor=pointer]:
+                      - /url: /web/srv-d8dvm43bc2fs73c4mpqg/metrics
+                      - img [ref=e145]
+                      - generic [ref=e147]: Metrics
+              - generic [ref=e148]:
+                - generic [ref=e149]: Manage
+                - list "Manage" [ref=e150]:
+                  - listitem [ref=e151]:
+                    - link "Environment" [ref=e152] [cursor=pointer]:
+                      - /url: /web/srv-d8dvm43bc2fs73c4mpqg/env
+                      - img [ref=e153]
+                      - generic [ref=e157]: Environment
+                  - listitem [ref=e158]:
+                    - link "Shell" [ref=e159] [cursor=pointer]:
+                      - /url: /web/srv-d8dvm43bc2fs73c4mpqg/shell
+                      - img [ref=e160]
+                      - generic [ref=e164]:
+                        - generic [ref=e165]: Shell
+                        - status [ref=e168]:
+                          - img [ref=e169]
+                  - listitem [ref=e171]:
+                    - link "Scaling" [ref=e172] [cursor=pointer]:
+                      - /url: /web/srv-d8dvm43bc2fs73c4mpqg/scaling
+                      - img [ref=e173]
+                      - generic [ref=e178]:
+                        - generic [ref=e179]: Scaling
+                        - status [ref=e182]:
+                          - img [ref=e183]
+                  - listitem [ref=e185]:
+                    - link "Previews" [ref=e186] [cursor=pointer]:
+                      - /url: /web/srv-d8dvm43bc2fs73c4mpqg/previews
+                      - img [ref=e187]
+                      - generic [ref=e191]: Previews
+                  - listitem [ref=e192]:
+                    - link "Disk" [ref=e193] [cursor=pointer]:
+                      - /url: /web/srv-d8dvm43bc2fs73c4mpqg/disks
+                      - img [ref=e194]
+                      - generic [ref=e199]:
+                        - generic [ref=e200]: Disk
+                        - status [ref=e203]:
+                          - img [ref=e204]
+                  - listitem [ref=e206]:
+                    - link "One-Off Jobs" [ref=e207] [cursor=pointer]:
+                      - /url: /web/srv-d8dvm43bc2fs73c4mpqg/jobs
+                      - img [ref=e208]
+                      - generic [ref=e214]:
+                        - generic [ref=e215]: One-Off Jobs
+                        - status [ref=e218]:
+                          - img [ref=e219]
+          - generic [ref=e222]:
+            - button "Collapse items" [expanded] [ref=e223] [cursor=pointer]:
+              - img [ref=e224]
+            - list "Footer navigation" [ref=e226]:
+              - listitem [ref=e227]:
+                - link "Changelog" [ref=e228] [cursor=pointer]:
+                  - /url: https://render.com/changelog
+                  - img [ref=e229]
+                  - generic [ref=e234]: Changelog
+              - listitem [ref=e235]:
+                - link "Invite a friend" [ref=e236] [cursor=pointer]:
+                  - /url: /invites
+                  - img [ref=e237]
+                  - generic [ref=e239]: Invite a friend
+              - listitem [ref=e240]:
+                - button "Contact support" [ref=e241] [cursor=pointer]:
+                  - img [ref=e242]
+                  - generic [ref=e246]: Contact support
+            - link "Render Status" [ref=e248] [cursor=pointer]:
+              - /url: https://status.render.com
+              - img [ref=e249]
+              - generic [ref=e251]: Render Status
+        - generic [ref=e253]:
+          - banner [ref=e255]:
+            - generic [ref=e256]:
+              - generic [ref=e257]:
+                - img [ref=e258]
+                - generic [ref=e260]: Web Service
+              - generic [ref=e261]:
+                - heading "Parko Python 3 Free Upgrade your instance" [level=1] [ref=e263]:
+                  - generic [ref=e264]: Parko
+                  - generic [ref=e265]:
+                    - generic [ref=e266]: Python 3
+                    - link "Free" [ref=e267] [cursor=pointer]:
+                      - /url: /web/srv-d8dvm43bc2fs73c4mpqg/plan
+                      - generic [ref=e268]: Free
+                    - link "Upgrade your instance" [ref=e269] [cursor=pointer]:
+                      - /url: /web/srv-d8dvm43bc2fs73c4mpqg/plan
+                      - text: Upgrade your instance
+                      - img [ref=e271]
+                - generic [ref=e274]:
+                  - button "Connect" [ref=e275] [cursor=pointer]:
+                    - generic [ref=e276]: Connect
+                    - img [ref=e277]
+                  - button "Manual Deploy" [ref=e279] [cursor=pointer]:
+                    - generic [ref=e280]: Manual Deploy
+                    - img [ref=e281]
+            - generic [ref=e285]:
+              - generic [ref=e287]:
+                - generic [ref=e288]: "Service ID:"
+                - generic "Service ID:" [ref=e289]:
+                  - generic [ref=e290]: srv-d8dvm43bc2fs73c4mpqg
+                  - button "Copy" [ref=e293] [cursor=pointer]:
+                    - img [ref=e294]
+              - generic [ref=e298]:
+                - img "GitHub" [ref=e300]
+                - link "janatlk / Parko main" [ref=e302] [cursor=pointer]:
+                  - /url: https://github.com/janatlk/Parko/tree/main
+                  - generic [ref=e303]:
+                    - generic [ref=e304]: janatlk / Parko
+                    - img [ref=e305]
+                    - generic [ref=e307]: main
+              - generic "Copy" [ref=e309]:
+                - link "https://parko-9ae8.onrender.com" [ref=e311] [cursor=pointer]:
+                  - /url: https://parko-9ae8.onrender.com
+                - button "Copy" [ref=e314] [cursor=pointer]:
+                  - img [ref=e315]
+          - main [ref=e318]:
+            - generic [ref=e319]:
+              - alert [ref=e320]:
+                - generic [ref=e322]:
+                  - img [ref=e324]
+                  - generic [ref=e328]:
+                    - generic [ref=e330]: Your free instance will spin down with inactivity, which can delay requests by 50 seconds or more.
+                    - link "Upgrade now" [ref=e332] [cursor=pointer]:
+                      - /url: /web/srv-d8dvm43bc2fs73c4mpqg/plan
+              - generic [ref=e334]:
+                - generic [ref=e335]:
+                  - generic [ref=e336]:
+                    - generic [ref=e337]: May 31, 2026 at 3:48 PM
+                    - generic [ref=e338]:
+                      - img [ref=e339]
+                      - generic [ref=e342]: building
+                  - generic [ref=e343]:
+                    - link "50231a7" [ref=e344] [cursor=pointer]:
+                      - /url: https://github.com/janatlk/Parko/commit/50231a7962391169adc28b6eb9a9c569ecc17f05
+                    - generic [ref=e345]: Add missing django-cors-headers to requirements.txt
+                - button "Cancel deploy" [ref=e347] [cursor=pointer]
+              - generic [ref=e348]:
+                - generic [ref=e350]:
+                  - generic [ref=e352]:
+                    - button "All logs" [ref=e355] [cursor=pointer]:
+                      - generic [ref=e356]:
+                        - generic [ref=e357]: All logs
+                        - img [ref=e358]
+                    - generic [ref=e361]:
+                      - generic [ref=e362]: Search
+                      - generic [ref=e364]:
+                        - img [ref=e365]
+                        - searchbox "Search" [ref=e367]
+                    - button "Live tail" [ref=e370] [cursor=pointer]:
+                      - generic [ref=e373]:
+                        - img [ref=e374]
+                        - generic [ref=e376]: Live tail
+                        - img [ref=e377]
+                    - button "Maximize" [ref=e383] [cursor=pointer]:
+                      - img "Maximize" [ref=e384]
+                    - button "Options" [ref=e389] [cursor=pointer]:
+                      - img "Options" [ref=e390]
+                  - generic:
+                    - button "Return to Bottom":
+                      - img
+                  - listbox [ref=e394]:
+                    - generic [ref=e411]: May 31
+                    - option "03:48:15 PM ==> It looks like we don't have access to your repo, but we'll try to clone it anyway." [ref=e412]:
+                      - generic [ref=e414]:
+                        - img [ref=e416]
+                        - time [ref=e420]: 03:48:15 PM
+                      - generic [ref=e422]: ==> It looks like we don't have access to your repo, but we'll try to clone it anyway.
+                    - option "03:48:15 PM ==> Cloning from https://github.com/janatlk/Parko" [ref=e423]:
+                      - generic [ref=e425]:
+                        - img [ref=e427]
+                        - time [ref=e431]: 03:48:15 PM
+                      - generic [ref=e433]:
+                        - text: ==>
+                        - generic [ref=e434]:
+                          - text: Cloning from
+                          - link "https://github.com/janatlk/Parko" [ref=e435] [cursor=pointer]:
+                            - /url: https://github.com/janatlk/Parko
+                    - option "03:48:17 PM ==> Checking out commit 50231a7962391169adc28b6eb9a9c569ecc17f05 in branch main" [ref=e436]:
+                      - generic [ref=e438]:
+                        - img [ref=e440]
+                        - time [ref=e444]: 03:48:17 PM
+                      - generic [ref=e446]: ==> Checking out commit 50231a7962391169adc28b6eb9a9c569ecc17f05 in branch main
+                    - option "03:48:19 PM ==> Using Python version 3.14.3 (default)" [ref=e447]:
+                      - generic [ref=e449]:
+                        - img [ref=e451]
+                        - time [ref=e455]: 03:48:19 PM
+                      - generic [ref=e457]: ==> Using Python version 3.14.3 (default)
+                    - 'option "03:48:19 PM ==> Docs on specifying a Python version: https://render.com/docs/python-version" [ref=e458]':
+                      - generic [ref=e460]:
+                        - img [ref=e462]
+                        - time [ref=e466]: 03:48:19 PM
+                      - generic [ref=e468]:
+                        - text: ==>
+                        - generic [ref=e469]:
+                          - text: "Docs on specifying a Python version:"
+                          - link "https://render.com/docs/python-version" [ref=e470] [cursor=pointer]:
+                            - /url: https://render.com/docs/python-version
+                    - option "03:48:19 PM ==> Installing Python version 3.14.3..." [ref=e471]:
+                      - generic [ref=e473]:
+                        - img [ref=e475]
+                        - time [ref=e479]: 03:48:19 PM
+                      - generic [ref=e481]: ==> Installing Python version 3.14.3...
+                    - option "03:48:26 PM ==> Using Poetry version 2.1.3 (default)" [ref=e482]:
+                      - generic [ref=e484]:
+                        - img [ref=e486]
+                        - time [ref=e490]: 03:48:26 PM
+                      - generic [ref=e492]: ==> Using Poetry version 2.1.3 (default)
+                    - 'option "03:48:26 PM ==> Docs on specifying a Poetry version: https://render.com/docs/poetry-version" [ref=e493]':
+                      - generic [ref=e495]:
+                        - img [ref=e497]
+                        - time [ref=e501]: 03:48:26 PM
+                      - generic [ref=e503]:
+                        - text: ==>
+                        - generic [ref=e504]:
+                          - text: "Docs on specifying a Poetry version:"
+                          - link "https://render.com/docs/poetry-version" [ref=e505] [cursor=pointer]:
+                            - /url: https://render.com/docs/poetry-version
+                    - option "03:48:26 PM ==> Running build command 'bash build.sh'..." [ref=e506]:
+                      - generic [ref=e508]:
+                        - img [ref=e510]
+                        - time [ref=e514]: 03:48:26 PM
+                      - generic [ref=e516]: ==> Running build command 'bash build.sh'...
+                    - option "03:48:26 PM === Building Parko for Render ===" [ref=e517]:
+                      - generic [ref=e519]:
+                        - img [ref=e521]
+                        - time [ref=e525]: 03:48:26 PM
+                      - generic [ref=e527]: === Building Parko for Render ===
+                    - option "03:48:26 PM → Building frontend..." [ref=e528]:
+                      - generic [ref=e530]:
+                        - img [ref=e532]
+                        - time [ref=e536]: 03:48:26 PM
+                      - generic [ref=e538]: → Building frontend...
+                    - option "03:48:26 PM ==> Using Node.js version 24.14.1 (default)" [ref=e539]:
+                      - generic [ref=e541]:
+                        - img [ref=e543]
+                        - time [ref=e547]: 03:48:26 PM
+                      - generic [ref=e549]: ==> Using Node.js version 24.14.1 (default)
+                    - 'option "03:48:26 PM ==> Docs on specifying a Node.js version: https://render.com/docs/node-version" [ref=e550]':
+                      - generic [ref=e552]:
+                        - img [ref=e554]
+                        - time [ref=e558]: 03:48:26 PM
+                      - generic [ref=e560]:
+                        - text: ==>
+                        - generic [ref=e561]:
+                          - text: "Docs on specifying a Node.js version:"
+                          - link "https://render.com/docs/node-version" [ref=e562] [cursor=pointer]:
+                            - /url: https://render.com/docs/node-version
+                    - option "03:48:38 PM" [ref=e563]:
+                      - generic [ref=e565]:
+                        - img [ref=e567]
+                        - time [ref=e571]: 03:48:38 PM
+                    - option "03:48:38 PM added 473 packages, and audited 474 packages in 12s" [ref=e573]:
+                      - generic [ref=e575]:
+                        - img [ref=e577]
+                        - time [ref=e581]: 03:48:38 PM
+                      - generic [ref=e583]: added 473 packages, and audited 474 packages in 12s
+                    - option "03:48:38 PM" [ref=e584]:
+                      - generic [ref=e586]:
+                        - img [ref=e588]
+                        - time [ref=e592]: 03:48:38 PM
+                    - option "03:48:38 PM 215 packages are looking for funding" [ref=e594]:
+                      - generic [ref=e596]:
+                        - img [ref=e598]
+                        - time [ref=e602]: 03:48:38 PM
+                      - generic [ref=e604]: 215 packages are looking for funding
+                    - 'option "03:48:38 PM run `npm fund` for details" [ref=e605]':
+                      - generic [ref=e607]:
+                        - img [ref=e609]
+                        - time [ref=e613]: 03:48:38 PM
+                      - generic [ref=e615]: "run `npm fund` for details"
+                    - option "03:48:38 PM" [ref=e616]:
+                      - generic [ref=e618]:
+                        - img [ref=e620]
+                        - time [ref=e624]: 03:48:38 PM
+                    - option "03:48:38 PM 6 vulnerabilities (5 moderate, 1 high)" [ref=e626]:
+                      - generic [ref=e628]:
+                        - img [ref=e630]
+                        - time [ref=e634]: 03:48:38 PM
+                      - generic [ref=e636]: 6 vulnerabilities (5 moderate, 1 high)
+                    - option "03:48:38 PM" [ref=e637]:
+                      - generic [ref=e639]:
+                        - img [ref=e641]
+                        - time [ref=e645]: 03:48:38 PM
+                    - option "03:48:38 PM To address issues that do not require attention, run:" [ref=e647]:
+                      - generic [ref=e649]:
+                        - img [ref=e651]
+                        - time [ref=e655]: 03:48:38 PM
+                      - generic [ref=e657]: "To address issues that do not require attention, run:"
+                    - option "03:48:38 PM npm audit fix" [ref=e658]:
+                      - generic [ref=e660]:
+                        - img [ref=e662]
+                        - time [ref=e666]: 03:48:38 PM
+                      - generic [ref=e668]: npm audit fix
+                    - option "03:48:38 PM" [ref=e669]:
+                      - generic [ref=e671]:
+                        - img [ref=e673]
+                        - time [ref=e677]: 03:48:38 PM
+                    - option "03:48:38 PM To address all issues (including breaking changes), run:" [ref=e679]:
+                      - generic [ref=e681]:
+                        - img [ref=e683]
+                        - time [ref=e687]: 03:48:38 PM
+                      - generic [ref=e689]: "To address all issues (including breaking changes), run:"
+                    - option "03:48:38 PM npm audit fix --force" [ref=e690]:
+                      - generic [ref=e692]:
+                        - img [ref=e694]
+                        - time [ref=e698]: 03:48:38 PM
+                      - generic [ref=e700]: npm audit fix --force
+                    - option "03:48:38 PM" [ref=e701]:
+                      - generic [ref=e703]:
+                        - img [ref=e705]
+                        - time [ref=e709]: 03:48:38 PM
+                    - 'option "03:48:38 PM Run `npm audit` for details." [ref=e711]':
+                      - generic [ref=e713]:
+                        - img [ref=e715]
+                        - time [ref=e719]: 03:48:38 PM
+                      - generic [ref=e721]: "Run `npm audit` for details."
+                    - option "03:48:38 PM" [ref=e722]:
+                      - generic [ref=e724]:
+                        - img [ref=e726]
+                        - time [ref=e730]: 03:48:38 PM
+                    - option "03:48:38 PM > frontend@0.0.0 build" [ref=e732]:
+                      - generic [ref=e734]:
+                        - img [ref=e736]
+                        - time [ref=e740]: 03:48:38 PM
+                      - generic [ref=e742]: "> frontend@0.0.0 build"
+                    - option "03:48:38 PM > tsc && vite build" [ref=e743]:
+                      - generic [ref=e745]:
+                        - img [ref=e747]
+                        - time [ref=e751]: 03:48:38 PM
+                      - generic [ref=e753]: "> tsc && vite build"
+                    - option "03:48:38 PM" [ref=e754]:
+                      - generic [ref=e756]:
+                        - img [ref=e758]
+                        - time [ref=e762]: 03:48:38 PM
+                    - option "03:48:43 PM vite v5.4.21 building for production..." [ref=e764]:
+                      - generic [ref=e766]:
+                        - img [ref=e768]
+                        - time [ref=e772]: 03:48:43 PM
+                      - generic [ref=e774]: vite v5.4.21 building for production...
+                    - option "03:48:43 PM transforming..." [ref=e775]:
+                      - generic [ref=e777]:
+                        - img [ref=e779]
+                        - time [ref=e783]: 03:48:43 PM
+                      - generic [ref=e785]: transforming...
+                    - option "03:48:52 PM ✓ 8100 modules transformed." [ref=e786]:
+                      - generic [ref=e788]:
+                        - img [ref=e790]
+                        - time [ref=e794]: 03:48:52 PM
+                      - generic [ref=e796]: ✓ 8100 modules transformed.
+                    - option "03:48:52 PM rendering chunks..." [ref=e797]:
+                      - generic [ref=e799]:
+                        - img [ref=e801]
+                        - time [ref=e805]: 03:48:52 PM
+                      - generic [ref=e807]: rendering chunks...
+                    - option "03:48:52 PM computing gzip size..." [ref=e808]:
+                      - generic [ref=e810]:
+                        - img [ref=e812]
+                        - time [ref=e816]: 03:48:52 PM
+                      - generic [ref=e818]: computing gzip size...
+                    - 'option "03:48:52 PM dist/index.html 0.47 kB │ gzip: 0.31 kB" [ref=e819]':
+                      - generic [ref=e821]:
+                        - img [ref=e823]
+                        - time [ref=e827]: 03:48:52 PM
+                      - generic [ref=e829]: "dist/index.html 0.47 kB │ gzip: 0.31 kB"
+                    - 'option "03:48:52 PM dist/assets/index-Djh8y1Ki.css 226.68 kB │ gzip: 32.88 kB" [ref=e830]':
+                      - generic [ref=e832]:
+                        - img [ref=e834]
+                        - time [ref=e838]: 03:48:52 PM
+                      - generic [ref=e840]: "dist/assets/index-Djh8y1Ki.css 226.68 kB │ gzip: 32.88 kB"
+                    - 'option "03:48:52 PM dist/assets/index-C6Qx6cSi.js 1,772.80 kB │ gzip: 526.17 kB" [ref=e841]':
+                      - generic [ref=e843]:
+                        - img [ref=e845]
+                        - time [ref=e849]: 03:48:52 PM
+                      - generic [ref=e851]: "dist/assets/index-C6Qx6cSi.js 1,772.80 kB │ gzip: 526.17 kB"
+                    - option "03:48:52 PM" [ref=e852]:
+                      - generic [ref=e854]:
+                        - img [ref=e856]
+                        - time [ref=e860]: 03:48:52 PM
+                    - option "03:48:52 PM (!) Some chunks are larger than 500 kB after minification. Consider:" [ref=e862]:
+                      - generic [ref=e864]:
+                        - img [ref=e866]
+                        - time [ref=e870]: 03:48:52 PM
+                      - generic [ref=e872]: "(!) Some chunks are larger than 500 kB after minification. Consider:"
+                    - option "03:48:52 PM - Using dynamic import() to code-split the application" [ref=e873]:
+                      - generic [ref=e875]:
+                        - img [ref=e877]
+                        - time [ref=e881]: 03:48:52 PM
+                      - generic [ref=e883]: "- Using dynamic import() to code-split the application"
+                    - 'option "03:48:52 PM - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks" [ref=e884]':
+                      - generic [ref=e886]:
+                        - img [ref=e888]
+                        - time [ref=e892]: 03:48:52 PM
+                      - generic [ref=e895]:
+                        - text: "- Use build.rollupOptions.output.manualChunks to improve chunking:"
+                        - link "https://rollupjs.org/configuration-options/#output-manualchunks" [ref=e896] [cursor=pointer]:
+                          - /url: https://rollupjs.org/configuration-options/#output-manualchunks
+                    - option "03:48:52 PM - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit." [ref=e897]:
+                      - generic [ref=e899]:
+                        - img [ref=e901]
+                        - time [ref=e906]: 03:48:52 PM
+                      - generic [ref=e908]: "- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit."
+                    - option "03:48:52 PM ✓ built in 8.94s" [ref=e909]:
+                      - generic [ref=e911]:
+                        - img [ref=e913]
+                        - time [ref=e917]: 03:48:52 PM
+                      - generic [ref=e919]: ✓ built in 8.94s
+                    - option "03:48:53 PM → Preparing backend..." [ref=e920]:
+                      - generic [ref=e922]:
+                        - img [ref=e924]
+                        - time [ref=e928]: 03:48:53 PM
+                      - generic [ref=e930]: → Preparing backend...
+                    - option "03:48:53 PM Collecting Django<5.0,>=4.2 (from -r requirements.txt (line 1))" [ref=e931]:
+                      - generic [ref=e933]:
+                        - img [ref=e935]
+                        - time [ref=e939]: 03:48:53 PM
+                      - generic [ref=e941]: Collecting Django<5.0,>=4.2 (from -r requirements.txt (line 1))
+                    - option "03:48:53 PM Downloading django-4.2.30-py3-none-any.whl.metadata (4.2 kB)" [ref=e942]:
+                      - generic [ref=e944]:
+                        - img [ref=e946]
+                        - time [ref=e950]: 03:48:53 PM
+                      - generic [ref=e952]: Downloading django-4.2.30-py3-none-any.whl.metadata (4.2 kB)
+                    - option "03:48:53 PM Collecting djangorestframework<4.0,>=3.14 (from -r requirements.txt (line 2))" [ref=e953]:
+                      - generic [ref=e955]:
+                        - img [ref=e957]
+                        - time [ref=e961]: 03:48:53 PM
+                      - generic [ref=e963]: Collecting djangorestframework<4.0,>=3.14 (from -r requirements.txt (line 2))
+                    - option "03:48:53 PM Downloading djangorestframework-3.17.1-py3-none-any.whl.metadata (7.9 kB)" [ref=e964]:
+                      - generic [ref=e966]:
+                        - img [ref=e968]
+                        - time [ref=e972]: 03:48:53 PM
+                      - generic [ref=e974]: Downloading djangorestframework-3.17.1-py3-none-any.whl.metadata (7.9 kB)
+                    - option "03:48:53 PM Collecting django-cors-headers>=4.3.0 (from -r requirements.txt (line 3))" [ref=e975]:
+                      - generic [ref=e977]:
+                        - img [ref=e979]
+                        - time [ref=e983]: 03:48:53 PM
+                      - generic [ref=e985]: Collecting django-cors-headers>=4.3.0 (from -r requirements.txt (line 3))
+                    - option "03:48:53 PM Downloading django_cors_headers-4.9.0-py3-none-any.whl.metadata (16 kB)" [ref=e986]:
+                      - generic [ref=e988]:
+                        - img [ref=e990]
+                        - time [ref=e994]: 03:48:53 PM
+                      - generic [ref=e996]: Downloading django_cors_headers-4.9.0-py3-none-any.whl.metadata (16 kB)
+                    - option "03:48:53 PM Collecting django-environ>=0.11.2 (from -r requirements.txt (line 4))" [ref=e997]:
+                      - generic [ref=e999]:
+                        - img [ref=e1001]
+                        - time [ref=e1005]: 03:48:53 PM
+                      - generic [ref=e1007]: Collecting django-environ>=0.11.2 (from -r requirements.txt (line 4))
+                    - option "03:48:53 PM Downloading django_environ-0.13.0-py3-none-any.whl.metadata (13 kB)" [ref=e1008]:
+                      - generic [ref=e1010]:
+                        - img [ref=e1012]
+                        - time [ref=e1016]: 03:48:53 PM
+                      - generic [ref=e1018]: Downloading django_environ-0.13.0-py3-none-any.whl.metadata (13 kB)
+                    - option "03:48:53 PM Collecting psycopg2-binary>=2.9.9 (from -r requirements.txt (line 5))" [ref=e1019]:
+                      - generic [ref=e1021]:
+                        - img [ref=e1023]
+                        - time [ref=e1027]: 03:48:53 PM
+                      - generic [ref=e1029]: Collecting psycopg2-binary>=2.9.9 (from -r requirements.txt (line 5))
+                    - option "03:48:53 PM Downloading psycopg2_binary-2.9.12-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (4.9 kB)" [ref=e1030]:
+                      - generic [ref=e1032]:
+                        - img [ref=e1034]
+                        - time [ref=e1038]: 03:48:53 PM
+                      - generic [ref=e1040]: Downloading psycopg2_binary-2.9.12-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (4.9 kB)
+                    - option "03:48:53 PM Collecting djangorestframework-simplejwt>=5.3.0 (from -r requirements.txt (line 6))" [ref=e1041]:
+                      - generic [ref=e1043]:
+                        - img [ref=e1045]
+                        - time [ref=e1049]: 03:48:53 PM
+                      - generic [ref=e1051]: Collecting djangorestframework-simplejwt>=5.3.0 (from -r requirements.txt (line 6))
+                    - option "03:48:53 PM Downloading djangorestframework_simplejwt-5.5.1-py3-none-any.whl.metadata (4.6 kB)" [ref=e1052]:
+                      - generic [ref=e1054]:
+                        - img [ref=e1056]
+                        - time [ref=e1060]: 03:48:53 PM
+                      - generic [ref=e1062]: Downloading djangorestframework_simplejwt-5.5.1-py3-none-any.whl.metadata (4.6 kB)
+                    - option "03:48:54 PM Collecting drf-spectacular>=0.26.5 (from -r requirements.txt (line 7))" [ref=e1063]:
+                      - generic [ref=e1065]:
+                        - img [ref=e1067]
+                        - time [ref=e1071]: 03:48:54 PM
+                      - generic [ref=e1073]: Collecting drf-spectacular>=0.26.5 (from -r requirements.txt (line 7))
+                    - option "03:48:54 PM Downloading drf_spectacular-0.29.0-py3-none-any.whl.metadata (14 kB)" [ref=e1074]:
+                      - generic [ref=e1076]:
+                        - img [ref=e1078]
+                        - time [ref=e1082]: 03:48:54 PM
+                      - generic [ref=e1084]: Downloading drf_spectacular-0.29.0-py3-none-any.whl.metadata (14 kB)
+                    - option "03:48:54 PM Collecting django-filter>=23.5 (from -r requirements.txt (line 8))" [ref=e1085]:
+                      - generic [ref=e1087]:
+                        - img [ref=e1089]
+                        - time [ref=e1093]: 03:48:54 PM
+                      - generic [ref=e1095]: Collecting django-filter>=23.5 (from -r requirements.txt (line 8))
+                    - option "03:48:54 PM Downloading django_filter-25.2-py3-none-any.whl.metadata (5.1 kB)" [ref=e1096]:
+                      - generic [ref=e1098]:
+                        - img [ref=e1100]
+                        - time [ref=e1104]: 03:48:54 PM
+                      - generic [ref=e1106]: Downloading django_filter-25.2-py3-none-any.whl.metadata (5.1 kB)
+                    - option "03:48:54 PM Collecting Pillow>=10.0 (from -r requirements.txt (line 9))" [ref=e1107]:
+                      - generic [ref=e1109]:
+                        - img [ref=e1111]
+                        - time [ref=e1115]: 03:48:54 PM
+                      - generic [ref=e1117]: Collecting Pillow>=10.0 (from -r requirements.txt (line 9))
+                    - option "03:48:54 PM Downloading pillow-12.2.0-cp314-cp314-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (8.8 kB)" [ref=e1118]:
+                      - generic [ref=e1120]:
+                        - img [ref=e1122]
+                        - time [ref=e1126]: 03:48:54 PM
+                      - generic [ref=e1128]: Downloading pillow-12.2.0-cp314-cp314-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (8.8 kB)
+                    - option "03:48:54 PM Collecting openpyxl>=3.1.0 (from -r requirements.txt (line 10))" [ref=e1129]:
+                      - generic [ref=e1131]:
+                        - img [ref=e1133]
+                        - time [ref=e1137]: 03:48:54 PM
+                      - generic [ref=e1139]: Collecting openpyxl>=3.1.0 (from -r requirements.txt (line 10))
+                    - option "03:48:54 PM Downloading openpyxl-3.1.5-py2.py3-none-any.whl.metadata (2.5 kB)" [ref=e1140]:
+                      - generic [ref=e1142]:
+                        - img [ref=e1144]
+                        - time [ref=e1148]: 03:48:54 PM
+                      - generic [ref=e1150]: Downloading openpyxl-3.1.5-py2.py3-none-any.whl.metadata (2.5 kB)
+                    - option "03:48:54 PM Collecting reportlab>=4.0.0 (from -r requirements.txt (line 11))" [ref=e1151]:
+                      - generic [ref=e1153]:
+                        - img [ref=e1155]
+                        - time [ref=e1159]: 03:48:54 PM
+                      - generic [ref=e1161]: Collecting reportlab>=4.0.0 (from -r requirements.txt (line 11))
+                    - option "03:48:54 PM Downloading reportlab-4.5.1-py3-none-any.whl.metadata (1.7 kB)" [ref=e1162]:
+                      - generic [ref=e1164]:
+                        - img [ref=e1166]
+                        - time [ref=e1170]: 03:48:54 PM
+                      - generic [ref=e1172]: Downloading reportlab-4.5.1-py3-none-any.whl.metadata (1.7 kB)
+                    - option "03:48:54 PM Collecting sendgrid>=6.10.0 (from -r requirements.txt (line 12))" [ref=e1173]:
+                      - generic [ref=e1175]:
+                        - img [ref=e1177]
+                        - time [ref=e1181]: 03:48:54 PM
+                      - generic [ref=e1183]: Collecting sendgrid>=6.10.0 (from -r requirements.txt (line 12))
+                    - option "03:48:54 PM Downloading sendgrid-6.12.5-py3-none-any.whl.metadata (12 kB)" [ref=e1184]:
+                      - generic [ref=e1186]:
+                        - img [ref=e1188]
+                        - time [ref=e1192]: 03:48:54 PM
+                      - generic [ref=e1194]: Downloading sendgrid-6.12.5-py3-none-any.whl.metadata (12 kB)
+                    - option "03:48:54 PM Collecting groq>=0.4.0 (from -r requirements.txt (line 13))" [ref=e1195]:
+                      - generic [ref=e1197]:
+                        - img [ref=e1199]
+                        - time [ref=e1203]: 03:48:54 PM
+                      - generic [ref=e1205]: Collecting groq>=0.4.0 (from -r requirements.txt (line 13))
+                    - option "03:48:54 PM Downloading groq-1.4.0-py3-none-any.whl.metadata (16 kB)" [ref=e1206]:
+                      - generic [ref=e1208]:
+                        - img [ref=e1210]
+                        - time [ref=e1214]: 03:48:54 PM
+                      - generic [ref=e1216]: Downloading groq-1.4.0-py3-none-any.whl.metadata (16 kB)
+                    - option "03:48:54 PM Collecting gunicorn>=21.2.0 (from -r requirements.txt (line 14))" [ref=e1217]:
+                      - generic [ref=e1219]:
+                        - img [ref=e1221]
+                        - time [ref=e1225]: 03:48:54 PM
+                      - generic [ref=e1227]: Collecting gunicorn>=21.2.0 (from -r requirements.txt (line 14))
+                    - option "03:48:54 PM Downloading gunicorn-26.0.0-py3-none-any.whl.metadata (5.4 kB)" [ref=e1228]:
+                      - generic [ref=e1230]:
+                        - img [ref=e1232]
+                        - time [ref=e1236]: 03:48:54 PM
+                      - generic [ref=e1238]: Downloading gunicorn-26.0.0-py3-none-any.whl.metadata (5.4 kB)
+                    - option "03:48:54 PM Collecting whitenoise>=6.6.0 (from -r requirements.txt (line 15))" [ref=e1239]:
+                      - generic [ref=e1241]:
+                        - img [ref=e1243]
+                        - time [ref=e1247]: 03:48:54 PM
+                      - generic [ref=e1249]: Collecting whitenoise>=6.6.0 (from -r requirements.txt (line 15))
+                    - option "03:48:54 PM Downloading whitenoise-6.12.0-py3-none-any.whl.metadata (3.7 kB)" [ref=e1250]:
+                      - generic [ref=e1252]:
+                        - img [ref=e1254]
+                        - time [ref=e1258]: 03:48:54 PM
+                      - generic [ref=e1260]: Downloading whitenoise-6.12.0-py3-none-any.whl.metadata (3.7 kB)
+                    - option "03:48:54 PM Collecting asgiref<4,>=3.6.0 (from Django<5.0,>=4.2->-r requirements.txt (line 1))" [ref=e1261]:
+                      - generic [ref=e1263]:
+                        - img [ref=e1265]
+                        - time [ref=e1269]: 03:48:54 PM
+                      - generic [ref=e1271]: Collecting asgiref<4,>=3.6.0 (from Django<5.0,>=4.2->-r requirements.txt (line 1))
+                    - option "03:48:54 PM Downloading asgiref-3.11.1-py3-none-any.whl.metadata (9.3 kB)" [ref=e1272]:
+                      - generic [ref=e1274]:
+                        - img [ref=e1276]
+                        - time [ref=e1280]: 03:48:54 PM
+                      - generic [ref=e1282]: Downloading asgiref-3.11.1-py3-none-any.whl.metadata (9.3 kB)
+                    - option "03:48:54 PM Collecting sqlparse>=0.3.1 (from Django<5.0,>=4.2->-r requirements.txt (line 1))" [ref=e1283]:
+                      - generic [ref=e1285]:
+                        - img [ref=e1287]
+                        - time [ref=e1291]: 03:48:54 PM
+                      - generic [ref=e1293]: Collecting sqlparse>=0.3.1 (from Django<5.0,>=4.2->-r requirements.txt (line 1))
+                    - option "03:48:54 PM Downloading sqlparse-0.5.5-py3-none-any.whl.metadata (4.7 kB)" [ref=e1294]:
+                      - generic [ref=e1296]:
+                        - img [ref=e1298]
+                        - time [ref=e1302]: 03:48:54 PM
+                      - generic [ref=e1304]: Downloading sqlparse-0.5.5-py3-none-any.whl.metadata (4.7 kB)
+                    - option "03:48:54 PM Collecting pyjwt>=1.7.1 (from djangorestframework-simplejwt>=5.3.0->-r requirements.txt (line 6))" [ref=e1305]:
+                      - generic [ref=e1307]:
+                        - img [ref=e1309]
+                        - time [ref=e1313]: 03:48:54 PM
+                      - generic [ref=e1315]: Collecting pyjwt>=1.7.1 (from djangorestframework-simplejwt>=5.3.0->-r requirements.txt (line 6))
+                    - option "03:48:54 PM Downloading pyjwt-2.13.0-py3-none-any.whl.metadata (3.4 kB)" [ref=e1316]:
+                      - generic [ref=e1318]:
+                        - img [ref=e1320]
+                        - time [ref=e1324]: 03:48:54 PM
+                      - generic [ref=e1326]: Downloading pyjwt-2.13.0-py3-none-any.whl.metadata (3.4 kB)
+                    - option "03:48:54 PM Collecting uritemplate>=2.0.0 (from drf-spectacular>=0.26.5->-r requirements.txt (line 7))" [ref=e1327]:
+                      - generic [ref=e1329]:
+                        - img [ref=e1331]
+                        - time [ref=e1335]: 03:48:54 PM
+                      - generic [ref=e1337]: Collecting uritemplate>=2.0.0 (from drf-spectacular>=0.26.5->-r requirements.txt (line 7))
+                    - option "03:48:54 PM Downloading uritemplate-4.2.0-py3-none-any.whl.metadata (2.6 kB)" [ref=e1338]:
+                      - generic [ref=e1340]:
+                        - img [ref=e1342]
+                        - time [ref=e1346]: 03:48:54 PM
+                      - generic [ref=e1348]: Downloading uritemplate-4.2.0-py3-none-any.whl.metadata (2.6 kB)
+                    - option "03:48:54 PM Collecting PyYAML>=5.1 (from drf-spectacular>=0.26.5->-r requirements.txt (line 7))" [ref=e1349]:
+                      - generic [ref=e1351]:
+                        - img [ref=e1353]
+                        - time [ref=e1357]: 03:48:54 PM
+                      - generic [ref=e1359]: Collecting PyYAML>=5.1 (from drf-spectacular>=0.26.5->-r requirements.txt (line 7))
+                    - option "03:48:54 PM Downloading pyyaml-6.0.3-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.4 kB)" [ref=e1360]:
+                      - generic [ref=e1362]:
+                        - img [ref=e1364]
+                        - time [ref=e1368]: 03:48:54 PM
+                      - generic [ref=e1370]: Downloading pyyaml-6.0.3-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.4 kB)
+                    - option "03:48:54 PM Collecting jsonschema>=2.6.0 (from drf-spectacular>=0.26.5->-r requirements.txt (line 7))" [ref=e1371]:
+                      - generic [ref=e1373]:
+                        - img [ref=e1375]
+                        - time [ref=e1379]: 03:48:54 PM
+                      - generic [ref=e1381]: Collecting jsonschema>=2.6.0 (from drf-spectacular>=0.26.5->-r requirements.txt (line 7))
+                    - option "03:48:54 PM Downloading jsonschema-4.26.0-py3-none-any.whl.metadata (7.6 kB)" [ref=e1382]:
+                      - generic [ref=e1384]:
+                        - img [ref=e1386]
+                        - time [ref=e1390]: 03:48:54 PM
+                      - generic [ref=e1392]: Downloading jsonschema-4.26.0-py3-none-any.whl.metadata (7.6 kB)
+                    - option "03:48:54 PM Collecting inflection>=0.3.1 (from drf-spectacular>=0.26.5->-r requirements.txt (line 7))" [ref=e1393]:
+                      - generic [ref=e1395]:
+                        - img [ref=e1397]
+                        - time [ref=e1401]: 03:48:54 PM
+                      - generic [ref=e1403]: Collecting inflection>=0.3.1 (from drf-spectacular>=0.26.5->-r requirements.txt (line 7))
+                    - option "03:48:55 PM Downloading inflection-0.5.1-py2.py3-none-any.whl.metadata (1.7 kB)" [ref=e1404]:
+                      - generic [ref=e1406]:
+                        - img [ref=e1408]
+                        - time [ref=e1412]: 03:48:55 PM
+                      - generic [ref=e1414]: Downloading inflection-0.5.1-py2.py3-none-any.whl.metadata (1.7 kB)
+                    - 'option "03:48:55 PM INFO: pip is looking at multiple versions of django-filter to determine which version is compatible with other requirements. This could take a while." [ref=e1415]':
+                      - generic [ref=e1417]:
+                        - img [ref=e1419]
+                        - time [ref=e1423]: 03:48:55 PM
+                      - generic [ref=e1425]: "INFO: pip is looking at multiple versions of django-filter to determine which version is compatible with other requirements. This could take a while."
+                    - option "03:48:55 PM Collecting django-filter>=23.5 (from -r requirements.txt (line 8))" [ref=e1426]:
+                      - generic [ref=e1428]:
+                        - img [ref=e1430]
+                        - time [ref=e1434]: 03:48:55 PM
+                      - generic [ref=e1436]: Collecting django-filter>=23.5 (from -r requirements.txt (line 8))
+                    - option "03:48:55 PM Downloading django_filter-25.1-py3-none-any.whl.metadata (5.1 kB)" [ref=e1437]:
+                      - generic [ref=e1439]:
+                        - img [ref=e1441]
+                        - time [ref=e1445]: 03:48:55 PM
+                      - generic [ref=e1447]: Downloading django_filter-25.1-py3-none-any.whl.metadata (5.1 kB)
+                    - option "03:48:55 PM Collecting et-xmlfile (from openpyxl>=3.1.0->-r requirements.txt (line 10))" [ref=e1448]:
+                      - generic [ref=e1450]:
+                        - img [ref=e1452]
+                        - time [ref=e1456]: 03:48:55 PM
+                      - generic [ref=e1458]: Collecting et-xmlfile (from openpyxl>=3.1.0->-r requirements.txt (line 10))
+                    - option "03:48:55 PM Downloading et_xmlfile-2.0.0-py3-none-any.whl.metadata (2.7 kB)" [ref=e1459]:
+                      - generic [ref=e1461]:
+                        - img [ref=e1463]
+                        - time [ref=e1467]: 03:48:55 PM
+                      - generic [ref=e1469]: Downloading et_xmlfile-2.0.0-py3-none-any.whl.metadata (2.7 kB)
+                    - option "03:48:55 PM Collecting charset-normalizer (from reportlab>=4.0.0->-r requirements.txt (line 11))" [ref=e1470]:
+                      - generic [ref=e1472]:
+                        - img [ref=e1474]
+                        - time [ref=e1478]: 03:48:55 PM
+                      - generic [ref=e1480]: Collecting charset-normalizer (from reportlab>=4.0.0->-r requirements.txt (line 11))
+                    - option "03:48:55 PM Downloading charset_normalizer-3.4.7-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (40 kB)" [ref=e1481]:
+                      - generic [ref=e1483]:
+                        - img [ref=e1485]
+                        - time [ref=e1489]: 03:48:55 PM
+                      - generic [ref=e1491]: Downloading charset_normalizer-3.4.7-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (40 kB)
+                    - option "03:48:55 PM Collecting python-http-client>=3.2.1 (from sendgrid>=6.10.0->-r requirements.txt (line 12))" [ref=e1492]:
+                      - generic [ref=e1494]:
+                        - img [ref=e1496]
+                        - time [ref=e1500]: 03:48:55 PM
+                      - generic [ref=e1502]: Collecting python-http-client>=3.2.1 (from sendgrid>=6.10.0->-r requirements.txt (line 12))
+                    - option "03:48:55 PM Downloading python_http_client-3.3.7-py3-none-any.whl.metadata (6.9 kB)" [ref=e1503]:
+                      - generic [ref=e1505]:
+                        - img [ref=e1507]
+                        - time [ref=e1511]: 03:48:55 PM
+                      - generic [ref=e1513]: Downloading python_http_client-3.3.7-py3-none-any.whl.metadata (6.9 kB)
+                    - option "03:48:55 PM Collecting cryptography>=45.0.6 (from sendgrid>=6.10.0->-r requirements.txt (line 12))" [ref=e1514]:
+                      - generic [ref=e1516]:
+                        - img [ref=e1518]
+                        - time [ref=e1522]: 03:48:55 PM
+                      - generic [ref=e1524]: Collecting cryptography>=45.0.6 (from sendgrid>=6.10.0->-r requirements.txt (line 12))
+                    - option "03:48:55 PM Downloading cryptography-48.0.0-cp311-abi3-manylinux_2_34_x86_64.whl.metadata (4.3 kB)" [ref=e1525]:
+                      - generic [ref=e1527]:
+                        - img [ref=e1529]
+                        - time [ref=e1533]: 03:48:55 PM
+                      - generic [ref=e1535]: Downloading cryptography-48.0.0-cp311-abi3-manylinux_2_34_x86_64.whl.metadata (4.3 kB)
+                    - option "03:48:55 PM Collecting werkzeug>=2.2.0 (from sendgrid>=6.10.0->-r requirements.txt (line 12))" [ref=e1536]:
+                      - generic [ref=e1538]:
+                        - img [ref=e1540]
+                        - time [ref=e1544]: 03:48:55 PM
+                      - generic [ref=e1546]: Collecting werkzeug>=2.2.0 (from sendgrid>=6.10.0->-r requirements.txt (line 12))
+                    - option "03:48:55 PM Downloading werkzeug-3.1.8-py3-none-any.whl.metadata (4.0 kB)" [ref=e1547]:
+                      - generic [ref=e1549]:
+                        - img [ref=e1551]
+                        - time [ref=e1555]: 03:48:55 PM
+                      - generic [ref=e1557]: Downloading werkzeug-3.1.8-py3-none-any.whl.metadata (4.0 kB)
+                    - option "03:48:55 PM Collecting anyio<5,>=3.5.0 (from groq>=0.4.0->-r requirements.txt (line 13))" [ref=e1558]:
+                      - generic [ref=e1560]:
+                        - img [ref=e1562]
+                        - time [ref=e1566]: 03:48:55 PM
+                      - generic [ref=e1568]: Collecting anyio<5,>=3.5.0 (from groq>=0.4.0->-r requirements.txt (line 13))
+                    - option "03:48:55 PM Downloading anyio-4.13.0-py3-none-any.whl.metadata (4.5 kB)" [ref=e1569]:
+                      - generic [ref=e1571]:
+                        - img [ref=e1573]
+                        - time [ref=e1577]: 03:48:55 PM
+                      - generic [ref=e1579]: Downloading anyio-4.13.0-py3-none-any.whl.metadata (4.5 kB)
+                    - option "03:48:55 PM Collecting distro<2,>=1.7.0 (from groq>=0.4.0->-r requirements.txt (line 13))" [ref=e1580]:
+                      - generic [ref=e1582]:
+                        - img [ref=e1584]
+                        - time [ref=e1588]: 03:48:55 PM
+                      - generic [ref=e1590]: Collecting distro<2,>=1.7.0 (from groq>=0.4.0->-r requirements.txt (line 13))
+                    - option "03:48:55 PM Downloading distro-1.9.0-py3-none-any.whl.metadata (6.8 kB)" [ref=e1591]:
+                      - generic [ref=e1593]:
+                        - img [ref=e1595]
+                        - time [ref=e1599]: 03:48:55 PM
+                      - generic [ref=e1601]: Downloading distro-1.9.0-py3-none-any.whl.metadata (6.8 kB)
+                    - option "03:48:55 PM Collecting httpx<1,>=0.23.0 (from groq>=0.4.0->-r requirements.txt (line 13))" [ref=e1602]:
+                      - generic [ref=e1604]:
+                        - img [ref=e1606]
+                        - time [ref=e1610]: 03:48:55 PM
+                      - generic [ref=e1612]: Collecting httpx<1,>=0.23.0 (from groq>=0.4.0->-r requirements.txt (line 13))
+                    - option "03:48:55 PM Downloading httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)" [ref=e1613]:
+                      - generic [ref=e1615]:
+                        - img [ref=e1617]
+                        - time [ref=e1621]: 03:48:55 PM
+                      - generic [ref=e1623]: Downloading httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
+                    - option "03:48:55 PM Collecting pydantic<3,>=1.9.0 (from groq>=0.4.0->-r requirements.txt (line 13))" [ref=e1624]:
+                      - generic [ref=e1626]:
+                        - img [ref=e1628]
+                        - time [ref=e1632]: 03:48:55 PM
+                      - generic [ref=e1634]: Collecting pydantic<3,>=1.9.0 (from groq>=0.4.0->-r requirements.txt (line 13))
+                    - option "03:48:55 PM Downloading pydantic-2.13.4-py3-none-any.whl.metadata (109 kB)" [ref=e1635]:
+                      - generic [ref=e1637]:
+                        - img [ref=e1639]
+                        - time [ref=e1643]: 03:48:55 PM
+                      - generic [ref=e1645]: Downloading pydantic-2.13.4-py3-none-any.whl.metadata (109 kB)
+                    - option "03:48:55 PM Collecting sniffio (from groq>=0.4.0->-r requirements.txt (line 13))" [ref=e1646]:
+                      - generic [ref=e1648]:
+                        - img [ref=e1650]
+                        - time [ref=e1654]: 03:48:55 PM
+                      - generic [ref=e1656]: Collecting sniffio (from groq>=0.4.0->-r requirements.txt (line 13))
+                    - option "03:48:55 PM Downloading sniffio-1.3.1-py3-none-any.whl.metadata (3.9 kB)" [ref=e1657]:
+                      - generic [ref=e1659]:
+                        - img [ref=e1661]
+                        - time [ref=e1665]: 03:48:55 PM
+                      - generic [ref=e1667]: Downloading sniffio-1.3.1-py3-none-any.whl.metadata (3.9 kB)
+                    - option "03:48:55 PM Collecting typing-extensions<5,>=4.14 (from groq>=0.4.0->-r requirements.txt (line 13))" [ref=e1668]:
+                      - generic [ref=e1670]:
+                        - img [ref=e1672]
+                        - time [ref=e1676]: 03:48:55 PM
+                      - generic [ref=e1678]: Collecting typing-extensions<5,>=4.14 (from groq>=0.4.0->-r requirements.txt (line 13))
+                    - option "03:48:55 PM Downloading typing_extensions-4.15.0-py3-none-any.whl.metadata (3.3 kB)" [ref=e1679]:
+                      - generic [ref=e1681]:
+                        - img [ref=e1683]
+                        - time [ref=e1687]: 03:48:55 PM
+                      - generic [ref=e1689]: Downloading typing_extensions-4.15.0-py3-none-any.whl.metadata (3.3 kB)
+                    - option "03:48:55 PM Collecting idna>=2.8 (from anyio<5,>=3.5.0->groq>=0.4.0->-r requirements.txt (line 13))" [ref=e1690]:
+                      - generic [ref=e1692]:
+                        - img [ref=e1694]
+                        - time [ref=e1698]: 03:48:55 PM
+                      - generic [ref=e1700]: Collecting idna>=2.8 (from anyio<5,>=3.5.0->groq>=0.4.0->-r requirements.txt (line 13))
+                    - option "03:48:55 PM Downloading idna-3.17-py3-none-any.whl.metadata (6.4 kB)" [ref=e1701]:
+                      - generic [ref=e1703]:
+                        - img [ref=e1705]
+                        - time [ref=e1709]: 03:48:55 PM
+                      - generic [ref=e1711]: Downloading idna-3.17-py3-none-any.whl.metadata (6.4 kB)
+                    - option "03:48:55 PM Collecting certifi (from httpx<1,>=0.23.0->groq>=0.4.0->-r requirements.txt (line 13))" [ref=e1712]:
+                      - generic [ref=e1714]:
+                        - img [ref=e1716]
+                        - time [ref=e1720]: 03:48:55 PM
+                      - generic [ref=e1722]: Collecting certifi (from httpx<1,>=0.23.0->groq>=0.4.0->-r requirements.txt (line 13))
+                    - option "03:48:55 PM Downloading certifi-2026.5.20-py3-none-any.whl.metadata (2.5 kB)" [ref=e1723]:
+                      - generic [ref=e1725]:
+                        - img [ref=e1727]
+                        - time [ref=e1731]: 03:48:55 PM
+                      - generic [ref=e1733]: Downloading certifi-2026.5.20-py3-none-any.whl.metadata (2.5 kB)
+                    - option "03:48:55 PM Collecting httpcore==1.* (from httpx<1,>=0.23.0->groq>=0.4.0->-r requirements.txt (line 13))" [ref=e1734]:
+                      - generic [ref=e1736]:
+                        - img [ref=e1738]
+                        - time [ref=e1742]: 03:48:55 PM
+                      - generic [ref=e1744]: Collecting httpcore==1.* (from httpx<1,>=0.23.0->groq>=0.4.0->-r requirements.txt (line 13))
+                    - option "03:48:55 PM Downloading httpcore-1.0.9-py3-none-any.whl.metadata (21 kB)" [ref=e1745]:
+                      - generic [ref=e1747]:
+                        - img [ref=e1749]
+                        - time [ref=e1753]: 03:48:55 PM
+                      - generic [ref=e1755]: Downloading httpcore-1.0.9-py3-none-any.whl.metadata (21 kB)
+                    - option "03:48:55 PM Collecting h11>=0.16 (from httpcore==1.*->httpx<1,>=0.23.0->groq>=0.4.0->-r requirements.txt (line 13))" [ref=e1756]:
+                      - generic [ref=e1758]:
+                        - img [ref=e1760]
+                        - time [ref=e1764]: 03:48:55 PM
+                      - generic [ref=e1766]: Collecting h11>=0.16 (from httpcore==1.*->httpx<1,>=0.23.0->groq>=0.4.0->-r requirements.txt (line 13))
+                    - option "03:48:56 PM Downloading h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)" [ref=e1767]:
+                      - generic [ref=e1769]:
+                        - img [ref=e1771]
+                        - time [ref=e1775]: 03:48:56 PM
+                      - generic [ref=e1777]: Downloading h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+                    - option "03:48:56 PM Collecting annotated-types>=0.6.0 (from pydantic<3,>=1.9.0->groq>=0.4.0->-r requirements.txt (line 13))" [ref=e1778]:
+                      - generic [ref=e1780]:
+                        - img [ref=e1782]
+                        - time [ref=e1786]: 03:48:56 PM
+                      - generic [ref=e1788]: Collecting annotated-types>=0.6.0 (from pydantic<3,>=1.9.0->groq>=0.4.0->-r requirements.txt (line 13))
+                    - option "03:48:56 PM Downloading annotated_types-0.7.0-py3-none-any.whl.metadata (15 kB)" [ref=e1789]:
+                      - generic [ref=e1791]:
+                        - img [ref=e1793]
+                        - time [ref=e1797]: 03:48:56 PM
+                      - generic [ref=e1799]: Downloading annotated_types-0.7.0-py3-none-any.whl.metadata (15 kB)
+                    - option "03:48:56 PM Collecting pydantic-core==2.46.4 (from pydantic<3,>=1.9.0->groq>=0.4.0->-r requirements.txt (line 13))" [ref=e1800]:
+                      - generic [ref=e1802]:
+                        - img [ref=e1804]
+                        - time [ref=e1808]: 03:48:56 PM
+                      - generic [ref=e1810]: Collecting pydantic-core==2.46.4 (from pydantic<3,>=1.9.0->groq>=0.4.0->-r requirements.txt (line 13))
+                    - option "03:48:56 PM Downloading pydantic_core-2.46.4-cp314-cp314-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.6 kB)" [ref=e1811]:
+                      - generic [ref=e1813]:
+                        - img [ref=e1815]
+                        - time [ref=e1819]: 03:48:56 PM
+                      - generic [ref=e1821]: Downloading pydantic_core-2.46.4-cp314-cp314-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.6 kB)
+                    - option "03:48:56 PM Collecting typing-inspection>=0.4.2 (from pydantic<3,>=1.9.0->groq>=0.4.0->-r requirements.txt (line 13))" [ref=e1822]:
+                      - generic [ref=e1824]:
+                        - img [ref=e1826]
+                        - time [ref=e1830]: 03:48:56 PM
+                      - generic [ref=e1832]: Collecting typing-inspection>=0.4.2 (from pydantic<3,>=1.9.0->groq>=0.4.0->-r requirements.txt (line 13))
+                    - option "03:48:56 PM Downloading typing_inspection-0.4.2-py3-none-any.whl.metadata (2.6 kB)" [ref=e1833]:
+                      - generic [ref=e1835]:
+                        - img [ref=e1837]
+                        - time [ref=e1841]: 03:48:56 PM
+                      - generic [ref=e1843]: Downloading typing_inspection-0.4.2-py3-none-any.whl.metadata (2.6 kB)
+                    - option "03:48:56 PM Collecting packaging (from gunicorn>=21.2.0->-r requirements.txt (line 14))" [ref=e1844]:
+                      - generic [ref=e1846]:
+                        - img [ref=e1848]
+                        - time [ref=e1852]: 03:48:56 PM
+                      - generic [ref=e1854]: Collecting packaging (from gunicorn>=21.2.0->-r requirements.txt (line 14))
+                    - option "03:48:56 PM Downloading packaging-26.2-py3-none-any.whl.metadata (3.5 kB)" [ref=e1855]:
+                      - generic [ref=e1857]:
+                        - img [ref=e1859]
+                        - time [ref=e1863]: 03:48:56 PM
+                      - generic [ref=e1865]: Downloading packaging-26.2-py3-none-any.whl.metadata (3.5 kB)
+                    - option "03:48:56 PM Collecting cffi>=2.0.0 (from cryptography>=45.0.6->sendgrid>=6.10.0->-r requirements.txt (line 12))" [ref=e1866]:
+                      - generic [ref=e1868]:
+                        - img [ref=e1870]
+                        - time [ref=e1874]: 03:48:56 PM
+                      - generic [ref=e1876]: Collecting cffi>=2.0.0 (from cryptography>=45.0.6->sendgrid>=6.10.0->-r requirements.txt (line 12))
+                    - option "03:48:56 PM Downloading cffi-2.0.0-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (2.6 kB)" [ref=e1877]:
+                      - generic [ref=e1879]:
+                        - img [ref=e1881]
+                        - time [ref=e1885]: 03:48:56 PM
+                      - generic [ref=e1887]: Downloading cffi-2.0.0-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (2.6 kB)
+                    - option "03:48:57 PM Collecting pycparser (from cffi>=2.0.0->cryptography>=45.0.6->sendgrid>=6.10.0->-r requirements.txt (line 12))" [ref=e1888]:
+                      - generic [ref=e1890]:
+                        - img [ref=e1892]
+                        - time [ref=e1896]: 03:48:57 PM
+                      - generic [ref=e1898]: Collecting pycparser (from cffi>=2.0.0->cryptography>=45.0.6->sendgrid>=6.10.0->-r requirements.txt (line 12))
+                    - option "03:48:57 PM Downloading pycparser-3.0-py3-none-any.whl.metadata (8.2 kB)" [ref=e1899]:
+                      - generic [ref=e1901]:
+                        - img [ref=e1903]
+                        - time [ref=e1907]: 03:48:57 PM
+                      - generic [ref=e1909]: Downloading pycparser-3.0-py3-none-any.whl.metadata (8.2 kB)
+                    - option "03:48:57 PM Collecting attrs>=22.2.0 (from jsonschema>=2.6.0->drf-spectacular>=0.26.5->-r requirements.txt (line 7))" [ref=e1910]:
+                      - generic [ref=e1912]:
+                        - img [ref=e1914]
+                        - time [ref=e1918]: 03:48:57 PM
+                      - generic [ref=e1920]: Collecting attrs>=22.2.0 (from jsonschema>=2.6.0->drf-spectacular>=0.26.5->-r requirements.txt (line 7))
+                    - option "03:48:57 PM Downloading attrs-26.1.0-py3-none-any.whl.metadata (8.8 kB)" [ref=e1921]:
+                      - generic [ref=e1923]:
+                        - img [ref=e1925]
+                        - time [ref=e1929]: 03:48:57 PM
+                      - generic [ref=e1931]: Downloading attrs-26.1.0-py3-none-any.whl.metadata (8.8 kB)
+                    - option "03:48:57 PM Collecting jsonschema-specifications>=2023.03.6 (from jsonschema>=2.6.0->drf-spectacular>=0.26.5->-r requirements.txt (line 7))" [ref=e1932]:
+                      - generic [ref=e1934]:
+                        - img [ref=e1936]
+                        - time [ref=e1940]: 03:48:57 PM
+                      - generic [ref=e1942]: Collecting jsonschema-specifications>=2023.03.6 (from jsonschema>=2.6.0->drf-spectacular>=0.26.5->-r requirements.txt (line 7))
+                    - option "03:48:57 PM Downloading jsonschema_specifications-2025.9.1-py3-none-any.whl.metadata (2.9 kB)" [ref=e1943]:
+                      - generic [ref=e1945]:
+                        - img [ref=e1947]
+                        - time [ref=e1951]: 03:48:57 PM
+                      - generic [ref=e1953]: Downloading jsonschema_specifications-2025.9.1-py3-none-any.whl.metadata (2.9 kB)
+                    - option "03:48:57 PM Collecting referencing>=0.28.4 (from jsonschema>=2.6.0->drf-spectacular>=0.26.5->-r requirements.txt (line 7))" [ref=e1954]:
+                      - generic [ref=e1956]:
+                        - img [ref=e1958]
+                        - time [ref=e1962]: 03:48:57 PM
+                      - generic [ref=e1964]: Collecting referencing>=0.28.4 (from jsonschema>=2.6.0->drf-spectacular>=0.26.5->-r requirements.txt (line 7))
+                    - option "03:48:57 PM Downloading referencing-0.37.0-py3-none-any.whl.metadata (2.8 kB)" [ref=e1965]:
+                      - generic [ref=e1967]:
+                        - img [ref=e1969]
+                        - time [ref=e1973]: 03:48:57 PM
+                      - generic [ref=e1975]: Downloading referencing-0.37.0-py3-none-any.whl.metadata (2.8 kB)
+                    - option "03:48:57 PM Collecting rpds-py>=0.25.0 (from jsonschema>=2.6.0->drf-spectacular>=0.26.5->-r requirements.txt (line 7))" [ref=e1976]:
+                      - generic [ref=e1978]:
+                        - img [ref=e1980]
+                        - time [ref=e1984]: 03:48:57 PM
+                      - generic [ref=e1986]: Collecting rpds-py>=0.25.0 (from jsonschema>=2.6.0->drf-spectacular>=0.26.5->-r requirements.txt (line 7))
+                    - option "03:48:57 PM Downloading rpds_py-2026.5.1-cp314-cp314-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.1 kB)" [ref=e1987]:
+                      - generic [ref=e1989]:
+                        - img [ref=e1991]
+                        - time [ref=e1995]: 03:48:57 PM
+                      - generic [ref=e1997]: Downloading rpds_py-2026.5.1-cp314-cp314-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.1 kB)
+                    - option "03:48:57 PM Collecting markupsafe>=2.1.1 (from werkzeug>=2.2.0->sendgrid>=6.10.0->-r requirements.txt (line 12))" [ref=e1998]:
+                      - generic [ref=e2000]:
+                        - img [ref=e2002]
+                        - time [ref=e2006]: 03:48:57 PM
+                      - generic [ref=e2008]: Collecting markupsafe>=2.1.1 (from werkzeug>=2.2.0->sendgrid>=6.10.0->-r requirements.txt (line 12))
+                    - option "03:48:57 PM Downloading markupsafe-3.0.3-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.7 kB)" [ref=e2009]:
+                      - generic [ref=e2011]:
+                        - img [ref=e2013]
+                        - time [ref=e2017]: 03:48:57 PM
+                      - generic [ref=e2019]: Downloading markupsafe-3.0.3-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.7 kB)
+                    - option "03:48:57 PM Downloading django-4.2.30-py3-none-any.whl (8.0 MB)" [ref=e2020]:
+                      - generic [ref=e2022]:
+                        - img [ref=e2024]
+                        - time [ref=e2028]: 03:48:57 PM
+                      - generic [ref=e2030]: Downloading django-4.2.30-py3-none-any.whl (8.0 MB)
+                    - option "03:48:57 PM ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 8.0/8.0 MB 130.3 MB/s 0:00:00" [ref=e2031]:
+                      - generic [ref=e2033]:
+                        - img [ref=e2035]
+                        - time [ref=e2039]: 03:48:57 PM
+                      - generic [ref=e2041]: ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 8.0/8.0 MB 130.3 MB/s 0:00:00
+                    - option "03:48:57 PM Downloading djangorestframework-3.17.1-py3-none-any.whl (898 kB)" [ref=e2042]:
+                      - generic [ref=e2044]:
+                        - img [ref=e2046]
+                        - time [ref=e2050]: 03:48:57 PM
+                      - generic [ref=e2052]: Downloading djangorestframework-3.17.1-py3-none-any.whl (898 kB)
+                    - option "03:48:57 PM ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 898.8/898.8 kB 83.5 MB/s 0:00:00" [ref=e2053]:
+                      - generic [ref=e2055]:
+                        - img [ref=e2057]
+                        - time [ref=e2061]: 03:48:57 PM
+                      - generic [ref=e2063]: ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 898.8/898.8 kB 83.5 MB/s 0:00:00
+                    - option "03:48:57 PM Downloading asgiref-3.11.1-py3-none-any.whl (24 kB)" [ref=e2064]:
+                      - generic [ref=e2066]:
+                        - img [ref=e2068]
+                        - time [ref=e2072]: 03:48:57 PM
+                      - generic [ref=e2074]: Downloading asgiref-3.11.1-py3-none-any.whl (24 kB)
+                    - option "03:48:57 PM Downloading django_cors_headers-4.9.0-py3-none-any.whl (12 kB)" [ref=e2075]:
+                      - generic [ref=e2077]:
+                        - img [ref=e2079]
+                        - time [ref=e2083]: 03:48:57 PM
+                      - generic [ref=e2085]: Downloading django_cors_headers-4.9.0-py3-none-any.whl (12 kB)
+                    - option "03:48:57 PM Downloading django_environ-0.13.0-py3-none-any.whl (20 kB)" [ref=e2086]:
+                      - generic [ref=e2088]:
+                        - img [ref=e2090]
+                        - time [ref=e2094]: 03:48:57 PM
+                      - generic [ref=e2096]: Downloading django_environ-0.13.0-py3-none-any.whl (20 kB)
+                    - option "03:48:57 PM Downloading psycopg2_binary-2.9.12-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (4.3 MB)" [ref=e2097]:
+                      - generic [ref=e2099]:
+                        - img [ref=e2101]
+                        - time [ref=e2105]: 03:48:57 PM
+                      - generic [ref=e2107]: Downloading psycopg2_binary-2.9.12-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (4.3 MB)
+                    - option "03:48:57 PM ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.3/4.3 MB 167.5 MB/s 0:00:00" [ref=e2108]:
+                      - generic [ref=e2110]:
+                        - img [ref=e2112]
+                        - time [ref=e2116]: 03:48:57 PM
+                      - generic [ref=e2118]: ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.3/4.3 MB 167.5 MB/s 0:00:00
+                    - option "03:48:57 PM Downloading djangorestframework_simplejwt-5.5.1-py3-none-any.whl (107 kB)" [ref=e2119]:
+                      - generic [ref=e2121]:
+                        - img [ref=e2123]
+                        - time [ref=e2127]: 03:48:57 PM
+                      - generic [ref=e2129]: Downloading djangorestframework_simplejwt-5.5.1-py3-none-any.whl (107 kB)
+                    - option "03:48:57 PM Downloading drf_spectacular-0.29.0-py3-none-any.whl (105 kB)" [ref=e2130]:
+                      - generic [ref=e2132]:
+                        - img [ref=e2134]
+                        - time [ref=e2138]: 03:48:57 PM
+                      - generic [ref=e2140]: Downloading drf_spectacular-0.29.0-py3-none-any.whl (105 kB)
+                    - option "03:48:57 PM Downloading django_filter-25.1-py3-none-any.whl (94 kB)" [ref=e2141]:
+                      - generic [ref=e2143]:
+                        - img [ref=e2145]
+                        - time [ref=e2149]: 03:48:57 PM
+                      - generic [ref=e2151]: Downloading django_filter-25.1-py3-none-any.whl (94 kB)
+                    - option "03:48:57 PM Downloading pillow-12.2.0-cp314-cp314-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (7.1 MB)" [ref=e2152]:
+                      - generic [ref=e2154]:
+                        - img [ref=e2156]
+                        - time [ref=e2160]: 03:48:57 PM
+                      - generic [ref=e2162]: Downloading pillow-12.2.0-cp314-cp314-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (7.1 MB)
+                    - option "03:48:57 PM ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 7.1/7.1 MB 177.3 MB/s 0:00:00" [ref=e2163]:
+                      - generic [ref=e2165]:
+                        - img [ref=e2167]
+                        - time [ref=e2171]: 03:48:57 PM
+                      - generic [ref=e2173]: ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 7.1/7.1 MB 177.3 MB/s 0:00:00
+                    - option "03:48:57 PM Downloading openpyxl-3.1.5-py2.py3-none-any.whl (250 kB)" [ref=e2174]:
+                      - generic [ref=e2176]:
+                        - img [ref=e2178]
+                        - time [ref=e2182]: 03:48:57 PM
+                      - generic [ref=e2184]: Downloading openpyxl-3.1.5-py2.py3-none-any.whl (250 kB)
+                    - option "03:48:57 PM Downloading reportlab-4.5.1-py3-none-any.whl (2.0 MB)" [ref=e2185]:
+                      - generic [ref=e2187]:
+                        - img [ref=e2189]
+                        - time [ref=e2193]: 03:48:57 PM
+                      - generic [ref=e2195]: Downloading reportlab-4.5.1-py3-none-any.whl (2.0 MB)
+                    - option "03:48:57 PM ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.0/2.0 MB 126.2 MB/s 0:00:00" [ref=e2196]:
+                      - generic [ref=e2198]:
+                        - img [ref=e2200]
+                        - time [ref=e2204]: 03:48:57 PM
+                      - generic [ref=e2206]: ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.0/2.0 MB 126.2 MB/s 0:00:00
+                    - option "03:48:57 PM Downloading sendgrid-6.12.5-py3-none-any.whl (102 kB)" [ref=e2207]:
+                      - generic [ref=e2209]:
+                        - img [ref=e2211]
+                        - time [ref=e2215]: 03:48:57 PM
+                      - generic [ref=e2217]: Downloading sendgrid-6.12.5-py3-none-any.whl (102 kB)
+                    - option "03:48:57 PM Downloading groq-1.4.0-py3-none-any.whl (143 kB)" [ref=e2218]:
+                      - generic [ref=e2220]:
+                        - img [ref=e2222]
+                        - time [ref=e2226]: 03:48:57 PM
+                      - generic [ref=e2228]: Downloading groq-1.4.0-py3-none-any.whl (143 kB)
+                    - option "03:48:57 PM Downloading anyio-4.13.0-py3-none-any.whl (114 kB)" [ref=e2229]:
+                      - generic [ref=e2231]:
+                        - img [ref=e2233]
+                        - time [ref=e2237]: 03:48:57 PM
+                      - generic [ref=e2239]: Downloading anyio-4.13.0-py3-none-any.whl (114 kB)
+                    - option "03:48:57 PM Downloading distro-1.9.0-py3-none-any.whl (20 kB)" [ref=e2240]:
+                      - generic [ref=e2242]:
+                        - img [ref=e2244]
+                        - time [ref=e2248]: 03:48:57 PM
+                      - generic [ref=e2250]: Downloading distro-1.9.0-py3-none-any.whl (20 kB)
+                    - option "03:48:57 PM Downloading httpx-0.28.1-py3-none-any.whl (73 kB)" [ref=e2251]:
+                      - generic [ref=e2253]:
+                        - img [ref=e2255]
+                        - time [ref=e2259]: 03:48:57 PM
+                      - generic [ref=e2261]: Downloading httpx-0.28.1-py3-none-any.whl (73 kB)
+                    - option "03:48:57 PM Downloading httpcore-1.0.9-py3-none-any.whl (78 kB)" [ref=e2262]:
+                      - generic [ref=e2264]:
+                        - img [ref=e2266]
+                        - time [ref=e2270]: 03:48:57 PM
+                      - generic [ref=e2272]: Downloading httpcore-1.0.9-py3-none-any.whl (78 kB)
+                    - option "03:48:57 PM Downloading pydantic-2.13.4-py3-none-any.whl (472 kB)" [ref=e2273]:
+                      - generic [ref=e2275]:
+                        - img [ref=e2277]
+                        - time [ref=e2281]: 03:48:57 PM
+                      - generic [ref=e2283]: Downloading pydantic-2.13.4-py3-none-any.whl (472 kB)
+                    - option "03:48:57 PM Downloading pydantic_core-2.46.4-cp314-cp314-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.1 MB)" [ref=e2284]:
+                      - generic [ref=e2286]:
+                        - img [ref=e2288]
+                        - time [ref=e2292]: 03:48:57 PM
+                      - generic [ref=e2294]: Downloading pydantic_core-2.46.4-cp314-cp314-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.1 MB)
+                    - option "03:48:57 PM ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.1/2.1 MB 138.7 MB/s 0:00:00" [ref=e2295]:
+                      - generic [ref=e2297]:
+                        - img [ref=e2299]
+                        - time [ref=e2303]: 03:48:57 PM
+                      - generic [ref=e2305]: ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.1/2.1 MB 138.7 MB/s 0:00:00
+                    - option "03:48:57 PM Downloading typing_extensions-4.15.0-py3-none-any.whl (44 kB)" [ref=e2306]:
+                      - generic [ref=e2308]:
+                        - img [ref=e2310]
+                        - time [ref=e2314]: 03:48:57 PM
+                      - generic [ref=e2316]: Downloading typing_extensions-4.15.0-py3-none-any.whl (44 kB)
+                    - option "03:48:57 PM Downloading gunicorn-26.0.0-py3-none-any.whl (212 kB)" [ref=e2317]:
+                      - generic [ref=e2319]:
+                        - img [ref=e2321]
+                        - time [ref=e2325]: 03:48:57 PM
+                      - generic [ref=e2327]: Downloading gunicorn-26.0.0-py3-none-any.whl (212 kB)
+                    - option "03:48:58 PM Downloading whitenoise-6.12.0-py3-none-any.whl (20 kB)" [ref=e2328]:
+                      - generic [ref=e2330]:
+                        - img [ref=e2332]
+                        - time [ref=e2336]: 03:48:58 PM
+                      - generic [ref=e2338]: Downloading whitenoise-6.12.0-py3-none-any.whl (20 kB)
+                    - option "03:48:58 PM Downloading annotated_types-0.7.0-py3-none-any.whl (13 kB)" [ref=e2339]:
+                      - generic [ref=e2341]:
+                        - img [ref=e2343]
+                        - time [ref=e2347]: 03:48:58 PM
+                      - generic [ref=e2349]: Downloading annotated_types-0.7.0-py3-none-any.whl (13 kB)
+                    - option "03:48:58 PM Downloading cryptography-48.0.0-cp311-abi3-manylinux_2_34_x86_64.whl (4.7 MB)" [ref=e2350]:
+                      - generic [ref=e2352]:
+                        - img [ref=e2354]
+                        - time [ref=e2358]: 03:48:58 PM
+                      - generic [ref=e2360]: Downloading cryptography-48.0.0-cp311-abi3-manylinux_2_34_x86_64.whl (4.7 MB)
+                    - option "03:48:58 PM ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.7/4.7 MB 166.9 MB/s 0:00:00" [ref=e2361]:
+                      - generic [ref=e2363]:
+                        - img [ref=e2365]
+                        - time [ref=e2369]: 03:48:58 PM
+                      - generic [ref=e2371]: ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.7/4.7 MB 166.9 MB/s 0:00:00
+                    - option "03:48:58 PM Downloading cffi-2.0.0-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (219 kB)" [ref=e2372]:
+                      - generic [ref=e2374]:
+                        - img [ref=e2376]
+                        - time [ref=e2380]: 03:48:58 PM
+                      - generic [ref=e2382]: Downloading cffi-2.0.0-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (219 kB)
+                    - option "03:48:58 PM Downloading h11-0.16.0-py3-none-any.whl (37 kB)" [ref=e2383]:
+                      - generic [ref=e2385]:
+                        - img [ref=e2387]
+                        - time [ref=e2391]: 03:48:58 PM
+                      - generic [ref=e2393]: Downloading h11-0.16.0-py3-none-any.whl (37 kB)
+                    - option "03:48:58 PM Downloading idna-3.17-py3-none-any.whl (65 kB)" [ref=e2394]:
+                      - generic [ref=e2396]:
+                        - img [ref=e2398]
+                        - time [ref=e2402]: 03:48:58 PM
+                      - generic [ref=e2404]: Downloading idna-3.17-py3-none-any.whl (65 kB)
+                    - option "03:48:58 PM Downloading inflection-0.5.1-py2.py3-none-any.whl (9.5 kB)" [ref=e2405]:
+                      - generic [ref=e2407]:
+                        - img [ref=e2409]
+                        - time [ref=e2413]: 03:48:58 PM
+                      - generic [ref=e2415]: Downloading inflection-0.5.1-py2.py3-none-any.whl (9.5 kB)
+                - paragraph [ref=e400]:
+                  - text: Need better ways to work with logs? Try the
+                  - link "Render CLI" [ref=e401] [cursor=pointer]:
+                    - /url: https://render.com/docs/cli
+                    - img [ref=e402]
+                    - text: Render CLI
+                  - text: ","
+                  - link "Render MCP Server" [ref=e405] [cursor=pointer]:
+                    - /url: https://render.com/docs/mcp-server
+                  - text: ", or set up a"
+                  - link "log stream integration" [ref=e406] [cursor=pointer]:
+                    - /url: https://render.com/docs/log-streams
+                    - text: log stream integration
+                    - img [ref=e407]
+    - generic:
+      - generic:
+        - generic: "0 services selected:"
+        - generic:
+          - generic:
+            - button:
+              - generic:
+                - img
+              - generic: Move
+              - img
+      - generic:
+        - separator
+        - generic:
+          - generic:
+            - button:
+              - img
+  - iframe [ref=e410]:
+    

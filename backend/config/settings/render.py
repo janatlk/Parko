@@ -17,7 +17,9 @@ DATABASES = {
 }
 
 # Static files
-STATIC_URL = 'static/'
+# Use '/' as static URL so frontend assets (built with root-relative paths like /assets/...)
+# are served directly by WhiteNoise without needing URL rewrites.
+STATIC_URL = '/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',

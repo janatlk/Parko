@@ -813,3 +813,79 @@ Starting development server at http://0.0.0.0:8000/
 Quit the server with CTRL-BREAK.
 
 INFO 2026-05-31 15:00:18,141 autoreload Watching for file changes with StatReloader
+WARNING 2026-05-31 15:37:26,571 log Unauthorized: /api/v1/auth/me/
+WARNING 2026-05-31 15:37:26,572 basehttp "GET /api/v1/auth/me/ HTTP/1.1" 401 795
+WARNING 2026-05-31 15:37:26,577 log Unauthorized: /api/v1/auth/me/
+WARNING 2026-05-31 15:37:26,578 basehttp "GET /api/v1/auth/me/ HTTP/1.1" 401 795
+WARNING 2026-05-31 15:37:26,582 log Unauthorized: /api/v1/auth/refresh/
+WARNING 2026-05-31 15:37:26,583 basehttp "POST /api/v1/auth/refresh/ HTTP/1.1" 401 312
+INFO 2026-05-31 15:37:34,135 basehttp "POST /api/v1/auth/login/ HTTP/1.1" 200 852
+INFO 2026-05-31 15:37:34,149 basehttp "GET /api/v1/auth/me/ HTTP/1.1" 200 254
+INFO 2026-05-31 15:37:34,570 basehttp "GET /api/v1/dashboard/overview/?months=12&limit=8 HTTP/1.1" 200 6467
+INFO 2026-05-31 15:37:37,507 _client HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO 2026-05-31 15:37:37,544 basehttp "GET /api/v1/dashboard/insights/ HTTP/1.1" 200 750
+INFO 2026-05-31 15:39:06,949 basehttp "GET /api/v1/custom-tables/tables/ HTTP/1.1" 200 1338
+INFO 2026-05-31 15:39:15,942 basehttp "GET /api/v1/custom-tables/tables/5/ HTTP/1.1" 200 867
+INFO 2026-05-31 15:42:13,969 basehttp "POST /api/v1/custom-tables/tables/ HTTP/1.1" 201 526
+INFO 2026-05-31 15:42:14,087 basehttp "GET /api/v1/custom-tables/tables/ HTTP/1.1" 200 1573
+INFO 2026-05-31 15:42:18,616 basehttp "GET /api/v1/custom-tables/tables/6/ HTTP/1.1" 200 526
+INFO 2026-05-31 15:42:18,616 basehttp "GET /api/v1/custom-tables/records/?table=6 HTTP/1.1" 200 120
+INFO 2026-05-31 15:42:18,630 basehttp "GET /api/v1/cars/?page=1 HTTP/1.1" 200 1109
+INFO 2026-05-31 15:42:40,264 basehttp "POST /api/v1/custom-tables/records/ HTTP/1.1" 201 285
+INFO 2026-05-31 15:42:40,282 basehttp "GET /api/v1/custom-tables/records/?table=6 HTTP/1.1" 200 451
+INFO 2026-05-31 15:42:50,863 basehttp "GET /api/v1/custom-tables/tables/1/ HTTP/1.1" 200 326
+INFO 2026-05-31 15:42:50,863 basehttp "GET /api/v1/custom-tables/records/?table=1 HTTP/1.1" 200 333
+INFO 2026-05-31 15:42:50,866 basehttp "GET /api/v1/cars/?page=1 HTTP/1.1" 200 1109
+INFO 2026-05-31 15:42:52,457 basehttp "DELETE /api/v1/custom-tables/records/1/ HTTP/1.1" 204 0
+INFO 2026-05-31 15:42:52,473 basehttp "GET /api/v1/custom-tables/records/?table=1 HTTP/1.1" 200 120
+INFO 2026-05-31 15:42:55,698 basehttp "GET /api/v1/ai/suggestions/ HTTP/1.1" 200 46
+INFO 2026-05-31 15:42:55,702 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 2171
+INFO 2026-05-31 15:43:09,628 services AI Settings - Provider: groq, Model: llama-3.1-8b-instant, API Key: gsk_MOVS22...SfHO
+INFO 2026-05-31 15:43:10,195 services Groq client initialized for user 1
+INFO 2026-05-31 15:43:10,197 services Making Groq API call for user 1, model: llama-3.1-8b-instant, messages: 3
+INFO 2026-05-31 15:43:11,380 _client HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO 2026-05-31 15:43:11,382 services Groq API response received for user 1
+INFO 2026-05-31 15:43:11,382 services Tokens - prompt: 6585, completion: 105
+INFO 2026-05-31 15:43:11,382 services AI response for user 1: 326 chars
+INFO 2026-05-31 15:43:11,405 basehttp "POST /api/v1/ai/chat/ HTTP/1.1" 200 1425
+INFO 2026-05-31 15:43:11,433 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 2368
+INFO 2026-05-31 15:43:14,712 basehttp "POST /api/v1/ai/execute/ HTTP/1.1" 200 144
+INFO 2026-05-31 15:43:24,820 services AI Settings - Provider: groq, Model: llama-3.1-8b-instant, API Key: gsk_MOVS22...SfHO
+INFO 2026-05-31 15:43:25,301 services Groq client initialized for user 1
+INFO 2026-05-31 15:43:25,303 services Making Groq API call for user 1, model: llama-3.1-8b-instant, messages: 6
+INFO 2026-05-31 15:43:26,050 _client HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO 2026-05-31 15:43:26,052 services Groq API response received for user 1
+INFO 2026-05-31 15:43:26,052 services Tokens - prompt: 6720, completion: 13
+INFO 2026-05-31 15:43:26,052 services AI response for user 1: 33 chars
+INFO 2026-05-31 15:43:26,076 basehttp "POST /api/v1/ai/chat/ HTTP/1.1" 200 1358
+INFO 2026-05-31 15:43:26,107 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 2368
+INFO 2026-05-31 15:43:34,188 services AI Settings - Provider: groq, Model: llama-3.1-8b-instant, API Key: gsk_MOVS22...SfHO
+INFO 2026-05-31 15:43:34,731 services Groq client initialized for user 1
+INFO 2026-05-31 15:43:34,734 services Making Groq API call for user 1, model: llama-3.1-8b-instant, messages: 8
+INFO 2026-05-31 15:43:36,173 _client HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO 2026-05-31 15:43:36,174 services Groq API response received for user 1
+INFO 2026-05-31 15:43:36,174 services Tokens - prompt: 6746, completion: 149
+INFO 2026-05-31 15:43:36,174 services AI response for user 1: 427 chars
+INFO 2026-05-31 15:43:36,196 basehttp "POST /api/v1/ai/chat/ HTTP/1.1" 200 2791
+INFO 2026-05-31 15:43:36,219 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 2368
+INFO 2026-05-31 15:43:41,288 basehttp "POST /api/v1/ai/execute/ HTTP/1.1" 200 144
+INFO 2026-05-31 15:43:52,477 services AI Settings - Provider: groq, Model: llama-3.1-8b-instant, API Key: gsk_MOVS22...SfHO
+INFO 2026-05-31 15:43:53,030 services Groq client initialized for user 1
+INFO 2026-05-31 15:43:53,033 services Making Groq API call for user 1, model: llama-3.1-8b-instant, messages: 8
+INFO 2026-05-31 15:43:54,335 _client HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+INFO 2026-05-31 15:43:54,336 services Groq API response received for user 1
+INFO 2026-05-31 15:43:54,336 services Tokens - prompt: 6800, completion: 93
+INFO 2026-05-31 15:43:54,336 services AI response for user 1: 256 chars
+INFO 2026-05-31 15:43:54,359 basehttp "POST /api/v1/ai/chat/ HTTP/1.1" 200 3304
+INFO 2026-05-31 15:43:54,384 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 2369
+INFO 2026-05-31 15:44:26,844 basehttp "PATCH /api/v1/auth/me/ HTTP/1.1" 200 254
+INFO 2026-05-31 15:44:31,768 basehttp "GET /api/v1/custom-tables/tables/ HTTP/1.1" 200 1573
+INFO 2026-05-31 15:44:34,165 basehttp "GET /api/v1/custom-tables/tables/5/ HTTP/1.1" 200 867
+INFO 2026-05-31 15:44:34,177 basehttp "GET /api/v1/custom-tables/records/?table=5 HTTP/1.1" 200 120
+INFO 2026-05-31 15:44:34,192 basehttp "GET /api/v1/cars/?page=1 HTTP/1.1" 200 1109
+INFO 2026-05-31 15:44:41,325 basehttp "PATCH /api/v1/auth/me/ HTTP/1.1" 200 254
+INFO 2026-05-31 15:44:57,880 basehttp "GET /api/v1/custom-tables/tables/6/ HTTP/1.1" 200 526
+INFO 2026-05-31 15:44:57,895 basehttp "GET /api/v1/custom-tables/records/?table=6 HTTP/1.1" 200 451
+INFO 2026-05-31 15:45:02,832 basehttp "GET /api/v1/ai/conversations/100/ HTTP/1.1" 200 2949
+INFO 2026-05-31 15:45:02,844 basehttp "GET /api/v1/ai/conversations/100/ HTTP/1.1" 200 2949
+INFO 2026-05-31 15:45:06,216 basehttp "GET /api/v1/ai/conversations/95/ HTTP/1.1" 200 1363
