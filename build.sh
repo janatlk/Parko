@@ -37,6 +37,7 @@ from companies.models import Company
 from fleet.models import Car, Fuel, Insurance, Inspection
 from datetime import date, timedelta
 import random
+import calendar
 
 User = get_user_model()
 
@@ -68,9 +69,14 @@ cars = []
 for c in cars_data:
     car = Car.objects.create(company=company, numplate=c['numplate'], brand=c['brand'], vin=c['vin'], status='active')
     cars.append(car)
+    today = date.today()
     for m in range(3):
-        d = date.today() - timedelta(days=30*m)
-        Fuel.objects.create(car=car, year=d.year, month=d.month, liters=random.randint(100,300), total_cost=random.randint(5000,15000), monthly_mileage=random.randint(500,2000))
+        month = today.month - m
+        year = today.year
+        while month <= 0:
+            month += 12
+            year -= 1
+        Fuel.objects.create(car=car, year=year, month=month, liters=random.randint(100,300), total_cost=random.randint(5000,15000), monthly_mileage=random.randint(500,2000))
     Insurance.objects.create(car=car, insurance_type='OSAGO', number=f'DEMO-{car.numplate}-OSAGO', start_date=date.today()-timedelta(days=30), end_date=date.today()+timedelta(days=335), cost=random.randint(5000,10000))
     Inspection.objects.create(car=car, number=f'DEMO-{car.numplate}-INSP', inspected_at=date.today()-timedelta(days=15), cost=random.randint(1000,3000))
 
