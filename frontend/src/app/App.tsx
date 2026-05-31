@@ -16,6 +16,9 @@ import { ReportsPage } from '@pages/ReportsPage'
 import { SparesPage } from '@pages/SparesPage'
 import { UsersPage } from '@pages/UsersPage'
 import { AIPage } from '@pages/AIPage'
+import { CustomTablesPage } from '@pages/CustomTablesPage'
+import { CustomTableDetailPage } from '@pages/CustomTableDetailPage'
+import { CustomTableBuilderPage } from '@pages/CustomTableBuilderPage'
 
 export function App() {
   return (
@@ -39,6 +42,9 @@ export function App() {
         <Route path="/users" element={<UsersPage />} />
         <Route path="/reports" element={<ReportsPage />} />
         <Route path="/ai" element={<AIPage />} />
+        <Route path="/custom-tables" element={<CustomTablesPage />} />
+        <Route path="/custom-tables/:id" element={<CustomTableDetailPage />} />
+        <Route path="/custom-tables/new" element={<CustomTableBuilderPage />} />
         <Route path="/profile" element={<ProfilePage />} />
       </Route>
       <Route path="*" element={<NotFoundPage />} />

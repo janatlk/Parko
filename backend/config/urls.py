@@ -17,6 +17,7 @@ urlpatterns = [
     path("api/v1/dashboard/", include("dashboard.urls")),
     path("api/v1/", include("feedback.urls")),
     path("api/v1/ai/", include("ai.urls")),
+    path("api/v1/custom-tables/", include("custom_tables.urls")),
 
     # Legacy/info endpoints
     path("api/", include("api.urls")),

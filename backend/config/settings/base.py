@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'dashboard',
     'feedback',
     'ai',
+    'custom_tables',
 ]
 
 MIDDLEWARE = [

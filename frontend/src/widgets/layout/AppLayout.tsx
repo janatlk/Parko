@@ -16,6 +16,7 @@ import {
   IconLanguage,
   IconTools,
   IconClipboardCheck,
+  IconTable,
 } from '@tabler/icons-react'
 
 import { useAuth } from '@features/auth/hooks/useAuth'
@@ -301,6 +302,15 @@ export function AppLayout() {
             active={activePath.startsWith('/reports')}
             onClick={() => toggle()}
             styles={() => getNavStyles(isDark, activePath.startsWith('/reports'))}
+          />
+          <NavLink
+            component={RouterNavLink}
+            to="/custom-tables"
+            label={t('custom_tables.title')}
+            leftSection={<IconTable size={18} stroke={1.5} color={isDark ? '#868e96' : undefined} />}
+            active={activePath.startsWith('/custom-tables')}
+            onClick={() => toggle()}
+            styles={() => getNavStyles(isDark, activePath.startsWith('/custom-tables'))}
           />
           <NavLink
             component={RouterNavLink}
