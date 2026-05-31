@@ -4,7 +4,7 @@ from .base import *
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-render-fallback-key-change-me')
 
-DEBUG = False
+DEBUG = True  # Temporary to diagnose admin 500 error
 
 ALLOWED_HOSTS = ['*']
 
