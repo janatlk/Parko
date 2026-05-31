@@ -1,0 +1,569 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - banner [ref=e4]:
+        - generic [ref=e5]:
+          - link "Render" [ref=e7] [cursor=pointer]:
+            - /url: /
+            - img "Render" [ref=e8]
+          - button "M My Workspace" [ref=e12] [cursor=pointer]:
+            - generic [ref=e13]:
+              - generic [ref=e14]: M
+              - generic "My Workspace" [ref=e15]
+              - img [ref=e16]
+        - generic [ref=e20]:
+          - navigation [ref=e21]:
+            - list [ref=e22]:
+              - listitem [ref=e23]:
+                - link "My project" [ref=e24] [cursor=pointer]:
+                  - /url: /project/prj-d8dvm477f7vs73clijo0
+                  - img [ref=e382]
+                  - generic [ref=e29]: My project
+                - button [ref=e32] [cursor=pointer]:
+                  - img [ref=e33]
+                - text: /
+              - listitem [ref=e35]:
+                - link "Production" [ref=e36] [cursor=pointer]:
+                  - /url: /project/prj-d8dvm477f7vs73clijo0/environment/evm-d8dvm477f7vs73clijog
+                  - img [ref=e386]
+                  - generic [ref=e50]: Production
+                - button [ref=e53] [cursor=pointer]:
+                  - img [ref=e54]
+                - text: /
+              - listitem [ref=e56]:
+                - link "Parko" [ref=e399] [cursor=pointer]:
+                  - /url: /web/srv-d8dvm43bc2fs73c4mpqg
+                  - img [ref=e400]
+                  - generic [ref=e402]: Parko
+                - button [ref=e403] [cursor=pointer]:
+                  - img [ref=e404]
+          - button "Search Ctrl + K" [ref=e68] [cursor=pointer]:
+            - img [ref=e70]
+            - text: Search
+            - generic [ref=e72]:
+              - img [ref=e73]
+              - generic [ref=e75]: Ctrl
+              - generic [ref=e76]: +
+              - generic [ref=e77]: K
+              - generic [ref=e78]: K
+        - generic [ref=e79]:
+          - button "New" [ref=e81] [cursor=pointer]:
+            - generic [ref=e82]:
+              - img [ref=e83]
+              - generic [ref=e85]: New
+          - button "Upgrade" [ref=e87] [cursor=pointer]:
+            - generic [ref=e88]:
+              - img [ref=e89]
+              - generic [ref=e91]: Upgrade
+          - button "Help" [ref=e93] [cursor=pointer]:
+            - img "Help" [ref=e94]
+          - button "j" [ref=e99] [cursor=pointer]:
+            - generic [ref=e101]: j
+      - generic [ref=e102]:
+        - navigation [ref=e103]:
+          - separator [ref=e104]
+          - generic [ref=e105]:
+            - generic [ref=e106]:
+              - link "Environment" [ref=e107] [cursor=pointer]:
+                - /url: /project/prj-d8dvm477f7vs73clijo0/environment/evm-d8dvm477f7vs73clijog
+                - img [ref=e108]
+                - generic [ref=e110]: Environment
+              - generic [ref=e111]:
+                - img [ref=e112]
+                - generic [ref=e114]: Parko
+            - generic [ref=e115]:
+              - list [ref=e116]:
+                - listitem [ref=e117]:
+                  - link "Events" [ref=e118] [cursor=pointer]:
+                    - /url: /web/srv-d8dvm43bc2fs73c4mpqg/events
+                    - img [ref=e119]
+                    - generic [ref=e126]: Events
+                - listitem [ref=e127]:
+                  - link "Settings" [ref=e128] [cursor=pointer]:
+                    - /url: /web/srv-d8dvm43bc2fs73c4mpqg/settings
+                    - img [ref=e129]
+                    - generic [ref=e132]: Settings
+              - generic [ref=e133]:
+                - generic [ref=e134]: Monitor
+                - list "Monitor" [ref=e135]:
+                  - listitem [ref=e136]:
+                    - link "Logs" [ref=e137] [cursor=pointer]:
+                      - /url: /web/srv-d8dvm43bc2fs73c4mpqg/logs
+                      - img [ref=e138]
+                      - generic [ref=e143]: Logs
+                  - listitem [ref=e144]:
+                    - link "Metrics" [ref=e145] [cursor=pointer]:
+                      - /url: /web/srv-d8dvm43bc2fs73c4mpqg/metrics
+                      - img [ref=e146]
+                      - generic [ref=e148]: Metrics
+              - generic [ref=e149]:
+                - generic [ref=e150]: Manage
+                - list "Manage" [ref=e151]:
+                  - listitem [ref=e152]:
+                    - link "Environment" [ref=e153] [cursor=pointer]:
+                      - /url: /web/srv-d8dvm43bc2fs73c4mpqg/env
+                      - img [ref=e154]
+                      - generic [ref=e158]: Environment
+                  - listitem [ref=e159]:
+                    - link "Shell" [ref=e160] [cursor=pointer]:
+                      - /url: /web/srv-d8dvm43bc2fs73c4mpqg/shell
+                      - img [ref=e161]
+                      - generic [ref=e165]:
+                        - generic [ref=e166]: Shell
+                        - status [ref=e169]:
+                          - img [ref=e170]
+                  - listitem [ref=e172]:
+                    - link "Scaling" [ref=e173] [cursor=pointer]:
+                      - /url: /web/srv-d8dvm43bc2fs73c4mpqg/scaling
+                      - img [ref=e174]
+                      - generic [ref=e179]:
+                        - generic [ref=e180]: Scaling
+                        - status [ref=e183]:
+                          - img [ref=e184]
+                  - listitem [ref=e186]:
+                    - link "Previews" [ref=e187] [cursor=pointer]:
+                      - /url: /web/srv-d8dvm43bc2fs73c4mpqg/previews
+                      - img [ref=e188]
+                      - generic [ref=e192]: Previews
+                  - listitem [ref=e193]:
+                    - link "Disk" [ref=e194] [cursor=pointer]:
+                      - /url: /web/srv-d8dvm43bc2fs73c4mpqg/disks
+                      - img [ref=e195]
+                      - generic [ref=e200]:
+                        - generic [ref=e201]: Disk
+                        - status [ref=e204]:
+                          - img [ref=e205]
+                  - listitem [ref=e207]:
+                    - link "One-Off Jobs" [ref=e208] [cursor=pointer]:
+                      - /url: /web/srv-d8dvm43bc2fs73c4mpqg/jobs
+                      - img [ref=e209]
+                      - generic [ref=e215]:
+                        - generic [ref=e216]: One-Off Jobs
+                        - status [ref=e219]:
+                          - img [ref=e220]
+          - generic [ref=e223]:
+            - button "Collapse items" [expanded] [ref=e224] [cursor=pointer]:
+              - img [ref=e225]
+            - list "Footer navigation" [ref=e227]:
+              - listitem [ref=e228]:
+                - link "Changelog" [ref=e229] [cursor=pointer]:
+                  - /url: https://render.com/changelog
+                  - img [ref=e230]
+                  - generic [ref=e235]: Changelog
+              - listitem [ref=e236]:
+                - link "Invite a friend" [ref=e237] [cursor=pointer]:
+                  - /url: /invites
+                  - img [ref=e238]
+                  - generic [ref=e240]: Invite a friend
+              - listitem [ref=e241]:
+                - button "Contact support" [ref=e242] [cursor=pointer]:
+                  - img [ref=e243]
+                  - generic [ref=e247]: Contact support
+            - link "Render Status" [ref=e249] [cursor=pointer]:
+              - /url: https://status.render.com
+              - img [ref=e250]
+              - generic [ref=e252]: Render Status
+        - generic [ref=e254]:
+          - banner [ref=e256]:
+            - generic [ref=e257]:
+              - generic [ref=e258]:
+                - img [ref=e259]
+                - generic [ref=e261]: Web Service
+              - generic [ref=e262]:
+                - heading "Parko Python 3 Free Upgrade your instance" [level=1] [ref=e264]:
+                  - generic [ref=e265]: Parko
+                  - generic [ref=e266]:
+                    - generic [ref=e267]: Python 3
+                    - link "Free" [ref=e268] [cursor=pointer]:
+                      - /url: /web/srv-d8dvm43bc2fs73c4mpqg/plan
+                      - generic [ref=e269]: Free
+                    - link "Upgrade your instance" [ref=e270] [cursor=pointer]:
+                      - /url: /web/srv-d8dvm43bc2fs73c4mpqg/plan
+                      - text: Upgrade your instance
+                      - img [ref=e272]
+                - generic [ref=e275]:
+                  - button "Connect" [ref=e276] [cursor=pointer]:
+                    - generic [ref=e277]: Connect
+                    - img [ref=e278]
+                  - button "Manual Deploy" [ref=e280] [cursor=pointer]:
+                    - generic [ref=e281]: Manual Deploy
+                    - img [ref=e282]
+            - generic [ref=e286]:
+              - generic [ref=e288]:
+                - generic [ref=e289]: "Service ID:"
+                - generic "Service ID:" [ref=e290]:
+                  - generic [ref=e291]: srv-d8dvm43bc2fs73c4mpqg
+                  - button "Copy" [ref=e294] [cursor=pointer]:
+                    - img [ref=e295]
+              - generic [ref=e299]:
+                - img "GitHub" [ref=e301]
+                - link "janatlk / Parko main" [ref=e303] [cursor=pointer]:
+                  - /url: https://github.com/janatlk/Parko/tree/main
+                  - generic [ref=e304]:
+                    - generic [ref=e305]: janatlk / Parko
+                    - img [ref=e306]
+                    - generic [ref=e308]: main
+              - generic "Copy" [ref=e310]:
+                - link "https://parko-9ae8.onrender.com" [ref=e312] [cursor=pointer]:
+                  - /url: https://parko-9ae8.onrender.com
+                - button "Copy" [ref=e315] [cursor=pointer]:
+                  - img [ref=e316]
+          - main [ref=e319]:
+            - generic [ref=e406]:
+              - alert [ref=e407]:
+                - generic [ref=e409]:
+                  - img [ref=e411]
+                  - generic [ref=e415]:
+                    - generic [ref=e417]: Your free instance will spin down with inactivity, which can delay requests by 50 seconds or more.
+                    - link "Upgrade now" [ref=e419] [cursor=pointer]:
+                      - /url: /web/srv-d8dvm43bc2fs73c4mpqg/plan
+              - generic [ref=e420]:
+                - generic [ref=e421]:
+                  - generic [ref=e422]:
+                    - generic [ref=e423]:
+                      - generic [ref=e424]: May 31, 2026 at 3:10 PM
+                      - generic [ref=e425]:
+                        - img [ref=e426]
+                        - generic [ref=e428]: failed
+                    - generic [ref=e429]:
+                      - link "d08a9a4" [ref=e430] [cursor=pointer]:
+                        - /url: https://github.com/janatlk/Parko/commit/d08a9a46e1f890a2fc907c62daad8115b63b15df
+                      - generic [ref=e431]: Fix Render static files configuration
+                  - button "Rollback" [disabled] [ref=e433]:
+                    - img [ref=e435]
+                    - text: Rollback
+                - generic [ref=e438]:
+                  - generic [ref=e439]: Exited with status 1 while building your code.
+                  - generic [ref=e440]:
+                    - text: Read our
+                    - link "docs" [ref=e441] [cursor=pointer]:
+                      - /url: https://render.com/docs/troubleshooting-deploys
+                    - text: for common ways to troubleshoot your deploy.
+              - generic [ref=e442]:
+                - generic [ref=e444]:
+                  - generic [ref=e446]:
+                    - button "All logs" [ref=e449] [cursor=pointer]:
+                      - generic [ref=e450]:
+                        - generic [ref=e451]: All logs
+                        - img [ref=e452]
+                    - generic [ref=e455]:
+                      - generic [ref=e456]: Search
+                      - generic [ref=e458]:
+                        - img [ref=e459]
+                        - searchbox "Search" [ref=e461]
+                    - button "May 31, 3:09 PM - 3:12 PM GMT+6" [ref=e464] [cursor=pointer]:
+                      - generic [ref=e465]:
+                        - generic [ref=e467]:
+                          - img [ref=e468]
+                          - generic [ref=e471]: May 31, 3:09 PM - 3:12 PM
+                          - img [ref=e472]
+                        - generic [ref=e474]: GMT+6
+                    - button "Maximize" [ref=e479] [cursor=pointer]:
+                      - img "Maximize" [ref=e480]
+                    - button "Options" [ref=e485] [cursor=pointer]:
+                      - img "Options" [ref=e486]
+                  - generic:
+                    - button "Return to Bottom":
+                      - img
+                  - listbox [ref=e490]:
+                    - generic [ref=e491]: May 31
+                    - option "03:11:33 PM ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 794.2/794.2 kB 80.6 MB/s 0:00:00" [ref=e492]:
+                      - generic [ref=e494]:
+                        - img [ref=e496]
+                        - time [ref=e500]: 03:11:33 PM
+                      - generic [ref=e502]: ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 794.2/794.2 kB 80.6 MB/s 0:00:00
+                    - option "03:11:33 PM Downloading referencing-0.37.0-py3-none-any.whl (26 kB)" [ref=e503]:
+                      - generic [ref=e505]:
+                        - img [ref=e507]
+                        - time [ref=e511]: 03:11:33 PM
+                      - generic [ref=e513]: Downloading referencing-0.37.0-py3-none-any.whl (26 kB)
+                    - option "03:11:33 PM Downloading rpds_py-2026.5.1-cp314-cp314-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (371 kB)" [ref=e514]:
+                      - generic [ref=e516]:
+                        - img [ref=e518]
+                        - time [ref=e522]: 03:11:33 PM
+                      - generic [ref=e524]: Downloading rpds_py-2026.5.1-cp314-cp314-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (371 kB)
+                    - option "03:11:33 PM Downloading sqlparse-0.5.5-py3-none-any.whl (46 kB)" [ref=e525]:
+                      - generic [ref=e527]:
+                        - img [ref=e529]
+                        - time [ref=e533]: 03:11:33 PM
+                      - generic [ref=e535]: Downloading sqlparse-0.5.5-py3-none-any.whl (46 kB)
+                    - option "03:11:33 PM Downloading typing_inspection-0.4.2-py3-none-any.whl (14 kB)" [ref=e536]:
+                      - generic [ref=e538]:
+                        - img [ref=e540]
+                        - time [ref=e544]: 03:11:33 PM
+                      - generic [ref=e546]: Downloading typing_inspection-0.4.2-py3-none-any.whl (14 kB)
+                    - option "03:11:33 PM Downloading uritemplate-4.2.0-py3-none-any.whl (11 kB)" [ref=e547]:
+                      - generic [ref=e549]:
+                        - img [ref=e551]
+                        - time [ref=e555]: 03:11:33 PM
+                      - generic [ref=e557]: Downloading uritemplate-4.2.0-py3-none-any.whl (11 kB)
+                    - option "03:11:33 PM Downloading werkzeug-3.1.8-py3-none-any.whl (226 kB)" [ref=e558]:
+                      - generic [ref=e560]:
+                        - img [ref=e562]
+                        - time [ref=e566]: 03:11:33 PM
+                      - generic [ref=e568]: Downloading werkzeug-3.1.8-py3-none-any.whl (226 kB)
+                    - option "03:11:33 PM Downloading markupsafe-3.0.3-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (23 kB)" [ref=e569]:
+                      - generic [ref=e571]:
+                        - img [ref=e573]
+                        - time [ref=e577]: 03:11:33 PM
+                      - generic [ref=e579]: Downloading markupsafe-3.0.3-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (23 kB)
+                    - option "03:11:33 PM Downloading certifi-2026.5.20-py3-none-any.whl (134 kB)" [ref=e580]:
+                      - generic [ref=e582]:
+                        - img [ref=e584]
+                        - time [ref=e588]: 03:11:33 PM
+                      - generic [ref=e590]: Downloading certifi-2026.5.20-py3-none-any.whl (134 kB)
+                    - option "03:11:33 PM Downloading charset_normalizer-3.4.7-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (215 kB)" [ref=e591]:
+                      - generic [ref=e593]:
+                        - img [ref=e595]
+                        - time [ref=e599]: 03:11:33 PM
+                      - generic [ref=e601]: Downloading charset_normalizer-3.4.7-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (215 kB)
+                    - option "03:11:33 PM Downloading et_xmlfile-2.0.0-py3-none-any.whl (18 kB)" [ref=e602]:
+                      - generic [ref=e604]:
+                        - img [ref=e606]
+                        - time [ref=e610]: 03:11:33 PM
+                      - generic [ref=e612]: Downloading et_xmlfile-2.0.0-py3-none-any.whl (18 kB)
+                    - option "03:11:33 PM Downloading packaging-26.2-py3-none-any.whl (100 kB)" [ref=e613]:
+                      - generic [ref=e615]:
+                        - img [ref=e617]
+                        - time [ref=e621]: 03:11:33 PM
+                      - generic [ref=e623]: Downloading packaging-26.2-py3-none-any.whl (100 kB)
+                    - option "03:11:33 PM Downloading pycparser-3.0-py3-none-any.whl (48 kB)" [ref=e624]:
+                      - generic [ref=e626]:
+                        - img [ref=e628]
+                        - time [ref=e632]: 03:11:33 PM
+                      - generic [ref=e634]: Downloading pycparser-3.0-py3-none-any.whl (48 kB)
+                    - option "03:11:33 PM Downloading sniffio-1.3.1-py3-none-any.whl (10 kB)" [ref=e635]:
+                      - generic [ref=e637]:
+                        - img [ref=e639]
+                        - time [ref=e643]: 03:11:33 PM
+                      - generic [ref=e645]: Downloading sniffio-1.3.1-py3-none-any.whl (10 kB)
+                    - 'option "03:11:33 PM Installing collected packages: whitenoise, uritemplate, typing-extensions, sqlparse, sniffio, rpds-py, PyYAML, python-http-client, pyjwt, pycparser, psycopg2-binary, Pillow, packaging, markupsafe, inflection, idna, h11, et-xmlfile, django-environ, distro, charset-normalizer, certifi, attrs, asgiref, annotated-types, werkzeug, typing-inspection, reportlab, referencing, pydantic-core, openpyxl, httpcore, gunicorn, Django, cffi, anyio, pydantic, jsonschema-specifications, httpx, djangorestframework, django-filter, cryptography, sendgrid, jsonschema, groq, djangorestframework-simplejwt, drf-spectacular" [ref=e646]':
+                      - generic [ref=e648]:
+                        - img [ref=e650]
+                        - time [ref=e654]: 03:11:33 PM
+                      - generic [ref=e656]: "Installing collected packages: whitenoise, uritemplate, typing-extensions, sqlparse, sniffio, rpds-py, PyYAML, python-http-client, pyjwt, pycparser, psycopg2-binary, Pillow, packaging, markupsafe, inflection, idna, h11, et-xmlfile, django-environ, distro, charset-normalizer, certifi, attrs, asgiref, annotated-types, werkzeug, typing-inspection, reportlab, referencing, pydantic-core, openpyxl, httpcore, gunicorn, Django, cffi, anyio, pydantic, jsonschema-specifications, httpx, djangorestframework, django-filter, cryptography, sendgrid, jsonschema, groq, djangorestframework-simplejwt, drf-spectacular"
+                    - option "03:11:44 PM" [ref=e657]:
+                      - generic [ref=e659]:
+                        - img [ref=e661]
+                        - time [ref=e665]: 03:11:44 PM
+                    - option "03:11:44 PM Successfully installed Django-4.2.30 Pillow-12.2.0 PyYAML-6.0.3 annotated-types-0.7.0 anyio-4.13.0 asgiref-3.11.1 attrs-26.1.0 certifi-2026.5.20 cffi-2.0.0 charset-normalizer-3.4.7 cryptography-48.0.0 distro-1.9.0 django-environ-0.13.0 django-filter-25.1 djangorestframework-3.17.1 djangorestframework-simplejwt-5.5.1 drf-spectacular-0.29.0 et-xmlfile-2.0.0 groq-1.4.0 gunicorn-26.0.0 h11-0.16.0 httpcore-1.0.9 httpx-0.28.1 idna-3.17 inflection-0.5.1 jsonschema-4.26.0 jsonschema-specifications-2025.9.1 markupsafe-3.0.3 openpyxl-3.1.5 packaging-26.2 psycopg2-binary-2.9.12 pycparser-3.0 pydantic-2.13.4 pydantic-core-2.46.4 pyjwt-2.13.0 python-http-client-3.3.7 referencing-0.37.0 reportlab-4.5.1 rpds-py-2026.5.1 sendgrid-6.12.5 sniffio-1.3.1 sqlparse-0.5.5 typing-extensions-4.15.0 typing-inspection-0.4.2 uritemplate-4.2.0 werkzeug-3.1.8 whitenoise-6.12.0" [ref=e667]:
+                      - generic [ref=e669]:
+                        - img [ref=e671]
+                        - time [ref=e675]: 03:11:44 PM
+                      - generic [ref=e677]: Successfully installed Django-4.2.30 Pillow-12.2.0 PyYAML-6.0.3 annotated-types-0.7.0 anyio-4.13.0 asgiref-3.11.1 attrs-26.1.0 certifi-2026.5.20 cffi-2.0.0 charset-normalizer-3.4.7 cryptography-48.0.0 distro-1.9.0 django-environ-0.13.0 django-filter-25.1 djangorestframework-3.17.1 djangorestframework-simplejwt-5.5.1 drf-spectacular-0.29.0 et-xmlfile-2.0.0 groq-1.4.0 gunicorn-26.0.0 h11-0.16.0 httpcore-1.0.9 httpx-0.28.1 idna-3.17 inflection-0.5.1 jsonschema-4.26.0 jsonschema-specifications-2025.9.1 markupsafe-3.0.3 openpyxl-3.1.5 packaging-26.2 psycopg2-binary-2.9.12 pycparser-3.0 pydantic-2.13.4 pydantic-core-2.46.4 pyjwt-2.13.0 python-http-client-3.3.7 referencing-0.37.0 reportlab-4.5.1 rpds-py-2026.5.1 sendgrid-6.12.5 sniffio-1.3.1 sqlparse-0.5.5 typing-extensions-4.15.0 typing-inspection-0.4.2 uritemplate-4.2.0 werkzeug-3.1.8 whitenoise-6.12.0
+                    - option "03:11:44 PM" [ref=e678]:
+                      - generic [ref=e680]:
+                        - img [ref=e682]
+                        - time [ref=e686]: 03:11:44 PM
+                    - 'option "03:11:44 PM [notice] A new release of pip is available: 25.3 -> 26.1.1" [ref=e688]':
+                      - generic [ref=e690]:
+                        - img [ref=e692]
+                        - time [ref=e696]: 03:11:44 PM
+                      - generic [ref=e698]: "[notice] A new release of pip is available: 25.3 -> 26.1.1"
+                    - 'option "03:11:44 PM [notice] To update, run: pip install --upgrade pip" [ref=e699]':
+                      - generic [ref=e701]:
+                        - img [ref=e703]
+                        - time [ref=e707]: 03:11:44 PM
+                      - generic [ref=e709]: "[notice] To update, run: pip install --upgrade pip"
+                    - option "03:11:45 PM Traceback (most recent call last):" [ref=e710]:
+                      - generic [ref=e712]:
+                        - img [ref=e714]
+                        - time [ref=e718]: 03:11:45 PM
+                      - generic [ref=e720]: "Traceback (most recent call last):"
+                    - option "03:11:45 PM File \"/opt/render/project/src/backend/manage.py\", line 14, in <module>" [ref=e721]:
+                      - generic [ref=e723]:
+                        - img [ref=e725]
+                        - time [ref=e729]: 03:11:45 PM
+                      - generic [ref=e731]: File "/opt/render/project/src/backend/manage.py", line 14, in <module>
+                    - option "03:11:45 PM main()" [ref=e732]:
+                      - generic [ref=e734]:
+                        - img [ref=e736]
+                        - time [ref=e740]: 03:11:45 PM
+                      - generic [ref=e742]: main()
+                    - option "03:11:45 PM ~~~~^^" [ref=e743]:
+                      - generic [ref=e745]:
+                        - img [ref=e747]
+                        - time [ref=e751]: 03:11:45 PM
+                      - generic [ref=e753]: ~~~~^^
+                    - option "03:11:45 PM File \"/opt/render/project/src/backend/manage.py\", line 10, in main" [ref=e754]:
+                      - generic [ref=e756]:
+                        - img [ref=e758]
+                        - time [ref=e762]: 03:11:45 PM
+                      - generic [ref=e764]: File "/opt/render/project/src/backend/manage.py", line 10, in main
+                    - option "03:11:45 PM execute_from_command_line(sys.argv)" [ref=e765]:
+                      - generic [ref=e767]:
+                        - img [ref=e769]
+                        - time [ref=e773]: 03:11:45 PM
+                      - generic [ref=e775]: execute_from_command_line(sys.argv)
+                    - option "03:11:45 PM ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^" [ref=e776]:
+                      - generic [ref=e778]:
+                        - img [ref=e780]
+                        - time [ref=e784]: 03:11:45 PM
+                      - generic [ref=e786]: ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+                    - option "03:11:45 PM File \"/opt/render/project/src/.venv/lib/python3.14/site-packages/django/core/management/__init__.py\", line 442, in execute_from_command_line" [ref=e787]:
+                      - generic [ref=e789]:
+                        - img [ref=e791]
+                        - time [ref=e795]: 03:11:45 PM
+                      - generic [ref=e797]: File "/opt/render/project/src/.venv/lib/python3.14/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+                    - option "03:11:45 PM utility.execute()" [ref=e798]:
+                      - generic [ref=e800]:
+                        - img [ref=e802]
+                        - time [ref=e806]: 03:11:45 PM
+                      - generic [ref=e808]: utility.execute()
+                    - option "03:11:45 PM ~~~~~~~~~~~~~~~^^" [ref=e809]:
+                      - generic [ref=e811]:
+                        - img [ref=e813]
+                        - time [ref=e817]: 03:11:45 PM
+                      - generic [ref=e819]: ~~~~~~~~~~~~~~~^^
+                    - option "03:11:45 PM File \"/opt/render/project/src/.venv/lib/python3.14/site-packages/django/core/management/__init__.py\", line 416, in execute" [ref=e820]:
+                      - generic [ref=e822]:
+                        - img [ref=e824]
+                        - time [ref=e828]: 03:11:45 PM
+                      - generic [ref=e830]: File "/opt/render/project/src/.venv/lib/python3.14/site-packages/django/core/management/__init__.py", line 416, in execute
+                    - option "03:11:45 PM django.setup()" [ref=e831]:
+                      - generic [ref=e833]:
+                        - img [ref=e835]
+                        - time [ref=e839]: 03:11:45 PM
+                      - generic [ref=e841]: django.setup()
+                    - option "03:11:45 PM ~~~~~~~~~~~~^^" [ref=e842]:
+                      - generic [ref=e844]:
+                        - img [ref=e846]
+                        - time [ref=e850]: 03:11:45 PM
+                      - generic [ref=e852]: ~~~~~~~~~~~~^^
+                    - option "03:11:45 PM File \"/opt/render/project/src/.venv/lib/python3.14/site-packages/django/__init__.py\", line 24, in setup" [ref=e853]:
+                      - generic [ref=e855]:
+                        - img [ref=e857]
+                        - time [ref=e861]: 03:11:45 PM
+                      - generic [ref=e863]: File "/opt/render/project/src/.venv/lib/python3.14/site-packages/django/__init__.py", line 24, in setup
+                    - option "03:11:45 PM apps.populate(settings.INSTALLED_APPS)" [ref=e864]:
+                      - generic [ref=e866]:
+                        - img [ref=e868]
+                        - time [ref=e872]: 03:11:45 PM
+                      - generic [ref=e874]: apps.populate(settings.INSTALLED_APPS)
+                    - option "03:11:45 PM ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^" [ref=e875]:
+                      - generic [ref=e877]:
+                        - img [ref=e879]
+                        - time [ref=e883]: 03:11:45 PM
+                      - generic [ref=e885]: ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+                    - option "03:11:45 PM File \"/opt/render/project/src/.venv/lib/python3.14/site-packages/django/apps/registry.py\", line 91, in populate" [ref=e886]:
+                      - generic [ref=e888]:
+                        - img [ref=e890]
+                        - time [ref=e894]: 03:11:45 PM
+                      - generic [ref=e896]: File "/opt/render/project/src/.venv/lib/python3.14/site-packages/django/apps/registry.py", line 91, in populate
+                    - option "03:11:45 PM app_config = AppConfig.create(entry)" [ref=e897]:
+                      - generic [ref=e899]:
+                        - img [ref=e901]
+                        - time [ref=e905]: 03:11:45 PM
+                      - generic [ref=e907]: app_config = AppConfig.create(entry)
+                    - option "03:11:45 PM File \"/opt/render/project/src/.venv/lib/python3.14/site-packages/django/apps/config.py\", line 193, in create" [ref=e908]:
+                      - generic [ref=e910]:
+                        - img [ref=e912]
+                        - time [ref=e916]: 03:11:45 PM
+                      - generic [ref=e918]: File "/opt/render/project/src/.venv/lib/python3.14/site-packages/django/apps/config.py", line 193, in create
+                    - option "03:11:45 PM import_module(entry)" [ref=e919]:
+                      - generic [ref=e921]:
+                        - img [ref=e923]
+                        - time [ref=e927]: 03:11:45 PM
+                      - generic [ref=e929]: import_module(entry)
+                    - option "03:11:45 PM ~~~~~~~~~~~~~^^^^^^^" [ref=e930]:
+                      - generic [ref=e932]:
+                        - img [ref=e934]
+                        - time [ref=e938]: 03:11:45 PM
+                      - generic [ref=e940]: ~~~~~~~~~~~~~^^^^^^^
+                    - option "03:11:45 PM File \"/opt/render/project/python/Python-3.14.3/lib/python3.14/importlib/__init__.py\", line 88, in import_module" [ref=e941]:
+                      - generic [ref=e943]:
+                        - img [ref=e945]
+                        - time [ref=e949]: 03:11:45 PM
+                      - generic [ref=e951]: File "/opt/render/project/python/Python-3.14.3/lib/python3.14/importlib/__init__.py", line 88, in import_module
+                    - option "03:11:45 PM return _bootstrap._gcd_import(name[level:], package, level)" [ref=e952]:
+                      - generic [ref=e954]:
+                        - img [ref=e956]
+                        - time [ref=e960]: 03:11:45 PM
+                      - generic [ref=e962]: return _bootstrap._gcd_import(name[level:], package, level)
+                    - option "03:11:45 PM ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^" [ref=e963]:
+                      - generic [ref=e965]:
+                        - img [ref=e967]
+                        - time [ref=e971]: 03:11:45 PM
+                      - generic [ref=e973]: ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    - option "03:11:45 PM File \"<frozen importlib._bootstrap>\", line 1398, in _gcd_import" [ref=e974]:
+                      - generic [ref=e976]:
+                        - img [ref=e978]
+                        - time [ref=e982]: 03:11:45 PM
+                      - generic [ref=e984]: File "<frozen importlib._bootstrap>", line 1398, in _gcd_import
+                    - option "03:11:45 PM File \"<frozen importlib._bootstrap>\", line 1371, in _find_and_load" [ref=e985]:
+                      - generic [ref=e987]:
+                        - img [ref=e989]
+                        - time [ref=e993]: 03:11:45 PM
+                      - generic [ref=e995]: File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+                    - option "03:11:45 PM File \"<frozen importlib._bootstrap>\", line 1335, in _find_and_load_unlocked" [ref=e996]:
+                      - generic [ref=e998]:
+                        - img [ref=e1000]
+                        - time [ref=e1004]: 03:11:45 PM
+                      - generic [ref=e1006]: File "<frozen importlib._bootstrap>", line 1335, in _find_and_load_unlocked
+                    - 'option "03:11:45 PM ModuleNotFoundError: No module named ''corsheaders''" [ref=e1007]':
+                      - generic [ref=e1009]:
+                        - img [ref=e1011]
+                        - time [ref=e1015]: 03:11:45 PM
+                      - generic [ref=e1017]: "ModuleNotFoundError: No module named 'corsheaders'"
+                    - option "03:11:45 PM ==> Build failed 😞" [ref=e1018]:
+                      - generic [ref=e1020]:
+                        - img [ref=e1022]
+                        - time [ref=e1026]: 03:11:45 PM
+                      - generic [ref=e1028]: ==> Build failed 😞
+                    - 'option "03:11:45 PM ==> Common ways to troubleshoot your deploy: https://render.com/docs/troubleshooting-deploys" [ref=e1029]':
+                      - generic [ref=e1031]:
+                        - img [ref=e1033]
+                        - time [ref=e1037]: 03:11:45 PM
+                      - generic [ref=e1039]:
+                        - text: ==>
+                        - generic [ref=e1040]:
+                          - text: "Common ways to troubleshoot your deploy:"
+                          - link "https://render.com/docs/troubleshooting-deploys" [ref=e1041] [cursor=pointer]:
+                            - /url: https://render.com/docs/troubleshooting-deploys
+                - paragraph [ref=e1043]:
+                  - text: Need better ways to work with logs? Try the
+                  - link "Render CLI" [ref=e1044] [cursor=pointer]:
+                    - /url: https://render.com/docs/cli
+                    - img [ref=e1045]
+                    - text: Render CLI
+                  - text: ","
+                  - link "Render MCP Server" [ref=e1048] [cursor=pointer]:
+                    - /url: https://render.com/docs/mcp-server
+                  - text: ", or set up a"
+                  - link "log stream integration" [ref=e1049] [cursor=pointer]:
+                    - /url: https://render.com/docs/log-streams
+                    - text: log stream integration
+                    - img [ref=e1050]
+    - generic:
+      - generic:
+        - generic: "0 services selected:"
+        - generic:
+          - generic:
+            - button:
+              - generic:
+                - img
+              - generic: Move
+              - img
+      - generic:
+        - separator
+        - generic:
+          - generic:
+            - button:
+              - img
+  - iframe [ref=e381]:
+    
+  - generic [ref=e1054]:
+    - generic [ref=e1055]:
+      - heading [level=1] [ref=e1057]:
+        - img [ref=e1058]
+      - button "Close modal" [ref=e1061] [cursor=pointer]:
+        - img [ref=e1062]
+    - generic [ref=e1065]:
+      - generic [ref=e1066]: Debug build issues with AI
+      - generic [ref=e1067]: Connect the Render MCP server to AI apps like Cursor and Claude Code. Analyze your build logs and diagnose failures with natural language prompts.
+    - generic [ref=e1069]:
+      - link "View" [ref=e1071] [cursor=pointer]:
+        - /url: https://render.com/docs/mcp-server
+        - text: View
+        - img [ref=e1073]
+      - button "Dismiss" [ref=e1076] [cursor=pointer]
