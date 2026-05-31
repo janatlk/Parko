@@ -58,6 +58,19 @@ demo.set_password('demo')
 demo.save()
 print(f'{"Created" if created else "Updated"} demo user: demo / demo')
 
+# Create superuser for Django admin access
+if not User.objects.filter(username='admin').exists():
+    admin = User.objects.create_superuser(
+        username='admin',
+        email='admin@parko.demo',
+        password='admin123'
+    )
+    admin.company = company
+    admin.save()
+    print('Created superuser: admin / admin123')
+else:
+    print('Superuser already exists')
+
 # Create demo cars only if none exist (idempotent for persistent DB)
 if not Car.objects.filter(company=company).exists():
     cars_data = [
