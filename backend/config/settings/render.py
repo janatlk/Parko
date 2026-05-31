@@ -8,13 +8,31 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
-# Database - SQLite for demo (ephemeral on Render free tier)
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# Database - auto-switch: PostgreSQL if POSTGRES_HOST is set, else SQLite fallback
+if os.environ.get('POSTGRES_HOST'):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.environ.get('POSTGRES_DB', 'postgres'),
+            'USER': os.environ.get('POSTGRES_USER', 'postgres'),
+            'PASSWORD': os.environ.get('POSTGRES_PASSWORD', ''),
+            'HOST': os.environ.get('POSTGRES_HOST', ''),
+            'PORT': os.environ.get('POSTGRES_PORT', '5432'),
+            'CONN_MAX_AGE': 600,
+            'CONN_HEALTH_CHECKS': True,
+            'OPTIONS': {
+                'connect_timeout': 30,
+                'sslmode': 'require',
+            },
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # Static files
 # Use '/' as static URL so frontend assets (built with root-relative paths like /assets/...)
@@ -44,9 +62,9 @@ CSRF_COOKIE_SECURE = False
 
 # AI settings from environment
 AI_SETTINGS = {
-    'provider': 'groq',
-    'api_key': os.environ.get('GROQ_API_KEY', ''),
-    'model': 'llama-3.1-8b-instant',
+    'provider': os.environ.get('AI_PROVIDER', 'groq'),
+    'api_key': os.environ.get('AI_API_KEY', ''),
+    'model': os.environ.get('AI_MODEL', 'llama-3.1-8b-instant'),
 }
 
 # Email settings (optional)
