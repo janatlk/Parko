@@ -24,13 +24,58 @@ cp -r ../frontend/dist/* static/ 2>/dev/null || true
 # Run migrations
 python manage.py migrate --settings=config.settings.render
 
-# Create demo user (needed for fresh SQLite on every deploy)
-echo "→ Creating demo user..."
-python manage.py create_demo_user --settings=config.settings.render
+# Create demo user and data (needed for fresh SQLite on every deploy)
+echo "→ Creating demo user and data..."
+python manage.py shell --settings=config.settings.render << 'PYTHON'
+import os
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.render')
+import django
+django.setup()
 
-# Create demo data
-echo "→ Creating demo data..."
-python manage.py create_demo_data --settings=config.settings.render
+from django.contrib.auth import get_user_model
+from companies.models import Company
+from fleet.models import Car, Fuel, Insurance, Inspection
+from datetime import date, timedelta
+import random
+
+User = get_user_model()
+
+# Create demo company
+company, _ = Company.objects.get_or_create(name='Demo Company', defaults={'inn': '1234567890'})
+
+# Create demo user
+demo, created = User.objects.get_or_create(
+    username='demo',
+    defaults={
+        'email': 'demo@parko.demo',
+        'company': company,
+        'language': 'ru',
+        'role': 'COMPANY_ADMIN'
+    }
+)
+demo.set_password('demo')
+demo.save()
+print(f'{"Created" if created else "Updated"} demo user: demo / demo')
+
+# Create demo cars
+Car.objects.filter(company=company).delete()
+cars_data = [
+    {'numplate': 'A001AA', 'brand': 'Toyota', 'model': 'Camry', 'vin': 'DEMO1234567890001'},
+    {'numplate': 'B002BB', 'brand': 'BMW', 'model': 'X5', 'vin': 'DEMO1234567890002'},
+    {'numplate': 'C003CC', 'brand': 'Mercedes', 'model': 'E-Class', 'vin': 'DEMO1234567890003'},
+]
+cars = []
+for c in cars_data:
+    car = Car.objects.create(company=company, numplate=c['numplate'], brand=c['brand'], vin=c['vin'], status='active')
+    cars.append(car)
+    for m in range(3):
+        d = date.today() - timedelta(days=30*m)
+        Fuel.objects.create(car=car, year=d.year, month=d.month, liters=random.randint(100,300), total_cost=random.randint(5000,15000), monthly_mileage=random.randint(500,2000))
+    Insurance.objects.create(car=car, insurance_type='OSAGO', number=f'DEMO-{car.numplate}-OSAGO', start_date=date.today()-timedelta(days=30), end_date=date.today()+timedelta(days=335), cost=random.randint(5000,10000))
+    Inspection.objects.create(car=car, number=f'DEMO-{car.numplate}-INSP', inspected_at=date.today()-timedelta(days=15), cost=random.randint(1000,3000))
+
+print(f'Created {len(cars)} demo cars with fuel/insurance/inspection data')
+PYTHON
 
 # Collect static files
 python manage.py collectstatic --no-input --clear --settings=config.settings.render
