@@ -125,9 +125,14 @@ export function CustomTableDetailPage() {
               )}
             </div>
           </Group>
-          <Button size="xs" leftSection={<IconPlus size={16} />} onClick={open}>
-            {t('common.add', 'Добавить')}
-          </Button>
+          <Group gap="xs">
+            <Button variant="light" size="xs" leftSection={<IconEdit size={16} />} onClick={() => navigate(`/custom-tables/${tableId}/edit`)}>
+              {t('common.edit', 'Редактировать')}
+            </Button>
+            <Button size="xs" leftSection={<IconPlus size={16} />} onClick={open}>
+              {t('common.add', 'Добавить')}
+            </Button>
+          </Group>
         </Group>
 
         <Paper withBorder radius="md" style={{ overflowX: 'auto' }}>

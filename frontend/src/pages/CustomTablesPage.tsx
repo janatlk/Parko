@@ -1,4 +1,5 @@
 import {
+  ActionIcon,
   Alert,
   Button,
   Container,
@@ -10,7 +11,7 @@ import {
   Text,
   Title,
 } from '@mantine/core'
-import { IconAlertTriangle, IconPlus, IconTable } from '@tabler/icons-react'
+import { IconAlertTriangle, IconEdit, IconPlus, IconTable } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
@@ -66,11 +67,24 @@ export function CustomTablesPage() {
                 style={{ cursor: 'pointer' }}
                 onClick={() => navigate(`/custom-tables/${table.id}`)}
               >
-                <Group gap="xs" mb={4}>
-                  <IconTable size={18} />
-                  <Text fw={600} size="sm">
-                    {table.name}
-                  </Text>
+                <Group gap="xs" mb={4} justify="space-between">
+                  <Group gap="xs">
+                    <IconTable size={18} />
+                    <Text fw={600} size="sm">
+                      {table.name}
+                    </Text>
+                  </Group>
+                  <ActionIcon
+                    variant="subtle"
+                    size="sm"
+                    color="blue"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      navigate(`/custom-tables/${table.id}/edit`)
+                    }}
+                  >
+                    <IconEdit size={14} />
+                  </ActionIcon>
                 </Group>
                 <Text size="xs" c="dimmed" lineClamp={2}>
                   {table.description || t('custom_tables.no_description', 'Нет описания')}

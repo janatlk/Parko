@@ -469,32 +469,27 @@ export function AIPage() {
               <Text size="sm" c="dimmed" ta="center" maw={400} lh={1.6}>
                 {t('ai.welcome_subtitle')}
               </Text>
-              <Stack gap="xs" mt="md" maw={450}>
-                {(suggestions.length > 0
-                  ? suggestions
-                  : [
-                    { text: 'Какие машины в автопарке?', icon: '🚗', category: 'fleet' },
-                    { text: 'Покажи расходы на топливо', icon: '⛽', category: 'fuel' },
-                    { text: 'Покажи расходы на запчасти', icon: '🔧', category: 'maintenance' },
-                  ]
-                ).map((s) => (
-                  <Button
-                    key={s.text}
-                    variant="light"
-                    size="xs"
-                    radius="xl"
-                    fullWidth
-                    leftSection={<Text size="sm">{s.icon}</Text>}
-                    onClick={() => setInput(s.text)}
-                    styles={{
-                      root: { justifyContent: 'flex-start' },
-                      label: { overflow: 'hidden', textOverflow: 'ellipsis' },
-                    }}
-                  >
-                    {s.text}
-                  </Button>
-                ))}
-              </Stack>
+              {suggestions.length > 0 && (
+                <Stack gap="xs" mt="md" maw={450}>
+                  {suggestions.map((s) => (
+                    <Button
+                      key={s.text}
+                      variant="light"
+                      size="xs"
+                      radius="xl"
+                      fullWidth
+                      leftSection={<Text size="sm">{s.icon}</Text>}
+                      onClick={() => setInput(s.text)}
+                      styles={{
+                        root: { justifyContent: 'flex-start' },
+                        label: { overflow: 'hidden', textOverflow: 'ellipsis' },
+                      }}
+                    >
+                      {s.text}
+                    </Button>
+                  ))}
+                </Stack>
+              )}
             </Stack>
           ) : (
             <ScrollArea style={{ flex: 1 }} viewportRef={viewportRef} ref={scrollRef}>

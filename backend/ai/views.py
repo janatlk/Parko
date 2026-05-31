@@ -391,8 +391,4 @@ class AISuggestionsView(APIView):
                 'category': 'maintenance',
             })
 
-        # Shuffle and pick top 4
-        random.shuffle(suggestions)
-        suggestions = suggestions[:4]
-
-        return Response({'suggestions': suggestions})
+        return Response({'suggestions': []})
