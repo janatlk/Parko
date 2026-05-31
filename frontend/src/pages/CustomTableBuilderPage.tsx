@@ -10,6 +10,7 @@ import {
   Select,
   Stack,
   Switch,
+  TagsInput,
   Text,
   TextInput,
   Title,
@@ -134,12 +135,12 @@ export function CustomTableBuilderPage() {
                   size="xs"
                 />
                 {col.type === 'select' && (
-                  <TextInput
-                    placeholder="opt1,opt2,opt3"
-                    value={col.options?.join(',') || ''}
-                    onChange={(e) => updateColumn(index, 'options', e.currentTarget.value.split(',').map((s) => s.trim()).filter(Boolean))}
+                  <TagsInput
+                    placeholder="Варианты"
+                    value={col.options || []}
+                    onChange={(val) => updateColumn(index, 'options', val)}
                     size="xs"
-                    style={{ width: 140 }}
+                    style={{ width: 200 }}
                   />
                 )}
                 <ActionIcon variant="subtle" color="red" size="sm" onClick={() => removeColumn(index)}>

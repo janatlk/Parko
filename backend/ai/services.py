@@ -44,6 +44,7 @@ IMPORTANT SYNONYMS:
 - "бензин", "дизель", "топливо" all mean fuel
 - "custom table", "пользовательская таблица", "кастомная таблица" means custom table
 - To answer questions about data in custom tables, FIRST use tool_list_custom_tables to find the table, THEN use tool_list_custom_records to read its data
+- When displaying custom table records, use the `fields` object inside each record. Each key is a column name and value is the cell content. NEVER output `[object Object]` — always show individual field values
 
 RESPONSE STYLE:
 - For simple questions ("how many cars?") → answer in 1-2 sentences with key numbers bolded.
@@ -446,7 +447,7 @@ def collect_company_context(user) -> str:
                 parts.append(f"    Sample records from '{table.name}':")
                 for rec in samples:
                     car_info = f" car={rec.car.numplate}" if rec.car else ""
-                    parts.append(f"      record_id={rec.id}{car_info} data={rec.data}")
+                    parts.append(f"      record_id={rec.id}{car_info} fields={rec.data}")
     else:
         parts.append("Custom tables: 0")
     parts.append("")

@@ -646,12 +646,14 @@ def tool_list_custom_records(user, company, table_id, filters=None):
 
     data = []
     for record in qs:
+        # Flatten data fields for easy AI consumption
+        fields = {k: str(v) for k, v in record.data.items()}
         data.append({
             'id': record.id,
             'table_id': table.id,
             'table_name': table.name,
             'car': str(record.car) if record.car else None,
-            'data': record.data,
+            'fields': fields,
             'created_at': str(record.created_at),
         })
     return {
@@ -704,7 +706,6 @@ def tool_add_custom_table(user, company, data):
             description=data.get('description', ''),
             icon=data.get('icon', 'table'),
             schema={'columns': schema_columns},
-            settings=data.get('settings', {}),
         )
         return {
             'success': True,
@@ -829,8 +830,7 @@ def tool_update_custom_table(user, company, table_id, data):
         table.description = data.get('description', '')
     if 'icon' in data:
         table.icon = data.get('icon', 'table')
-    if 'settings' in data:
-        table.settings = data.get('settings', {})
+
 
     if 'columns' in data and isinstance(data['columns'], list):
         schema_columns = []
