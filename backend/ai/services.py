@@ -45,6 +45,7 @@ IMPORTANT SYNONYMS:
 - "custom table", "пользовательская таблица", "кастомная таблица" means custom table
 - To answer questions about data in custom tables, FIRST use tool_list_custom_tables to find the table, THEN use tool_list_custom_records to read its data
 - When displaying custom table records, use the `fields` object inside each record. Each key is a column name and value is the cell content. NEVER output `[object Object]` — always show individual field values
+- When creating/updating a column with type "select", ALWAYS include `options` array with the list of choices. Example: {"name": "Status", "type": "select", "required": true, "options": ["Active", "Inactive", "Pending"]}
 
 RESPONSE STYLE:
 - For simple questions ("how many cars?") → answer in 1-2 sentences with key numbers bolded.
@@ -165,7 +166,7 @@ AVAILABLE ACTIONS:
 - tool_list_cars: (status, brand, search)
 - tool_list_custom_tables: (name) — list user's custom tables
 - tool_list_custom_records: table_id, (search, limit) — read data from a custom table to answer questions
-- tool_add_custom_table: name, columns (array of {name, type, required}), (description, icon, settings)
+- tool_add_custom_table: name, columns (array of {name, type, required, options}), (description, icon, settings)
 - tool_update_custom_table: table_id, (name, columns, description, icon, settings) — modify schema of existing table
 - tool_add_custom_record: table_id, record_data (dict of column values), (car_id)
 - tool_update_custom_record: record_id, (table_id, car_id, record_data)
@@ -760,8 +761,8 @@ TOOL_DEFINITIONS = [
                     "icon": {"type": "string", "description": "Icon name (default: table)"},
                     "columns": {
                         "type": "array",
-                        "description": "Array of column definitions {name, type, required}. AI should choose types intelligently: date for dates, price/number for money, select for categories, text for notes.",
-                        "items": {"type": "object", "properties": {"name": {"type": "string"}, "type": {"type": "string", "enum": ["text", "number", "price", "date", "photo", "select"]}, "required": {"type": "boolean"}}}
+                        "description": "Array of column definitions {name, type, required, options}. AI should choose types intelligently: date for dates, price/number for money, select for categories, text for notes. For 'select' type ALWAYS provide options array with choices.",
+                        "items": {"type": "object", "properties": {"name": {"type": "string"}, "type": {"type": "string", "enum": ["text", "number", "price", "date", "photo", "select"]}, "required": {"type": "boolean"}, "options": {"type": "array", "items": {"type": "string"}, "description": "Choices for select columns"}}}
                     },
                     "settings": {"type": "object", "description": "Table settings (color, showTotals, etc.)"}
                 }
@@ -783,8 +784,8 @@ TOOL_DEFINITIONS = [
                     "icon": {"type": "string", "description": "New icon name"},
                     "columns": {
                         "type": "array",
-                        "description": "Full new column list (replaces existing columns)",
-                        "items": {"type": "object", "properties": {"name": {"type": "string"}, "type": {"type": "string", "enum": ["text", "number", "price", "date", "photo", "select"]}, "required": {"type": "boolean"}}}
+                        "description": "Full new column list (replaces existing columns). For 'select' type ALWAYS provide options array with choices.",
+                        "items": {"type": "object", "properties": {"name": {"type": "string"}, "type": {"type": "string", "enum": ["text", "number", "price", "date", "photo", "select"]}, "required": {"type": "boolean"}, "options": {"type": "array", "items": {"type": "string"}, "description": "Choices for select columns"}}}
                     },
                     "settings": {"type": "object", "description": "Table settings"}
                 }

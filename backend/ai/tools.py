@@ -695,6 +695,7 @@ def tool_add_custom_table(user, company, data):
                 'name': col.get('name', 'Unnamed'),
                 'type': col.get('type', 'text'),
                 'required': col.get('required', False),
+                'options': col.get('options', []),
             })
         else:
             return {'success': False, 'error': f"Invalid column format: {col}"}
@@ -842,6 +843,7 @@ def tool_update_custom_table(user, company, table_id, data):
                     'name': col.get('name', 'Unnamed'),
                     'type': col.get('type', 'text'),
                     'required': col.get('required', False),
+                    'options': col.get('options', []),
                 })
             else:
                 return {'success': False, 'error': f"Invalid column format: {col}"}
