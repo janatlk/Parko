@@ -4,7 +4,7 @@ from .base import *
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-render-fallback-key-change-me')
 
-DEBUG = True  # Temporary for debugging admin 500 error
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -37,14 +37,14 @@ else:
 # Static files
 # Use '/' as static URL so frontend assets (built with root-relative paths like /assets/...)
 # are served directly by WhiteNoise without needing URL rewrites.
-STATIC_URL = '/'
+STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
 
 # Media files
-MEDIA_URL = 'media/'
+MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # WhiteNoise middleware for serving static files
