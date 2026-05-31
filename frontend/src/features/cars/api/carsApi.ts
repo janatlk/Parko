@@ -15,7 +15,7 @@ export type ListCarsParams = {
 }
 
 export type CarCreatePayload = {
-  region: string
+  region?: string
   brand: string
   title: string
   numplate: string

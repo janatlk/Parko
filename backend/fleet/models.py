@@ -15,7 +15,7 @@ class Car(models.Model):
         on_delete=models.CASCADE,
         related_name='cars',
     )
-    region = models.CharField(max_length=100)
+    region = models.CharField(max_length=100, default='Кыргызстан', blank=True)
     brand = models.CharField(max_length=100)
     title = models.CharField(max_length=100)
     numplate = models.CharField(max_length=20)
@@ -221,10 +221,12 @@ class Fuel(models.Model):
         on_delete=models.CASCADE,
         related_name='fuel_records',
     )
+    date = models.DateField(default=timezone.localdate)
     year = models.PositiveIntegerField()
     month = models.PositiveSmallIntegerField()
     liters = models.PositiveIntegerField(default=0)
     total_cost = models.PositiveIntegerField(default=0)
+    odometer = models.PositiveIntegerField(default=0)
     monthly_mileage = models.PositiveIntegerField(default=0)
     consumption = models.DecimalField(max_digits=7, decimal_places=2, default=0)
     month_name = models.CharField(max_length=20, blank=True)
@@ -233,15 +235,12 @@ class Fuel(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=['car', 'year', 'month'], name='uq_fuel_car_year_month'),
-        ]
         indexes = [
-            models.Index(fields=['car', 'year', 'month']),
+            models.Index(fields=['car', 'date']),
         ]
 
     def __str__(self):
-        return f"Fuel {self.year}-{self.month:02d} car_id={self.car_id}"
+        return f"Fuel {self.date} car_id={self.car_id}"
 
     @staticmethod
     def _month_name(month: int) -> str:
@@ -262,8 +261,29 @@ class Fuel(models.Model):
         return names.get(month, '')
 
     def save(self, *args, **kwargs):
+        # Вычисляем year/month из date
+        if self.date:
+            self.year = self.date.year
+            self.month = self.date.month
+
         month = int(self.month or 0)
         self.month_name = self._month_name(month)
+
+        # Вычисляем пробег: odometer - предыдущий odometer для этой машины
+        if self.odometer and self.odometer > 0:
+            prev_odometer = (
+                Fuel.objects.filter(
+                    car=self.car,
+                    odometer__lt=self.odometer,
+                )
+                .exclude(id=self.id or 0)
+                .order_by('-odometer')
+                .values_list('odometer', flat=True)
+                .first()
+            )
+            self.monthly_mileage = self.odometer - (prev_odometer or 0)
+        else:
+            self.monthly_mileage = 0
 
         mileage = int(self.monthly_mileage or 0)
         liters = int(self.liters or 0)

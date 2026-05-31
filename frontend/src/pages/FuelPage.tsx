@@ -69,7 +69,7 @@ export function FuelPage() {
       title: t('fuel.delete_confirm.title'),
       children: (
         <Text size="sm">
-          {t('fuel.delete_confirm.message', { period: `${record.year}-${String(record.month).padStart(2, '0')}` })}
+          {t('fuel.delete_confirm.message', { period: record.date })}
         </Text>
       ),
       labels: {
@@ -130,7 +130,8 @@ export function FuelPage() {
           <ModernTable
             columns={[
               { key: 'car', title: t('fuel.table.car'), width: 160 },
-              { key: 'period', title: t('fuel.table.period'), width: 120 },
+              { key: 'date', title: t('fuel.table.date'), width: 120 },
+              { key: 'odometer', title: t('fuel.table.odometer'), width: 120 },
               { key: 'liters', title: t('fuel.table.liters'), width: 100 },
               { key: 'mileage', title: t('fuel.table.mileage'), width: 120 },
               { key: 'consumption', title: t('fuel.table.consumption'), width: 130 },
@@ -143,10 +144,9 @@ export function FuelPage() {
                 key={r.id}
                 cells={[
                   <TableCell key="car" fw={500}>{r.car_numplate ?? r.car}</TableCell>,
-                  <TableCell key="period">
-                    {r.year}-{String(r.month).padStart(2, '0')}
-                  </TableCell>,
+                  <TableCell key="date">{r.date}</TableCell>,
                   <TableCell key="liters">{r.liters} L</TableCell>,
+                  <TableCell key="odometer">{r.odometer} km</TableCell>,
                   <TableCell key="mileage">{r.monthly_mileage} km</TableCell>,
                   <TableCell key="consumption">{r.consumption} L/100km</TableCell>,
                   <TableCell key="cost" fw={500}>{formatPrice(r.total_cost, currency)}</TableCell>,

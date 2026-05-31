@@ -209,15 +209,17 @@ class FuelListSerializer(serializers.ModelSerializer):
             'id',
             'car',
             'car_numplate',
+            'date',
             'year',
             'month',
             'month_name',
             'liters',
             'total_cost',
+            'odometer',
             'monthly_mileage',
             'consumption',
         ]
-        read_only_fields = ['id', 'car_numplate', 'month_name', 'consumption']
+        read_only_fields = ['id', 'car_numplate', 'year', 'month', 'month_name', 'monthly_mileage', 'consumption']
 
 
 class FuelDetailSerializer(serializers.ModelSerializer):
@@ -226,21 +228,24 @@ class FuelDetailSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'car',
+            'date',
             'year',
             'month',
             'month_name',
             'liters',
             'total_cost',
+            'odometer',
             'monthly_mileage',
             'consumption',
             'created_at',
             'updated_at',
         ]
-        read_only_fields = ['id', 'month_name', 'consumption', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'year', 'month', 'month_name', 'monthly_mileage', 'consumption', 'created_at', 'updated_at']
 
 
 class FuelCreateUpdateSerializer(FuelDetailSerializer):
-    pass
+    class Meta(FuelDetailSerializer.Meta):
+        read_only_fields = ['id', 'year', 'month', 'month_name', 'monthly_mileage', 'consumption', 'created_at', 'updated_at']
 
 
 class InsuranceListSerializer(serializers.ModelSerializer):

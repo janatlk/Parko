@@ -258,9 +258,10 @@ class FuelViewSet(CompanyScopedModelViewSet):
         'car': ['exact'],
         'year': ['exact'],
         'month': ['exact'],
+        'date': ['exact', 'gte', 'lte'],
     }
-    ordering_fields = ['id', 'year', 'month', 'created_at']
-    ordering = ['-year', '-month', '-id']
+    ordering_fields = ['id', 'date', 'year', 'month', 'created_at']
+    ordering = ['-date', '-id']
 
     def get_permissions(self):
         if self.request.method in ('GET', 'HEAD', 'OPTIONS'):

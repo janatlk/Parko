@@ -10,8 +10,6 @@ type FuelQueryArgs = {
   page: number
   page_size?: number
   car?: number
-  year?: number
-  month?: number
 }
 
 const fuelKeys = {
@@ -24,8 +22,7 @@ export function useFuelQuery(args: FuelQueryArgs) {
     page: args.page,
     page_size: args.page_size,
     car: args.car,
-    year: args.year,
-    month: args.month,
+
   }
 
   return useQuery<PaginatedResponse<Fuel>>({

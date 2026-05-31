@@ -44,7 +44,7 @@ export function CarFormModal({
 
   const initial = useMemo(
     () => ({
-      region: car?.region ?? '',
+      region: car?.region ?? 'Кыргызстан',
       brand: car?.brand ?? '',
       title: car?.title ?? '',
       numplate: car?.numplate ?? '',
@@ -64,7 +64,7 @@ export function CarFormModal({
   }, [initial, opened])
 
   const submit = async () => {
-    if (!form.region.trim()) return
+    // region is optional, defaults to 'Кыргызстан'
     if (!form.brand.trim()) return
     if (!form.title.trim()) return
     if (!form.numplate.trim()) return
@@ -115,7 +115,6 @@ export function CarFormModal({
           label={t('cars.form.region')}
           value={form.region}
           onChange={(valueOrEvent) => setForm((s) => ({ ...s, region: getInputValue(valueOrEvent) }))}
-          required
         />
         <TextInput
           label={t('cars.form.brand')}
@@ -162,7 +161,6 @@ export function CarFormModal({
           data={CAR_STATUSES.map((s) => ({ value: s, label: s }))}
           value={form.status}
           onChange={(value) => value && setForm((s) => ({ ...s, status: value as CarStatus }))}
-          required
         />
 
         <Group justify="flex-end">

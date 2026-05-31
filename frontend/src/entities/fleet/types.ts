@@ -55,11 +55,13 @@ export type Fuel = {
   id: Id
   car: Id
   car_numplate?: string
+  date?: string
   year: number
   month: number
   month_name?: string
   liters: number
   total_cost: number
+  odometer: number
   monthly_mileage: number
   consumption: string
   created_at?: string

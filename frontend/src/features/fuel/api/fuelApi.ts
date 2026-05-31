@@ -6,18 +6,15 @@ export type ListFuelParams = {
   page?: number
   page_size?: number
   car?: number
-  year?: number
-  month?: number
   ordering?: string
 }
 
 export type FuelCreatePayload = {
   car: number
-  year: number
-  month: number
+  date: string
   liters: number
   total_cost: number
-  monthly_mileage: number
+  odometer: number
 }
 
 export type FuelUpdatePayload = Partial<FuelCreatePayload>
@@ -28,8 +25,6 @@ export async function listFuel(params: ListFuelParams = {}): Promise<PaginatedRe
       page: params.page,
       page_size: params.page_size,
       car: params.car,
-      year: params.year,
-      month: params.month,
       ordering: params.ordering,
     },
   })

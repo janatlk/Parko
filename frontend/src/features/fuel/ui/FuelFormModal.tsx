@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 
 import { Button, Group, Modal, NumberInput, Select, Stack, Text } from '@mantine/core'
-import { MonthPickerInput } from '@mantine/dates'
+import { DatePickerInput } from '@mantine/dates'
 import { useTranslation } from 'react-i18next'
 
 import { useCarsQuery } from '@features/cars/hooks/useCars'
@@ -10,6 +10,14 @@ import type { FuelCreatePayload, FuelUpdatePayload } from '../api/fuelApi'
 import type { Fuel } from '@entities/fleet/types'
 
 type Mode = 'create' | 'edit'
+
+type FormState = {
+  car: string | null
+  date: string
+  liters: number
+  total_cost: number
+  odometer: number
+}
 
 type Props = {
   opened: boolean
@@ -31,21 +39,19 @@ export function FuelFormModal({
   isSubmitting,
 }: Props) {
   const { t } = useTranslation()
-  const now = useMemo(() => new Date(), [])
+
   const initial = useMemo(
     () => ({
-      car: record ? String(record.car) : null as string | null,
-      date: record
-        ? new Date(record.year, (record.month || 1) - 1)
-        : (now as Date | string),
+      car: record ? String(record.car) : (null as string | null),
+      date: record?.date ? String(record.date).split('T')[0] : new Date().toISOString().split('T')[0],
       liters: record?.liters ?? 0,
       total_cost: record?.total_cost ?? 0,
-      monthly_mileage: record?.monthly_mileage ?? 0,
+      odometer: record?.odometer ?? 0,
     }),
-    [record, now],
+    [record],
   )
 
-  const [form, setForm] = useState<typeof initial>(initial)
+  const [form, setForm] = useState<FormState>(initial)
 
   useEffect(() => {
     if (opened) setForm(initial)
@@ -66,16 +72,15 @@ export function FuelFormModal({
     if (!carId || Number.isNaN(carId)) return
     if (!form.date) return
 
-    const dateObj = form.date instanceof Date ? form.date : new Date(form.date)
+    const dateStr = form.date
 
     if (mode === 'edit' && record) {
       await onUpdate(record.id, {
         car: carId,
-        year: dateObj.getFullYear(),
-        month: dateObj.getMonth() + 1,
+        date: dateStr,
         liters: form.liters,
         total_cost: form.total_cost,
-        monthly_mileage: form.monthly_mileage,
+        odometer: form.odometer,
       })
       onClose()
       return
@@ -83,11 +88,10 @@ export function FuelFormModal({
 
     const payload: FuelCreatePayload = {
       car: carId,
-      year: dateObj.getFullYear(),
-      month: dateObj.getMonth() + 1,
+      date: dateStr,
       liters: form.liters,
       total_cost: form.total_cost,
-      monthly_mileage: form.monthly_mileage,
+      odometer: form.odometer,
     }
 
     await onCreate(payload)
@@ -115,13 +119,13 @@ export function FuelFormModal({
           disabled={isCarsLoading || isCarsError}
         />
 
-        <MonthPickerInput
-          label={t('fuel.form.period')}
-          placeholder={t('fuel.form.select_period')}
+        <DatePickerInput
+          label={t('fuel.form.date')}
+          placeholder={t('fuel.form.select_date')}
           value={form.date}
           onChange={(value) => {
             if (value) {
-              setForm((s) => ({ ...s, date: value }))
+              setForm((s) => ({ ...s, date: String(value) }))
             }
           }}
           required
@@ -144,9 +148,9 @@ export function FuelFormModal({
         />
 
         <NumberInput
-          label={t('fuel.form.monthly_mileage')}
-          value={form.monthly_mileage}
-          onChange={(value) => setForm((s) => ({ ...s, monthly_mileage: Number(value || 0) }))}
+          label={t('fuel.form.odometer')}
+          value={form.odometer}
+          onChange={(value) => setForm((s) => ({ ...s, odometer: Number(value || 0) }))}
           min={0}
           required
         />
