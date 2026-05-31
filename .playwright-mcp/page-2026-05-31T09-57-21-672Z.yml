@@ -1,0 +1,247 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - generic [ref=e6] [cursor=pointer]:
+        - img [ref=e7]
+        - paragraph [ref=e11]: PARKO
+      - generic [ref=e12]:
+        - paragraph [ref=e13] [cursor=pointer]: Возможности
+        - paragraph [ref=e14] [cursor=pointer]: О системе
+        - paragraph [ref=e15] [cursor=pointer]: Контакты
+      - generic [ref=e16]:
+        - generic [ref=e18]:
+          - img [ref=e20]
+          - textbox [ref=e25] [cursor=pointer]: RU
+          - generic:
+            - img
+        - button "Демо" [ref=e26] [cursor=pointer]:
+          - generic [ref=e28]: Демо
+        - button "Войти" [ref=e29] [cursor=pointer]:
+          - generic [ref=e31]: Войти
+  - generic [ref=e37]:
+    - generic [ref=e39]:
+      - generic [ref=e41]: SaaS платформа v2.0
+      - heading "Управление автопарком нового поколения" [level=1] [ref=e42]
+      - paragraph [ref=e43]: Parko — современная SaaS-система для эффективного управления корпоративным транспортом. Контроль топлива, ТО, отчёты в реальном времени.
+      - generic [ref=e44]:
+        - button "Начать работу" [ref=e45] [cursor=pointer]:
+          - generic [ref=e47]: Начать работу
+        - button "Демо доступ" [ref=e48] [cursor=pointer]:
+          - generic [ref=e49]:
+            - generic [ref=e50]: Демо доступ
+            - img [ref=e52]
+      - generic [ref=e55]:
+        - generic [ref=e56]:
+          - paragraph [ref=e57]: 500+
+          - paragraph [ref=e58]: Клиентов
+        - generic [ref=e59]:
+          - paragraph [ref=e60]: 15 000+
+          - paragraph [ref=e61]: Автомобилей
+        - generic [ref=e62]:
+          - paragraph [ref=e63]: 30%
+          - paragraph [ref=e64]: Экономия топлива
+        - generic [ref=e65]:
+          - paragraph [ref=e66]: 99.9%
+          - paragraph [ref=e67]: Uptime
+    - generic [ref=e69]:
+      - img "Dashboard Preview"
+      - generic [ref=e71]:
+        - paragraph [ref=e72]: Панель управления
+        - generic [ref=e74]: Real-time
+  - generic [ref=e76]:
+    - paragraph [ref=e77]: Возможности
+    - heading "Всё для управления автопарком" [level=2] [ref=e78]
+    - generic [ref=e80]:
+      - generic [ref=e82]:
+        - img [ref=e83]
+        - paragraph [ref=e87]: Управление автопарком
+        - paragraph [ref=e88]: Полный учёт машин, водителей и документов в единой системе
+        - generic [ref=e89]:
+          - paragraph [ref=e90]: 100+
+          - paragraph [ref=e91]: компаний
+      - generic [ref=e93]:
+        - img [ref=e94]
+        - paragraph [ref=e98]: Контроль топлива
+        - paragraph [ref=e99]: Отслеживание расхода топлива и пробега с аналитикой
+        - generic [ref=e100]:
+          - paragraph [ref=e101]: 30%
+          - paragraph [ref=e102]: экономия
+      - generic [ref=e104]:
+        - img [ref=e105]
+        - paragraph [ref=e107]: Техническое обслуживание
+        - paragraph [ref=e108]: Планирование и учёт всех видов ТО и ремонтов
+        - generic [ref=e109]:
+          - paragraph [ref=e110]: 24/7
+          - paragraph [ref=e111]: мониторинг
+      - generic [ref=e113]:
+        - img [ref=e114]
+        - paragraph [ref=e117]: Отчёты и аналитика
+        - paragraph [ref=e118]: Детальные отчёты с экспортом в Excel и PDF
+        - generic [ref=e119]:
+          - paragraph [ref=e120]: 15+
+          - paragraph [ref=e121]: видов отчётов
+  - generic [ref=e125]:
+    - generic [ref=e127]:
+      - img "Analytics"
+    - generic [ref=e128]:
+      - paragraph [ref=e129]: Преимущества
+      - heading "Почему выбирают Parko" [level=2] [ref=e130]
+      - generic [ref=e131]:
+        - generic [ref=e132]:
+          - img [ref=e134]
+          - generic [ref=e136]:
+            - paragraph [ref=e137]: Надёжность
+            - paragraph [ref=e138]: Защита данных и стабильная работа
+        - generic [ref=e139]:
+          - img [ref=e141]
+          - generic [ref=e144]:
+            - paragraph [ref=e145]: Экономия времени
+            - paragraph [ref=e146]: Автоматизация рутинных задач
+        - generic [ref=e147]:
+          - img [ref=e149]
+          - generic [ref=e153]:
+            - paragraph [ref=e154]: Аналитика
+            - paragraph [ref=e155]: Полная статистика по автопарку
+        - generic [ref=e156]:
+          - img [ref=e158]
+          - generic [ref=e160]:
+            - paragraph [ref=e161]: Доступность
+            - paragraph [ref=e162]: Работа с любого устройства
+  - generic [ref=e164]:
+    - paragraph [ref=e165]: О системе
+    - heading "Комплексный подход к управлению" [level=2] [ref=e166]
+    - generic [ref=e167]:
+      - generic [ref=e168]:
+        - img [ref=e169]
+        - generic [ref=e170]:
+          - paragraph [ref=e171]: Мониторинг
+          - paragraph [ref=e172]: Отслеживание всех показателей в реальном времени
+      - generic [ref=e173]:
+        - img [ref=e174]
+        - generic [ref=e175]:
+          - paragraph [ref=e176]: Аналитика
+          - paragraph [ref=e177]: Глубокий анализ данных для оптимизации
+      - generic [ref=e178]:
+        - img [ref=e179]
+        - generic [ref=e180]:
+          - paragraph [ref=e181]: Отчётность
+          - paragraph [ref=e182]: Готовые отчёты для руководства и госорганов
+  - generic [ref=e184]:
+    - paragraph [ref=e185]: Тарифы
+    - heading "Прозрачное ценообразование" [level=2] [ref=e186]
+    - generic [ref=e188]:
+      - generic [ref=e190]:
+        - paragraph [ref=e191]: Старт
+        - generic [ref=e192]:
+          - paragraph [ref=e193]: "990"
+          - paragraph [ref=e194]: сом/мес
+        - generic [ref=e195]:
+          - generic [ref=e196]:
+            - img [ref=e197]
+            - paragraph [ref=e199]: До 10 автомобилей
+          - generic [ref=e200]:
+            - img [ref=e201]
+            - paragraph [ref=e203]: Базовые отчёты
+          - generic [ref=e204]:
+            - img [ref=e205]
+            - paragraph [ref=e207]: Учёт топлива
+          - generic [ref=e208]:
+            - img [ref=e209]
+            - paragraph [ref=e211]: Email поддержка
+        - button "Выбрать тариф" [ref=e212] [cursor=pointer]:
+          - generic [ref=e214]: Выбрать тариф
+      - generic [ref=e216]:
+        - generic [ref=e218]: Популярный
+        - paragraph [ref=e219]: Бизнес
+        - generic [ref=e220]:
+          - paragraph [ref=e221]: "2490"
+          - paragraph [ref=e222]: сом/мес
+        - generic [ref=e223]:
+          - generic [ref=e224]:
+            - img [ref=e225]
+            - paragraph [ref=e227]: До 50 автомобилей
+          - generic [ref=e228]:
+            - img [ref=e229]
+            - paragraph [ref=e231]: Все отчёты
+          - generic [ref=e232]:
+            - img [ref=e233]
+            - paragraph [ref=e235]: ТО и ремонты
+          - generic [ref=e236]:
+            - img [ref=e237]
+            - paragraph [ref=e239]: Приоритетная поддержка
+          - generic [ref=e240]:
+            - img [ref=e241]
+            - paragraph [ref=e243]: API доступ
+        - button "Выбрать тариф" [ref=e244] [cursor=pointer]:
+          - generic [ref=e246]: Выбрать тариф
+      - generic [ref=e248]:
+        - paragraph [ref=e249]: Корпорация
+        - generic [ref=e250]:
+          - paragraph [ref=e251]: "4990"
+          - paragraph [ref=e252]: сом/мес
+        - generic [ref=e253]:
+          - generic [ref=e254]:
+            - img [ref=e255]
+            - paragraph [ref=e257]: Без ограничений
+          - generic [ref=e258]:
+            - img [ref=e259]
+            - paragraph [ref=e261]: Индивидуальные отчёты
+          - generic [ref=e262]:
+            - img [ref=e263]
+            - paragraph [ref=e265]: Персональный менеджер
+          - generic [ref=e266]:
+            - img [ref=e267]
+            - paragraph [ref=e269]: Обучение сотрудников
+          - generic [ref=e270]:
+            - img [ref=e271]
+            - paragraph [ref=e273]: SLA
+        - button "Выбрать тариф" [ref=e274] [cursor=pointer]:
+          - generic [ref=e276]: Выбрать тариф
+  - generic [ref=e278]:
+    - paragraph [ref=e279]: Контакты
+    - heading "Связаться с нами" [level=2] [ref=e280]
+    - generic [ref=e282]:
+      - generic [ref=e284]:
+        - paragraph [ref=e285]: Оставьте заявку и мы свяжемся с вами в ближайшее время для обсуждения деталей.
+        - generic [ref=e286]:
+          - img [ref=e288]
+          - generic [ref=e291]:
+            - paragraph [ref=e292]: Email
+            - paragraph [ref=e293]: info@parko.kg
+        - generic [ref=e294]:
+          - img [ref=e296]
+          - generic [ref=e298]:
+            - paragraph [ref=e299]: Телефон
+            - paragraph [ref=e300]: +996 (555) 123-456
+        - generic [ref=e301]:
+          - img [ref=e303]
+          - generic [ref=e306]:
+            - paragraph [ref=e307]: Адрес
+            - paragraph [ref=e308]: Бишкек, Кыргызстан
+      - generic [ref=e312]:
+        - generic [ref=e314]:
+          - generic [ref=e316]:
+            - generic [ref=e317]: Имя
+            - textbox "Имя" [ref=e319]:
+              - /placeholder: Ваше имя
+          - generic [ref=e321]:
+            - generic [ref=e322]: Email
+            - textbox "Email" [ref=e324]:
+              - /placeholder: email@example.com
+        - generic [ref=e325]:
+          - generic [ref=e326]: Сообщение
+          - textbox "Сообщение" [ref=e328]:
+            - /placeholder: Ваше сообщение...
+        - button "Отправить сообщение" [ref=e329] [cursor=pointer]:
+          - generic [ref=e331]: Отправить сообщение
+  - generic [ref=e333]:
+    - separator [ref=e334]
+    - generic [ref=e336]:
+      - generic [ref=e337]:
+        - generic [ref=e338]:
+          - img [ref=e339]
+          - paragraph [ref=e343]: PARKO
+        - paragraph [ref=e344]: © 2026 Parko. Fleet Management System. Все права защищены.
+      - generic [ref=e346]:
+        - paragraph [ref=e347] [cursor=pointer]: Политика конфиденциальности
+        - paragraph [ref=e348] [cursor=pointer]: Условия использования
