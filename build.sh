@@ -74,13 +74,13 @@ else:
 # Create demo cars only if none exist (idempotent for persistent DB)
 if not Car.objects.filter(company=company).exists():
     cars_data = [
-        {'numplate': 'A001AA', 'brand': 'Toyota', 'model': 'Camry', 'vin': 'DEMO1234567890001'},
-        {'numplate': 'B002BB', 'brand': 'BMW', 'model': 'X5', 'vin': 'DEMO1234567890002'},
-        {'numplate': 'C003CC', 'brand': 'Mercedes', 'model': 'E-Class', 'vin': 'DEMO1234567890003'},
+        {'numplate': 'A001AA', 'brand': 'Toyota', 'title': 'Camry', 'vin': 'DEMO1234567890001'},
+        {'numplate': 'B002BB', 'brand': 'BMW', 'title': 'X5', 'vin': 'DEMO1234567890002'},
+        {'numplate': 'C003CC', 'brand': 'Mercedes', 'title': 'E-Class', 'vin': 'DEMO1234567890003'},
     ]
     cars = []
     for c in cars_data:
-        car = Car.objects.create(company=company, numplate=c['numplate'], brand=c['brand'], vin=c['vin'], status='active')
+        car = Car.objects.create(company=company, numplate=c['numplate'], brand=c['brand'], title=c['title'], vin=c['vin'], status='active')
         cars.append(car)
         today = date.today()
         for m in range(3):
@@ -89,7 +89,9 @@ if not Car.objects.filter(company=company).exists():
             while month <= 0:
                 month += 12
                 year -= 1
-            Fuel.objects.create(car=car, year=year, month=month, liters=random.randint(100,300), total_cost=random.randint(5000,15000), monthly_mileage=random.randint(500,2000))
+            fuel_date = date(year, month, 1)
+            odometer = 10000 + m * random.randint(500,2000)
+            Fuel.objects.create(car=car, date=fuel_date, odometer=odometer, liters=random.randint(100,300), total_cost=random.randint(5000,15000), monthly_mileage=random.randint(500,2000))
         Insurance.objects.create(car=car, insurance_type='OSAGO', number=f'DEMO-{car.numplate}-OSAGO', start_date=date.today()-timedelta(days=30), end_date=date.today()+timedelta(days=335), cost=random.randint(5000,10000))
         Inspection.objects.create(car=car, number=f'DEMO-{car.numplate}-INSP', inspected_at=date.today()-timedelta(days=15), cost=random.randint(1000,3000))
     print(f'Created {len(cars)} demo cars with fuel/insurance/inspection data')
