@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useMediaQuery } from '@mantine/hooks'
 
 import {
   ActionIcon,
@@ -6,6 +7,7 @@ import {
   Avatar,
   Box,
   Button,
+  Drawer,
   Group,
   Loader,
   Paper,
@@ -86,6 +88,119 @@ function formatDate(iso: string): string {
   }
 }
 
+type SidebarPanelProps = {
+  isDark: boolean
+  conversations: { id: number; title: string; updated_at: string }[]
+  isLoadingConversations: boolean
+  currentConversationId: number | null
+  onNewChat: () => void
+  onSelectConversation: (id: number) => void
+  onDeleteClick: (id: number) => void
+  onCloseDrawer?: () => void
+}
+
+function SidebarPanel({
+  isDark,
+  conversations,
+  isLoadingConversations,
+  currentConversationId,
+  onNewChat,
+  onSelectConversation,
+  onDeleteClick,
+  onCloseDrawer,
+}: SidebarPanelProps) {
+  return (
+    <>
+      {/* New Chat Button */}
+      <Box p="md" style={{ borderBottom: `1px solid ${isDark ? '#2C2E33' : 'var(--mantine-color-gray-3)'}` }}>
+        <Button
+          fullWidth
+          leftSection={<IconPlus size={18} />}
+          onClick={() => {
+            onNewChat()
+            onCloseDrawer?.()
+          }}
+          variant="light"
+          size="md"
+        >
+          Новый чат
+        </Button>
+      </Box>
+
+      {/* Conversations List */}
+      <ScrollArea style={{ flex: 1 }}>
+        <Stack gap={2} p="xs">
+          {isLoadingConversations ? (
+            <Group justify="center" p="xl">
+              <Loader size="sm" />
+            </Group>
+          ) : conversations.length === 0 ? (
+            <Box p="xl" ta="center">
+              <IconMessage size={32} stroke={1.5} opacity={0.3} />
+              <Text size="sm" c="dimmed" mt="sm">
+                Нет истории чатов
+              </Text>
+            </Box>
+          ) : (
+            conversations.map((conv) => (
+              <Group
+                key={conv.id}
+                gap="xs"
+                p="xs"
+                style={{
+                  borderRadius: 'var(--mantine-radius-md)',
+                  cursor: 'pointer',
+                  background:
+                    currentConversationId === conv.id
+                      ? (isDark ? 'rgba(255,255,255,0.06)' : 'var(--mantine-color-gray-2)')
+                      : 'transparent',
+                  transition: 'all 0.15s ease',
+                }}
+                onClick={() => {
+                  onSelectConversation(conv.id)
+                  onCloseDrawer?.()
+                }}
+              >
+                <Avatar size={32} radius="md" color="blue" variant="light">
+                  <IconMessage size={16} />
+                </Avatar>
+                <Box style={{ flex: 1, minWidth: 0 }}>
+                  <Text size="sm" fw={500} truncate>
+                    {conv.title}
+                  </Text>
+                  <Text size="xs" c="dimmed">
+                    {formatDate(conv.updated_at)}
+                  </Text>
+                </Box>
+                <Menu position="right-start" width={150}>
+                  <Menu.Target>
+                    <ActionIcon
+                      variant="subtle"
+                      size="sm"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <IconDotsVertical size={14} />
+                    </ActionIcon>
+                  </Menu.Target>
+                  <Menu.Dropdown>
+                    <Menu.Item
+                      color="red"
+                      leftSection={<IconTrash size={14} />}
+                      onClick={() => onDeleteClick(conv.id)}
+                    >
+                      Удалить
+                    </Menu.Item>
+                  </Menu.Dropdown>
+                </Menu>
+              </Group>
+            ))
+          )}
+        </Stack>
+      </ScrollArea>
+    </>
+  )
+}
+
 export function AIPage() {
   const { t } = useTranslation()
 
@@ -99,6 +214,7 @@ export function AIPage() {
   const [conversationToDelete, setConversationToDelete] = useState<number | null>(null)
   const { colorScheme } = useMantineColorScheme()
   const isDark = colorScheme === 'dark'
+  const isMobile = useMediaQuery('(max-width: 768px)')
 
   const scrollRef = useRef<HTMLDivElement>(null)
   const viewportRef = useRef<HTMLDivElement>(null)
@@ -152,6 +268,7 @@ export function AIPage() {
     setExecutions([])
     messageIdCounter.current = 0
     setInput('')
+    localStorage.removeItem('ai_last_conversation_id')
   }, [])
 
   // Send message
@@ -284,12 +401,36 @@ export function AIPage() {
         // If we deleted the current conversation, start new chat
         if (currentConversationId === conversationToDelete) {
           handleNewChat()
+        } else {
+          // If deleted conversation was saved as last, clear it
+          const saved = localStorage.getItem('ai_last_conversation_id')
+          if (saved && Number(saved) === conversationToDelete) {
+            localStorage.removeItem('ai_last_conversation_id')
+          }
         }
         setDeleteModalOpen(false)
         setConversationToDelete(null)
       },
     })
   }, [conversationToDelete, currentConversationId, deleteConversation, handleNewChat])
+
+  // Persist / restore last conversation ID
+  useEffect(() => {
+    const saved = localStorage.getItem('ai_last_conversation_id')
+    if (saved) {
+      const id = Number(saved)
+      if (!Number.isNaN(id) && id > 0) {
+        loadConversation(id)
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    if (currentConversationId) {
+      localStorage.setItem('ai_last_conversation_id', String(currentConversationId))
+    }
+  }, [currentConversationId])
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -302,102 +443,60 @@ export function AIPage() {
 
   return (
     <Box style={{ height: 'calc(100vh - 140px)', display: 'flex', gap: 0 }}>
-      {/* Sidebar - GPT style */}
-      {sidebarOpen && (
-        <Box
-          style={{
-            width: 260,
-            flexShrink: 0,
-            background: isDark ? '#141517' : 'var(--mantine-color-gray-0)',
-            borderRight: `1px solid ${isDark ? '#2C2E33' : 'var(--mantine-color-gray-3)'}`,
-            display: 'flex',
-            flexDirection: 'column',
+      {/* Sidebar / Drawer */}
+      {isMobile ? (
+        <Drawer
+          opened={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+          position="left"
+          size="280px"
+          padding={0}
+          withCloseButton={false}
+          styles={{
+            body: { padding: 0, display: 'flex', flexDirection: 'column', height: '100%' },
+            content: { background: isDark ? '#141517' : 'var(--mantine-color-gray-0)' },
           }}
         >
-          {/* New Chat Button */}
-          <Box p="md" style={{ borderBottom: `1px solid ${isDark ? '#2C2E33' : 'var(--mantine-color-gray-3)'}` }}>
-            <Button
-              fullWidth
-              leftSection={<IconPlus size={18} />}
-              onClick={handleNewChat}
-              variant="light"
-              size="md"
-            >
-              Новый чат
-            </Button>
+          <SidebarPanel
+            isDark={isDark}
+            conversations={conversations}
+            isLoadingConversations={isLoadingConversations}
+            currentConversationId={currentConversationId}
+            onNewChat={handleNewChat}
+            onSelectConversation={loadConversation}
+            onDeleteClick={(id) => {
+              setConversationToDelete(id)
+              setDeleteModalOpen(true)
+            }}
+            onCloseDrawer={() => setSidebarOpen(false)}
+          />
+        </Drawer>
+      ) : (
+        sidebarOpen && (
+          <Box
+            style={{
+              width: 260,
+              flexShrink: 0,
+              background: isDark ? '#141517' : 'var(--mantine-color-gray-0)',
+              borderRight: `1px solid ${isDark ? '#2C2E33' : 'var(--mantine-color-gray-3)'}`,
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+            <SidebarPanel
+              isDark={isDark}
+              conversations={conversations}
+              isLoadingConversations={isLoadingConversations}
+              currentConversationId={currentConversationId}
+              onNewChat={handleNewChat}
+              onSelectConversation={loadConversation}
+              onDeleteClick={(id) => {
+                setConversationToDelete(id)
+                setDeleteModalOpen(true)
+              }}
+            />
           </Box>
-
-          {/* Conversations List */}
-          <ScrollArea style={{ flex: 1 }}>
-            <Stack gap={2} p="xs">
-              {isLoadingConversations ? (
-                <Group justify="center" p="xl">
-                  <Loader size="sm" />
-                </Group>
-              ) : conversations.length === 0 ? (
-                <Box p="xl" ta="center">
-                  <IconMessage size={32} stroke={1.5} opacity={0.3} />
-                  <Text size="sm" c="dimmed" mt="sm">
-                    Нет истории чатов
-                  </Text>
-                </Box>
-              ) : (
-                conversations.map((conv) => (
-                  <Group
-                    key={conv.id}
-                    gap="xs"
-                    p="xs"
-                    style={{
-                      borderRadius: 'var(--mantine-radius-md)',
-                      cursor: 'pointer',
-                      background:
-                        currentConversationId === conv.id
-                          ? (isDark ? 'rgba(255,255,255,0.06)' : 'var(--mantine-color-gray-2)')
-                          : 'transparent',
-                      transition: 'all 0.15s ease',
-                    }}
-                    onClick={() => loadConversation(conv.id)}
-                  >
-                    <Avatar size={32} radius="md" color="blue" variant="light">
-                      <IconMessage size={16} />
-                    </Avatar>
-                    <Box style={{ flex: 1, minWidth: 0 }}>
-                      <Text size="sm" fw={500} truncate>
-                        {conv.title}
-                      </Text>
-                      <Text size="xs" c="dimmed">
-                        {formatDate(conv.updated_at)}
-                      </Text>
-                    </Box>
-                    <Menu position="right-start" width={150}>
-                      <Menu.Target>
-                        <ActionIcon
-                          variant="subtle"
-                          size="sm"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <IconDotsVertical size={14} />
-                        </ActionIcon>
-                      </Menu.Target>
-                      <Menu.Dropdown>
-                        <Menu.Item
-                          color="red"
-                          leftSection={<IconTrash size={14} />}
-                          onClick={() => {
-                            setConversationToDelete(conv.id)
-                            setDeleteModalOpen(true)
-                          }}
-                        >
-                          Удалить
-                        </Menu.Item>
-                      </Menu.Dropdown>
-                    </Menu>
-                  </Group>
-                ))
-              )}
-            </Stack>
-          </ScrollArea>
-        </Box>
+        )
       )}
 
       {/* Main Chat Area */}
