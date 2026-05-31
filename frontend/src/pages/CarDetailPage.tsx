@@ -440,8 +440,9 @@ function FuelTable({ data }: { data: any }) {
       </Group>
       <ModernTable
         columns={[
-          { key: 'period', title: t('fuel.table.period'), width: 140 },
+          { key: 'date', title: t('fuel.table.date'), width: 120 },
           { key: 'liters', title: t('fuel.table.liters'), width: 100 },
+          { key: 'odometer', title: t('fuel.table.odometer'), width: 120 },
           { key: 'mileage', title: t('fuel.table.mileage'), width: 120 },
           { key: 'consumption', title: t('fuel.table.consumption'), width: 130 },
           { key: 'cost', title: t('fuel.table.total_cost'), width: 120 },
@@ -451,11 +452,9 @@ function FuelTable({ data }: { data: any }) {
           <ModernTableRow
             key={record.id}
             cells={[
-              <TableCell key="period" fw={500}>
-                {record.year}-{String(record.month).padStart(2, '0')}{' '}
-                {record.month_name && <Text component="span" c="dimmed" size="xs">({record.month_name})</Text>}
-              </TableCell>,
+              <TableCell key="date" fw={500}>{record.date}</TableCell>,
               <TableCell key="liters">{record.liters} L</TableCell>,
+              <TableCell key="odometer">{record.odometer} km</TableCell>,
               <TableCell key="mileage">{record.monthly_mileage} km</TableCell>,
               <TableCell key="consumption">{record.consumption} L/100km</TableCell>,
               <TableCell key="cost" fw={500}>{formatPrice(record.total_cost, currency)}</TableCell>,
