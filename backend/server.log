@@ -793,3 +793,23 @@ INFO 2026-05-31 14:33:34,498 basehttp "GET /api/v1/auth/me/ HTTP/1.1" 200 254
 INFO 2026-05-31 14:33:34,700 basehttp "GET /api/v1/ai/conversations/99/ HTTP/1.1" 200 5185
 INFO 2026-05-31 14:33:34,705 basehttp "GET /api/v1/ai/suggestions/ HTTP/1.1" 200 46
 INFO 2026-05-31 14:33:34,708 basehttp "GET /api/v1/ai/conversations/ HTTP/1.1" 200 2171
+INFO 2026-05-31 14:59:57,621 autoreload C:\Parko\backend\config\urls.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+May 31, 2026 - 13:57:21
+Django version 4.2.27, using settings 'config.settings.dev'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CTRL-BREAK.
+
+INFO 2026-05-31 14:59:59,028 autoreload Watching for file changes with StatReloader
+INFO 2026-05-31 15:00:17,237 autoreload C:\Parko\backend\config\wsgi.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+May 31, 2026 - 14:59:59
+Django version 4.2.27, using settings 'config.settings.dev'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CTRL-BREAK.
+
+INFO 2026-05-31 15:00:18,141 autoreload Watching for file changes with StatReloader

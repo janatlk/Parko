@@ -1,0 +1,94 @@
+- generic [ref=e2]:
+  - link "Skip to content" [ref=e3] [cursor=pointer]:
+    - /url: "#start-of-content"
+  - main [ref=e7]:
+    - generic [ref=e8]:
+      - generic [ref=e9]:
+        - generic [ref=e11]:
+          - img "Render" [ref=e13]
+          - img [ref=e15]
+          - img [ref=e18]
+        - heading "Render by Render wants access to your GitHub account" [level=1] [ref=e20]:
+          - generic [ref=e21]:
+            - link "Render" [ref=e22] [cursor=pointer]:
+              - /url: /apps/render
+            - text: by
+            - link "Render" [ref=e23] [cursor=pointer]:
+              - /url: /renderinc
+          - generic [ref=e24]: wants access to your GitHub account
+      - generic [ref=e25]:
+        - generic [ref=e27]:
+          - heading "Authorizing allows this app to" [level=2] [ref=e28]
+          - list [ref=e29]:
+            - listitem [ref=e30]:
+              - img [ref=e31]
+              - text: Verify your GitHub identity (janatlk)
+            - listitem [ref=e33]:
+              - img [ref=e34]
+              - text: Know which resources you can access
+            - listitem [ref=e36]:
+              - img [ref=e37]
+              - generic [ref=e39]:
+                - text: Act on your behalf
+                - link "What does this mean?" [ref=e40] [cursor=pointer]:
+                  - /url: https://docs.github.com/apps/using-github-apps/authorizing-github-apps#about-github-apps-acting-on-your-behalf
+          - paragraph [ref=e41]: Resources on your account
+          - generic [ref=e42]:
+            - img [ref=e43]
+            - strong [ref=e45]: Email addresses (read)
+            - generic [ref=e46]: View your email addresses
+          - list [ref=e47]:
+            - listitem [ref=e48]:
+              - img [ref=e50]
+              - generic [ref=e52]:
+                - link "Render" [ref=e53] [cursor=pointer]:
+                  - /url: /apps/render
+                - text: is not owned or operated by GitHub
+            - listitem [ref=e54]:
+              - img [ref=e56]
+              - generic [ref=e58]: Created 8 years ago
+            - listitem [ref=e59]:
+              - img [ref=e61]
+              - generic [ref=e63]: More than 1K GitHub users
+        - generic [ref=e66]:
+          - button "Authorize" [disabled] [ref=e67]
+          - button "Cancel" [ref=e68] [cursor=pointer]
+        - paragraph [ref=e70]:
+          - text: Authorizing will redirect to
+          - strong [ref=e71]: https://dashboard.render.com
+  - contentinfo [ref=e72]:
+    - heading "Footer" [level=2] [ref=e73]
+    - generic [ref=e74]:
+      - generic [ref=e75]:
+        - link "GitHub Homepage" [ref=e76] [cursor=pointer]:
+          - /url: https://github.com
+          - img [ref=e77]
+        - generic [ref=e79]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=e80]:
+        - heading "Footer navigation" [level=3] [ref=e81]
+        - list "Footer navigation" [ref=e82]:
+          - listitem [ref=e83]:
+            - link "Terms" [ref=e84] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=e85]:
+            - link "Privacy" [ref=e86] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=e87]:
+            - link "Security" [ref=e88] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=e89]:
+            - link "Status" [ref=e90] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=e91]:
+            - link "Community" [ref=e92] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=e93]:
+            - link "Docs" [ref=e94] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=e95]:
+            - link "Contact" [ref=e96] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=e97]:
+            - button "Manage cookies" [ref=e99] [cursor=pointer]
+          - listitem [ref=e100]:
+            - button "Do not share my personal information" [ref=e102] [cursor=pointer]

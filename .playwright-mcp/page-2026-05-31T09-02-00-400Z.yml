@@ -1,0 +1,15 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - link "Render" [ref=e5] [cursor=pointer]:
+        - /url: https://render.com/
+        - img "Render" [ref=e6]
+    - generic [ref=e37]:
+      - heading "Almost there!" [level=1] [ref=e38]
+      - generic [ref=e40]:
+        - generic [ref=e41]:
+          - generic [ref=e42]: We’ve sent you an email at janat00991@gmail.com.
+          - generic [ref=e43]: Please follow the instructions in the email.
+        - button "Resend Verification Email" [ref=e45] [cursor=pointer]
+  - iframe [ref=e36]:
+    

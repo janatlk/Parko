@@ -1,0 +1,37 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - link "Render" [ref=e5] [cursor=pointer]:
+        - /url: https://render.com/
+        - img "Render" [ref=e6]
+    - generic [ref=e16]:
+      - heading "Create an account" [level=1] [ref=e17]
+      - generic [ref=e19]:
+        - generic [ref=e21]: One last step — please confirm your email below.
+        - generic [ref=e22]:
+          - generic [ref=e24]:
+            - generic [ref=e25]: Email
+            - textbox "Email" [ref=e27]:
+              - /placeholder: your@email.com
+              - text: janat00991@gmail.com
+          - generic [ref=e28]:
+            - text: By signing up you agree to our
+            - link "terms of service" [ref=e29] [cursor=pointer]:
+              - /url: https://render.com/terms
+            - text: and
+            - link "privacy policy." [ref=e30] [cursor=pointer]:
+              - /url: https://render.com/privacy
+          - button "Create Account" [ref=e31] [cursor=pointer]
+        - generic [ref=e32]:
+          - text: This site is protected by
+          - link "hCaptcha." [ref=e33] [cursor=pointer]:
+            - /url: https://www.hCaptcha.com
+          - text: Its
+          - link "Privacy Policy" [ref=e34] [cursor=pointer]:
+            - /url: https://www.hcaptcha.com/privacy
+          - text: and
+          - link "Terms of Service" [ref=e35] [cursor=pointer]:
+            - /url: https://www.hcaptcha.com/terms
+          - text: apply.
+  - iframe [ref=e36]:
+    

@@ -17,14 +17,14 @@ cd backend
 # Install Python dependencies
 pip install -r requirements.txt
 
-# Copy frontend build to static files directory for WhiteNoise
-mkdir -p staticfiles
-cp -r ../frontend/dist/* staticfiles/ 2>/dev/null || true
+# Copy frontend build to static directory for collectstatic
+mkdir -p static
+cp -r ../frontend/dist/* static/ 2>/dev/null || true
 
 # Run migrations
 python manage.py migrate --settings=config.settings.render
 
 # Collect static files
-python manage.py collectstatic --no-input --settings=config.settings.render
+python manage.py collectstatic --no-input --clear --settings=config.settings.render
 
 echo "=== Build complete ==="
