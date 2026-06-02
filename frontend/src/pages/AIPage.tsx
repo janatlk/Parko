@@ -442,7 +442,7 @@ export function AIPage() {
   const isEmpty = localMessages.length === 0 && !isPending
 
   return (
-    <Box style={{ height: 'calc(100vh - 140px)', display: 'flex', gap: 0 }}>
+    <Box style={{ height: 'calc(100dvh - 140px)', display: 'flex', gap: 0 }}>
       {/* Sidebar / Drawer */}
       {isMobile ? (
         <Drawer
