@@ -89,7 +89,8 @@ export function SavedReportsList({ reports, isLoading, onView, onExport }: Saved
         {t('reports.saved_reports') || 'Saved Reports'}
       </Title>
 
-      <Table striped highlightOnHover withTableBorder>
+      <div style={{ overflowX: 'auto' }}>
+        <Table striped highlightOnHover withTableBorder>
         <Table.Thead>
           <Table.Tr>
             <Table.Th>{t('reports.name') || 'Name'}</Table.Th>
@@ -170,6 +171,7 @@ export function SavedReportsList({ reports, isLoading, onView, onExport }: Saved
           ))}
         </Table.Tbody>
       </Table>
+      </div>
     </Paper>
   )
 }

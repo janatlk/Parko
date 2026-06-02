@@ -91,7 +91,6 @@ function ChartRenderer({ chart }: { chart: ChartData }) {
                 dataKey={dataset.label}
                 fill={dataset.backgroundColor as string}
                 name={dataset.label}
-                activeBar={false}
                 isAnimationActive={false}
               />
             ))}

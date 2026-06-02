@@ -345,6 +345,32 @@ export function AppLayout() {
             styles={() => getNavStyles(isDark, activePath.startsWith('/ai'))}
           />
         </Stack>
+
+        <Stack gap="sm" mt="auto" py="sm" hiddenFrom="sm">
+          <Divider />
+          <ThemeToggle />
+          <Select
+            leftSection={<IconLanguage size={14} />}
+            data={LANGUAGES.map((l) => ({ value: l, label: l.toUpperCase() }))}
+            value={user?.language ?? 'ru'}
+            onChange={(value) => {
+              if (!value || !user) return
+              void i18n.changeLanguage(value)
+              showSuccess(t('common.language_changed', { lang: value.toUpperCase() }))
+              queryClient.invalidateQueries({ queryKey: ['dashboard', 'insights'] })
+              void (async () => {
+                try {
+                  const updated = await patchMeApi({ language: value as typeof user.language })
+                  setUser(updated)
+                } catch {
+                  setUser({ ...user, language: value as typeof user.language })
+                }
+              })()
+            }}
+            size="xs"
+            variant="filled"
+          />
+        </Stack>
       </AppShell.Navbar>
 
       <AppShell.Main>

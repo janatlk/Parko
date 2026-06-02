@@ -443,6 +443,7 @@ const resources = {
       reports: {
         title: 'Отчёты',
         type: 'Тип отчёта',
+        report_type: 'Тип отчёта',
         type_fuel: 'Расход топлива',
         type_maintenance: 'Затраты на обслуживание',
         type_insurance_inspection: 'Страховки и техосмотры',
@@ -1201,6 +1202,7 @@ const resources = {
       reports: {
         title: 'Reports',
         type: 'Report Type',
+        report_type: 'Report Type',
         type_fuel: 'Fuel Consumption',
         type_maintenance: 'Maintenance Costs',
         type_insurance_inspection: 'Insurance & Inspection',
@@ -1951,6 +1953,7 @@ const resources = {
       reports: {
         title: 'Отчёттор',
         type: 'Отчёт түрү',
+        report_type: 'Отчёт түрү',
         type_fuel: 'Күйүүчү май',
         type_maintenance: 'ТО чыгымдары',
         type_insurance_inspection: 'Страховка жана техосмотр',

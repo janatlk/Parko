@@ -88,6 +88,16 @@ select {
 
   .recharts-rectangle {
     transition: none !important;
+    opacity: 1 !important;
+    fill-opacity: 1 !important;
+    filter: none !important;
+  }
+
+  .recharts-bar:hover .recharts-rectangle,
+  .recharts-bar:active .recharts-rectangle {
+    opacity: 1 !important;
+    fill-opacity: 1 !important;
+    filter: none !important;
   }
 
   /* Smooth transitions */
