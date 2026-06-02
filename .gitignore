@@ -38,3 +38,9 @@ frontend/.vite/
 
 # Media
 backend/media/
+
+# Playwright MCP logs
+.playwright-mcp/
+
+# Temporary skills
+.agents/skills/pitch-deck-prompt-engineer/

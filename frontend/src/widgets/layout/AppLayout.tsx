@@ -11,7 +11,6 @@ import {
   IconUsers,
   IconFileAnalytics,
   IconBrain,
-  IconUser,
   IconLogout,
   IconLanguage,
   IconTools,
@@ -20,6 +19,7 @@ import {
 } from '@tabler/icons-react'
 
 import { useAuth } from '@features/auth/hooks/useAuth'
+import { useQueryClient } from '@tanstack/react-query'
 import { patchMeApi } from '@features/auth/api/authApi'
 import { LANGUAGES } from '@shared/constants/languages'
 import { showSuccess } from '@shared/utils/toast'
@@ -52,6 +52,7 @@ export function AppLayout() {
   const { user, logout, setUser } = useAuth()
   const { colorScheme } = useMantineColorScheme()
   const isDark = colorScheme === 'dark'
+  const queryClient = useQueryClient()
 
   const activePath = location.pathname
 
@@ -123,6 +124,8 @@ export function AppLayout() {
                   if (!user) return
                   void i18n.changeLanguage(value)
                   showSuccess(t('common.language_changed', { lang: value.toUpperCase() }))
+                  // Invalidate AI insights so they reload in the new language
+                  queryClient.invalidateQueries({ queryKey: ['dashboard', 'insights'] })
                   void (async () => {
                     try {
                       const updated = await patchMeApi({ language: value as typeof user.language })
@@ -178,27 +181,47 @@ export function AppLayout() {
           maxWidth: '100vw',
         }}
       >
-        {/* User Info Card */}
-        <Group gap="sm" mb="md" p="sm" style={{
-          background: isDark ? 'var(--mantine-color-dark-6)' : 'var(--mantine-color-gray-0)',
-          borderRadius: 'var(--mantine-radius-md)',
-          border: `1px solid ${isDark ? 'var(--mantine-color-dark-4)' : 'var(--mantine-color-gray-3)'}`,
-        }}>
-          <Avatar size={40} radius="xl" color="blue" variant="filled">
-            {getInitials()}
-          </Avatar>
-          <Stack gap={0} style={{ flex: 1, minWidth: 0 }}>
-            <Text size="sm" fw={600} truncate>
-              {user?.first_name || user?.last_name ? `${user.first_name ?? ''} ${user.last_name ?? ''}`.trim() : user?.username}
-            </Text>
-            <Text size="xs" c="dimmed" truncate>
-              {user?.company_name || user?.role}
-            </Text>
-          </Stack>
-          <Badge size="sm" variant="light" color="blue">
-            {user?.role}
-          </Badge>
-        </Group>
+        {/* User Info Card — clickable */}
+        <RouterNavLink
+          to="/profile"
+          onClick={() => toggle()}
+          style={({ isActive }) => ({
+            textDecoration: 'none',
+            display: 'block',
+            borderRadius: 'var(--mantine-radius-md)',
+            marginBottom: 'var(--mantine-spacing-md)',
+            background: isActive
+              ? (isDark ? 'var(--mantine-color-blue-9)' : 'var(--mantine-color-blue-0)')
+              : (isDark ? 'var(--mantine-color-dark-6)' : 'var(--mantine-color-gray-0)'),
+            border: `1px solid ${isActive
+              ? (isDark ? 'var(--mantine-color-blue-7)' : 'var(--mantine-color-blue-3)')
+              : (isDark ? 'var(--mantine-color-dark-4)' : 'var(--mantine-color-gray-3)')}`,
+          })}
+        >
+          {({ isActive }) => (
+            <Group gap="sm" p="sm" style={{ cursor: 'pointer' }}>
+              <Avatar size={40} radius="xl" color="blue" variant="filled">
+                {getInitials()}
+              </Avatar>
+              <Stack gap={0} style={{ flex: 1, minWidth: 0 }}>
+                <Text
+                  size="sm"
+                  fw={600}
+                  truncate
+                  c={isActive ? (isDark ? 'var(--mantine-color-blue-3)' : 'var(--mantine-color-blue-7)') : undefined}
+                >
+                  {user?.first_name || user?.last_name ? `${user.first_name ?? ''} ${user.last_name ?? ''}`.trim() : user?.username}
+                </Text>
+                <Text size="xs" c="dimmed" truncate>
+                  {user?.company_name || user?.role}
+                </Text>
+              </Stack>
+              <Badge size="sm" variant="light" color="blue">
+                {user?.role}
+              </Badge>
+            </Group>
+          )}
+        </RouterNavLink>
 
         {/* Navigation Links */}
         <Stack gap={2}>
@@ -320,15 +343,6 @@ export function AppLayout() {
             active={activePath.startsWith('/ai')}
             onClick={() => toggle()}
             styles={() => getNavStyles(isDark, activePath.startsWith('/ai'))}
-          />
-          <NavLink
-            component={RouterNavLink}
-            to="/profile"
-            label={t('profile.title')}
-            leftSection={<IconUser size={18} stroke={1.5} color={isDark ? '#868e96' : undefined} />}
-            active={activePath.startsWith('/profile')}
-            onClick={() => toggle()}
-            styles={() => getNavStyles(isDark, activePath.startsWith('/profile'))}
           />
         </Stack>
       </AppShell.Navbar>

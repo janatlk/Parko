@@ -9,7 +9,7 @@ export function formatPrice(value: number | string, currency: string = 'KGS'): s
   if (isNaN(numValue)) return '0'
   
   // Format the number (no decimals for simplicity)
-  const formatted = Math.round(numValue).toLocaleString()
+  const formatted = Math.round(numValue).toLocaleString('ru-RU')
   
   // Return with currency suffix
   return `${formatted} ${currency}`
