@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 
 import {
   getDashboardStats,
@@ -82,9 +83,12 @@ export function useFuelStatsByMonth(months = 6) {
 }
 
 export function useDashboardInsights() {
+  const { i18n } = useTranslation()
+  const language = i18n.language?.split('-')[0] || 'ru'
+
   return useQuery({
-    queryKey: ['dashboard', 'insights'],
-    queryFn: getDashboardInsights,
+    queryKey: ['dashboard', 'insights', language],
+    queryFn: () => getDashboardInsights(language),
     retry: 1,
     staleTime: 300_000, // 5 minutes
   })

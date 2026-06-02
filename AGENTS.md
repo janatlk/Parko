@@ -304,6 +304,36 @@ cd frontend && npm run dev
 4. Использовать Gunicorn + Nginx (вместо `runserver`)
 5. Собрать frontend (`npm run build`) и раздать статику через Nginx
 
+### Деплой на Render (ручный)
+
+⚠️ **Auto-deploy на Render сломан.** В логах сборки: *"It looks like we don't have access to your repo, but we'll try to clone it anyway."* Пуши в GitHub НЕ триггерят автоматический деплой.
+
+**Порядок действий:**
+
+1. Закоммитить и запушить изменения в `main`:
+   ```bash
+   git add .
+   git commit -m "описание изменений"
+   git push origin main
+   ```
+
+2. Открыть [dashboard.render.com](https://dashboard.render.com)
+
+3. Найти сервис **Parko** → открыть его
+
+4. Нажать кнопку **Manual Deploy** → выбрать **"Deploy latest commit"**
+
+5. Дождаться окончания сборки (статус станет **Live**)
+
+6. Проверить деплой:
+   ```bash
+   curl -s https://parko-9ae8.onrender.com | grep -o 'index-[A-Za-z0-9]*\.js'
+   ```
+
+**Если auto-deploy нужно починить:**
+- Settings → Build & Deploy → отключить и снова включить "Auto-Deploy"
+- Либо переподключить GitHub-репозиторий в настройках сервиса
+
 ### Проверка работоспособности
 
 ```bash

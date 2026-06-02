@@ -922,7 +922,9 @@ class DashboardInsightsView(APIView):
     def get(self, request):
         company = request.user.company
         company_id = company.id
-        cache_key = f'dashboard_insights_{company_id}'
+        # Get language from user profile or query param
+        lang = request.query_params.get('lang') or request.user.language or 'ru'
+        cache_key = f'dashboard_insights_{company_id}_{lang}'
 
         cached = cache.get(cache_key)
         if cached is not None:
@@ -983,18 +985,81 @@ class DashboardInsightsView(APIView):
             history_summary.append(f"{y}-{m:02d}: {fc:.0f}")
         history_summary.reverse()
 
-        # Build prompt
-        prompt = f"""Ты — аналитик автопарка. На основе данных дашборда сгенерируй 3-5 кратких инсайтов (по 1 предложению каждый) на русском языке. Фокусируйся на аномалиях, трендах и рекомендациях.
+        # Language configuration for prompt
+        LANG_CONFIG = {
+            'ru': {
+                'name': 'русском',
+                'system': 'Ты — аналитик автопарка. На основе данных дашборда сгенерируй 3-5 кратких инсайтов (по 1 предложению каждый)',
+                'focus': 'Фокусируйся на аномалиях, трендах и рекомендациях.',
+                'data_label': 'ДАННЫЕ',
+                'cars': 'Авто',
+                'active': 'активных',
+                'avg_consumption': 'Средний расход',
+                'operational_cost': 'Операционные затраты за месяц',
+                'expiring': 'Истекающие страховки/осмотры',
+                'top_vehicle': 'Самое дорогое авто',
+                'trend': 'Тренд затрат (последние 3 мес)',
+                'instruction': 'Верни ТОЛЬКО JSON-массив строк.',
+                'example': '["Расход топлива вырос на 15% vs прошлый месяц","Проверьте страховки 3 авто"]',
+                'fallback': [
+                    "Недостаточно данных для формирования инсайтов.",
+                    "Добавьте больше записей о топливе и ТО для аналитики.",
+                ],
+            },
+            'en': {
+                'name': 'English',
+                'system': 'You are a fleet analyst. Based on dashboard data, generate 3-5 short insights (1 sentence each)',
+                'focus': 'Focus on anomalies, trends, and recommendations.',
+                'data_label': 'DATA',
+                'cars': 'Vehicles',
+                'active': 'active',
+                'avg_consumption': 'Average consumption',
+                'operational_cost': 'Monthly operational costs',
+                'expiring': 'Expiring insurances/inspections',
+                'top_vehicle': 'Most expensive vehicle',
+                'trend': 'Cost trend (last 3 months)',
+                'instruction': 'Return ONLY a JSON array of strings.',
+                'example': '["Fuel consumption increased 15% vs last month","Check insurance for 3 vehicles"]',
+                'fallback': [
+                    "Not enough data to generate insights.",
+                    "Add more fuel and maintenance records for analytics.",
+                ],
+            },
+            'ky': {
+                'name': 'кыргызча',
+                'system': 'Сен автопарк аналитигисиң. Дашборд маалыматтарынын негизинде 3-5 кыскача инсайт (ар бири 1 сүйлөм) түз',
+                'focus': 'Аномалияларга, тренддерге жана сунуштарга көңүл буру.',
+                'data_label': 'МААЛЫМАТТАР',
+                'cars': 'Унаалар',
+                'active': 'активдүү',
+                'avg_consumption': 'Орточо чыгым',
+                'operational_cost': 'Айлык операциялык чыгымдар',
+                'expiring': 'Мөөнөтү бүткөн камсыздандыруулар/техкароолор',
+                'top_vehicle': 'Эң кымбат унаа',
+                'trend': 'Чыгым тренди (акыркы 3 ай)',
+                'instruction': 'ЖЫЛМАА гана JSON строкалар массивин кайтар.',
+                'example': '["Отун чыгымы өткөн айга караганда 15% өстү","3 унаанын камсыздандыруусун текшериңиз"]',
+                'fallback': [
+                    "Инсайттарды түзүү үчүн маалымат жетишсиз.",
+                    "Аналитика үчүн көбүрөөк отун жана ТО жазууларын кошуңуз.",
+                ],
+            },
+        }
 
-ДАННЫЕ:
-- Авто: {total_cars} шт. ({active_cars} активных)
-- Средний расход: {avg_fuel_consumption} л/100км
-- Операционные затраты за месяц: {total_operational_cost:.0f}
-- Истекающие страховки/осмотры: {expiring_count}
-- Самое дорогое авто: {top_vehicle['name'] if top_vehicle else 'N/A'} — {top_vehicle['total']:.0f} с.
-- Тренд затрат (последние 3 мес): {', '.join(history_summary)}
+        cfg = LANG_CONFIG.get(lang, LANG_CONFIG['ru'])
 
-Верни ТОЛЬКО JSON-массив строк. Пример: ["Расход топлива вырос на 15% vs прошлый месяц","Проверьте страховки 3 авто"]"""
+        # Build prompt in user's language
+        prompt = f"""{cfg['system']} на {cfg['name']} языке. {cfg['focus']}
+
+{cfg['data_label']}:
+- {cfg['cars']}: {total_cars} шт. ({active_cars} {cfg['active']})
+- {cfg['avg_consumption']}: {avg_fuel_consumption} л/100км
+- {cfg['operational_cost']}: {total_operational_cost:.0f}
+- {cfg['expiring']}: {expiring_count}
+- {cfg['top_vehicle']}: {top_vehicle['name'] if top_vehicle else 'N/A'} — {top_vehicle['total']:.0f} с.
+- {cfg['trend']}: {', '.join(history_summary)}
+
+{cfg['instruction']} Пример: {cfg['example']}"""
 
         # Call AI
         ai_settings = getattr(settings, 'AI_SETTINGS', {})
@@ -1026,10 +1091,7 @@ class DashboardInsightsView(APIView):
                 insights = []
 
         if not insights:
-            insights = [
-                "Недостаточно данных для формирования инсайтов.",
-                "Добавьте больше записей о топливе и ТО для аналитики.",
-            ]
+            insights = cfg['fallback']
 
         result = {'insights': insights}
         cache.set(cache_key, result, 600)  # 10 minutes

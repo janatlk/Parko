@@ -168,7 +168,9 @@ export async function getFuelStatsByMonth(months = 6): Promise<FuelStatsByMonth[
   return data
 }
 
-export async function getDashboardInsights(): Promise<{ insights: string[] }> {
-  const { data } = await http.get<{ insights: string[] }>('dashboard/insights/')
+export async function getDashboardInsights(language?: string): Promise<{ insights: string[] }> {
+  const { data } = await http.get<{ insights: string[] }>('dashboard/insights/', {
+    params: language ? { lang: language } : undefined,
+  })
   return data
 }
