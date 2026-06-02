@@ -81,8 +81,8 @@ function ChartRenderer({ chart }: { chart: ChartData }) {
           {title}
         </Title>
         <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={prepareBarChartData(data)}>
-            <CartesianGrid strokeDasharray="3 3" />
+          <BarChart data={prepareBarChartData(data)} style={{ background: 'transparent' }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--mantine-color-gray-6)" />
             <XAxis dataKey="name" />
             <YAxis />
             <Tooltip />
@@ -93,6 +93,7 @@ function ChartRenderer({ chart }: { chart: ChartData }) {
                 dataKey={dataset.label}
                 fill={dataset.backgroundColor as string}
                 name={dataset.label}
+                activeBar={false}
               />
             ))}
           </BarChart>
@@ -108,8 +109,8 @@ function ChartRenderer({ chart }: { chart: ChartData }) {
           {title}
         </Title>
         <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={prepareLineChartData(data)}>
-            <CartesianGrid strokeDasharray="3 3" />
+          <LineChart data={prepareLineChartData(data)} style={{ background: 'transparent' }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--mantine-color-gray-6)" />
             <XAxis dataKey="name" />
             <YAxis />
             <Tooltip />
@@ -122,6 +123,7 @@ function ChartRenderer({ chart }: { chart: ChartData }) {
                 stroke={dataset.borderColor as string}
                 fill={dataset.backgroundColor as string}
                 name={dataset.label}
+                activeDot={false}
               />
             ))}
           </LineChart>
@@ -137,7 +139,7 @@ function ChartRenderer({ chart }: { chart: ChartData }) {
           {title}
         </Title>
         <ResponsiveContainer width="100%" height={300}>
-          <PieChart>
+          <PieChart style={{ background: 'transparent' }}>
             <Pie
               data={preparePieChartData(data)}
               cx="50%"
@@ -148,6 +150,7 @@ function ChartRenderer({ chart }: { chart: ChartData }) {
               fill="#8884d8"
               dataKey="value"
               nameKey="name"
+              activeShape={false}
             >
               {preparePieChartData(data).map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.fill || COLORS[index % COLORS.length]} />
@@ -194,16 +197,40 @@ function formatNumber(num: number): string {
   return num.toFixed(1)
 }
 
-function SummaryCard({ label, value, t, currency, color }: { label: string; value: string | number; t: (key: string) => string; currency?: string; color?: string }) {
+const MONETARY_KEYS = [
+  'fuel_cost',
+  'maintenance_cost',
+  'insurance_cost',
+  'inspection_cost',
+  'total_cost',
+  'parts_cost',
+  'labor_cost',
+  'total_fuel_cost',
+  'total_maintenance_cost',
+  'total_insurance_cost',
+  'total_inspection_cost',
+  'grand_total',
+  'total_parts_cost',
+  'total_labor_cost',
+  'avg_cost_per_km',
+  'fuel_cost_per_km',
+  'maintenance_cost_per_km',
+]
+
+function SummaryCard({ label, value, t, currency, color, fieldKey }: { label: string; value: string | number; t: (key: string) => string; currency?: string; color?: string; fieldKey?: string }) {
   const translatedLabel = label.startsWith('reports.') ? t(label) : label
   const curr = currency || 'KGS'
+  const isMonetary = fieldKey ? MONETARY_KEYS.includes(fieldKey) : true
+  const displayValue = typeof value === 'number'
+    ? (isMonetary ? formatPrice(value, curr) : value.toLocaleString())
+    : value
   return (
     <Paper p="md" withBorder style={{ borderTop: `3px solid var(--mantine-color-${color || 'blue'}-filled)` }}>
       <Text size="sm" c="dimmed">
         {translatedLabel}
       </Text>
       <Text size="xl" fw={700} c={`${color || 'blue'}.6`}>
-        {typeof value === 'number' ? formatPrice(value, curr) : value}
+        {displayValue}
       </Text>
     </Paper>
   )
@@ -371,6 +398,7 @@ export function ReportResults({ report, onExport, onSave }: ReportResultsProps) 
               t={t}
               currency={currency}
               color={SUMMARY_COLORS[idx % SUMMARY_COLORS.length]}
+              fieldKey={key}
             />
           ))}
         </SimpleGrid>

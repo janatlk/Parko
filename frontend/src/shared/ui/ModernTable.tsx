@@ -66,7 +66,7 @@ export function ModernTable({
   columns,
   data,
   renderRow,
-  renderMobileCard,
+  renderMobileCard: _renderMobileCard,
   emptyMessage = 'No data available',
   withRowNumbers = false,
   total,
@@ -129,20 +129,21 @@ export function ModernTable({
 
   return (
     <>
-      {isDesktop || !renderMobileCard ? (
-        <Paper withBorder radius="md" style={{ overflow: 'hidden' }}>
-          <Box style={{ overflowX: 'auto', maxHeight, overflowY: 'auto' }}>
-            <Table highlightOnHover style={{ minWidth: 600 }} stickyHeader>
+      <Paper withBorder radius="md" style={{ overflow: 'hidden' }}>
+        <Box style={{ overflowX: 'auto', maxHeight, overflowY: 'auto' }}>
+          <Table highlightOnHover style={{ minWidth: 600 }} stickyHeader>
               <Table.Thead>
                 <Table.Tr>
                   {selectable && (
                     <Table.Th style={{ width: 40, textAlign: 'center' }}>
-                      <Checkbox
-                        size="sm"
-                        checked={allSelected}
-                        onChange={(e) => onSelectAll?.(e.currentTarget.checked)}
-                        aria-label="Select all"
-                      />
+                      <div onClick={(e) => e.stopPropagation()}>
+                        <Checkbox
+                          size="sm"
+                          checked={allSelected}
+                          onChange={(e) => onSelectAll?.(e.currentTarget.checked)}
+                          aria-label="Select all"
+                        />
+                      </div>
                     </Table.Th>
                   )}
                   {withRowNumbers && (
@@ -192,11 +193,6 @@ export function ModernTable({
             </Table>
           </Box>
         </Paper>
-      ) : (
-        <Stack gap="sm">
-          {data.map((item, index) => renderMobileCard!(item, index))}
-        </Stack>
-      )}
 
       {showPagination && (total !== undefined || onPageChange || onPageSizeChange) && (
         <Group justify="space-between" align="center" mt="md" wrap="wrap" gap="sm">
@@ -348,15 +344,16 @@ export function ModernTableRow({
     >
       {selectable && (
         <Table.Td style={{ width: 40, textAlign: 'center' }}>
-          <Checkbox
-            size="sm"
-            checked={selected}
-            onChange={(e) => {
-              e.stopPropagation()
-              onSelect?.()
-            }}
-            aria-label="Select row"
-          />
+          <div onClick={(e) => e.stopPropagation()}>
+            <Checkbox
+              size="sm"
+              checked={selected}
+              onChange={() => {
+                onSelect?.()
+              }}
+              aria-label="Select row"
+            />
+          </div>
         </Table.Td>
       )}
       {filteredCells}

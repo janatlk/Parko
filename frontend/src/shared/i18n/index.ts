@@ -41,6 +41,7 @@ const resources = {
         data_management: 'Управление данными',
         main_tables: 'Основные таблицы',
         language_changed: 'Язык изменён на {{lang}}',
+        clear_selection: 'Сбросить выбор',
       },
       theme: {
         light: 'Светлая',
@@ -777,6 +778,7 @@ const resources = {
         december: 'December',
         data_management: 'Data Management',
         main_tables: 'Main Tables',
+        clear_selection: 'Clear selection',
       },
       theme: {
         light: 'Light',
@@ -1532,6 +1534,7 @@ const resources = {
         december: 'Декабрь',
         data_management: 'Маалымат башкаруу',
         main_tables: 'Негизги таблицалар',
+        clear_selection: 'Тандоону тазалоо',
       },
       theme: {
         light: 'Ачык',
