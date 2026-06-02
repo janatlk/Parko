@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import type { PaginatedResponse } from '@shared/api/types'
 import type { Spare } from '@entities/fleet/types'
 
-import { listSpares, createSpare, updateSpare, deleteSpare, type ListSparesParams } from '../api/sparesApi'
+import { listSpares, createSpare, updateSpare, deleteSpare, bulkDeleteSpares, type ListSparesParams } from '../api/sparesApi'
 
 const sparesKeys = {
   all: ['spares'] as const,
@@ -49,6 +49,17 @@ export function useDeleteSpareMutation() {
 
   return useMutation({
     mutationFn: (id: number) => deleteSpare(id),
+    onSuccess: async () => {
+      await qc.invalidateQueries({ queryKey: sparesKeys.all })
+    },
+  })
+}
+
+export function useBulkDeleteSparesMutation() {
+  const qc = useQueryClient()
+
+  return useMutation({
+    mutationFn: (ids: number[]) => bulkDeleteSpares(ids),
     onSuccess: async () => {
       await qc.invalidateQueries({ queryKey: sparesKeys.all })
     },

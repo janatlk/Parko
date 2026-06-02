@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 
 import {
+  Badge,
   Button,
   Container,
   Group,
@@ -17,12 +18,13 @@ import {
   useCreateUserMutation,
   useUpdateUserMutation,
   useUsersQuery,
+  useBulkDeleteUsersMutation,
 } from '@features/users/hooks/useUsers'
 import { UserFormModal } from '@features/users/ui/UserFormModal'
 import { USER_ROLES } from '@shared/constants/roles'
 import { canEditUsers } from '@shared/lib/permissions'
 import { PermissionGuard } from '@shared/ui/PermissionGuard'
-import { ModernTable, ModernTableRow, TableCell, TableCellBadge } from '@shared/ui/ModernTable'
+import { ModernTable, ModernTableRow, TableCell, TableCellBadge, MobileTableCard } from '@shared/ui/ModernTable'
 
 export function UsersPage() {
   const { t } = useTranslation()
@@ -41,6 +43,9 @@ export function UsersPage() {
   const [modalOpened, setModalOpened] = useState(false)
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create')
   const [selectedUser, setSelectedUser] = useState<User | undefined>(undefined)
+  const [selectedIds, setSelectedIds] = useState<number[]>([])
+
+  const bulkDeleteMutation = useBulkDeleteUsersMutation()
 
   const openCreate = () => {
     setSelectedUser(undefined)
@@ -52,6 +57,32 @@ export function UsersPage() {
     setSelectedUser(u)
     setModalMode('edit')
     setModalOpened(true)
+  }
+
+  const handleSelect = (id: number) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+    )
+  }
+
+  const handleSelectAll = () => {
+    const allIds = filteredUsers.map((u) => u.id)
+    const allSelected = allIds.every((id) => selectedIds.includes(id))
+    if (allSelected) {
+      setSelectedIds((prev) => prev.filter((id) => !allIds.includes(id)))
+    } else {
+      setSelectedIds((prev) => Array.from(new Set([...prev, ...allIds])))
+    }
+  }
+
+  const confirmBulkDelete = () => {
+    if (selectedIds.length === 0) return
+    // Simple confirm without modals since we don't have modals imported here
+    if (window.confirm(`Delete ${selectedIds.length} users? This cannot be undone.`)) {
+      bulkDeleteMutation.mutate(selectedIds, {
+        onSuccess: () => setSelectedIds([]),
+      })
+    }
   }
 
   const users = data?.results ?? []
@@ -108,7 +139,32 @@ export function UsersPage() {
 
       {!isLoading && !isError && (
         <>
+          {selectedIds.length > 0 && (
+            <Group mb="sm" gap="sm" wrap="wrap">
+              <Badge size="sm" variant="light" color="blue">
+                Selected: {selectedIds.length}
+              </Badge>
+              <PermissionGuard canAccess={canEdit} mode="disable">
+                <Button
+                  size="xs"
+                  color="red"
+                  variant="light"
+                  onClick={confirmBulkDelete}
+                  loading={bulkDeleteMutation.isPending}
+                >
+                  Delete selected
+                </Button>
+              </PermissionGuard>
+              <Button size="xs" variant="subtle" onClick={() => setSelectedIds([])}>
+                Clear
+              </Button>
+            </Group>
+          )}
           <ModernTable
+            selectable
+            selectedIds={selectedIds}
+            
+            onSelectAll={handleSelectAll}
             columns={[
               { key: 'id', title: 'ID', width: 70 },
               { key: 'username', title: t('auth.username'), width: 180 },
@@ -121,6 +177,9 @@ export function UsersPage() {
             renderRow={(u) => (
               <ModernTableRow
                 key={u.id}
+                selectable
+                selected={selectedIds.includes(u.id)}
+                onSelect={() => handleSelect(u.id)}
                 cells={[
                   <TableCell key="id" align="center" fw={500}>#{u.id}</TableCell>,
                   <TableCell key="username" fw={500}>{u.username}</TableCell>,
@@ -139,6 +198,37 @@ export function UsersPage() {
                     </PermissionGuard>
                   </TableCell>,
                 ]}
+              />
+            )}
+            renderMobileCard={(u) => (
+              <MobileTableCard
+                key={u.id}
+                selectable
+                selected={selectedIds.includes(u.id)}
+                onSelect={() => handleSelect(u.id)}
+                title={u.username}
+                subtitle={`${u.first_name || ''} ${u.last_name || ''}`.trim() || undefined}
+                badges={[
+                  {
+                    label: u.is_active ? t('users.active') : t('users.inactive'),
+                    color: u.is_active ? 'green' : 'gray',
+                  },
+                  { label: u.role, color: 'blue' },
+                ]}
+                details={[
+                  { label: t('users.language'), value: u.language.toUpperCase() },
+                  { label: t('users.email'), value: u.email || '—' },
+                ]}
+                actions={
+                  <PermissionGuard canAccess={canEdit} mode="disable">
+                    <Button size="xs" variant="light" onClick={(e) => {
+                      e.stopPropagation()
+                      openEdit(u)
+                    }}>
+                      {t('users.edit')}
+                    </Button>
+                  </PermissionGuard>
+                }
               />
             )}
             emptyMessage={t('users.no_data') || 'No users found'}

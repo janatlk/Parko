@@ -65,3 +65,8 @@ export async function updateCar(carId: number, payload: CarUpdatePayload): Promi
 export async function deleteCar(carId: number): Promise<void> {
   await http.delete(`cars/${carId}/`)
 }
+
+export async function bulkDeleteCars(ids: number[]): Promise<{ status: string; deleted: number }> {
+  const { data } = await http.post<{ status: string; deleted: number }>('cars/bulk-delete/', { ids })
+  return data
+}

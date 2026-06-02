@@ -44,3 +44,8 @@ export async function updateFuel(fuelId: number, payload: FuelUpdatePayload): Pr
 export async function deleteFuel(fuelId: number): Promise<void> {
   await http.delete(`fuel/${fuelId}/`)
 }
+
+export async function bulkDeleteFuel(ids: number[]): Promise<{ status: string; deleted: number }> {
+  const { data } = await http.post<{ status: string; deleted: number }>('fuel/bulk-delete/', { ids })
+  return data
+}

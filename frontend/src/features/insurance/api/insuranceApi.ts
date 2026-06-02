@@ -51,3 +51,8 @@ export async function updateInsurance(
 export async function deleteInsurance(insuranceId: number): Promise<void> {
   await http.delete(`insurances/${insuranceId}/`)
 }
+
+export async function bulkDeleteInsurances(ids: number[]): Promise<{ status: string; deleted: number }> {
+  const { data } = await http.post<{ status: string; deleted: number }>('insurances/bulk-delete/', { ids })
+  return data
+}

@@ -52,3 +52,8 @@ export async function updateUser(userId: number, payload: UserUpdatePayload): Pr
 export async function deleteUser(userId: number): Promise<void> {
   await http.delete(`users/${userId}/`)
 }
+
+export async function bulkDeleteUsers(ids: number[]): Promise<{ status: string; deleted: number }> {
+  const { data } = await http.post<{ status: string; deleted: number }>('users/bulk-delete/', { ids })
+  return data
+}

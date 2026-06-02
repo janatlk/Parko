@@ -46,3 +46,8 @@ export async function updateInspection(
 export async function deleteInspection(inspectionId: number): Promise<void> {
   await http.delete(`inspections/${inspectionId}/`)
 }
+
+export async function bulkDeleteInspections(ids: number[]): Promise<{ status: string; deleted: number }> {
+  const { data } = await http.post<{ status: string; deleted: number }>('inspections/bulk-delete/', { ids })
+  return data
+}

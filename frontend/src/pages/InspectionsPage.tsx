@@ -1,16 +1,16 @@
 import { useMemo, useState } from 'react'
 
-import { ActionIcon, Button, Container, Group, Select, Text, Title } from '@mantine/core'
+import { ActionIcon, Badge, Button, Container, Group, Select, Text, Title } from '@mantine/core'
 import { IconEdit, IconTrash } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
 import { useModals } from '@mantine/modals'
 import { showNotification } from '@mantine/notifications'
 
 import { useCarsQuery } from '@features/cars/hooks/useCars'
-import { useCreateInspectionMutation, useInspectionsQuery, useUpdateInspectionMutation, useDeleteInspectionMutation } from '@features/inspections/hooks/useInspections'
+import { useCreateInspectionMutation, useInspectionsQuery, useUpdateInspectionMutation, useDeleteInspectionMutation, useBulkDeleteInspectionsMutation } from '@features/inspections/hooks/useInspections'
 import { InspectionFormModal } from '@features/inspections/ui/InspectionFormModal'
 import type { Inspection } from '@entities/fleet/types'
-import { ModernTable, ModernTableRow, TableCell } from '@shared/ui/ModernTable'
+import { ModernTable, ModernTableRow, TableCell, MobileTableCard } from '@shared/ui/ModernTable'
 import { formatPrice } from '@shared/utils/formatPrice'
 import { useAuth } from '@features/auth/hooks/useAuth'
 
@@ -45,6 +45,9 @@ export function InspectionsPage() {
   const [modalOpened, setModalOpened] = useState(false)
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create')
   const [selectedRecord, setSelectedRecord] = useState<Inspection | undefined>(undefined)
+  const [selectedIds, setSelectedIds] = useState<number[]>([])
+
+  const bulkDeleteMutation = useBulkDeleteInspectionsMutation()
 
   const openEdit = (record: Inspection, e: React.MouseEvent) => {
     e.stopPropagation()
@@ -92,6 +95,50 @@ export function InspectionsPage() {
     setPage(1)
   }
 
+  const handleSelect = (id: number) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+    )
+  }
+
+  const handleSelectAll = () => {
+    const allIds = records.map((r) => r.id)
+    const allSelected = allIds.every((id) => selectedIds.includes(id))
+    if (allSelected) {
+      setSelectedIds((prev) => prev.filter((id) => !allIds.includes(id)))
+    } else {
+      setSelectedIds((prev) => Array.from(new Set([...prev, ...allIds])))
+    }
+  }
+
+  const confirmBulkDelete = () => {
+    if (selectedIds.length === 0) return
+    modals.openConfirmModal({
+      title: t('inspections.bulk_delete.title') || 'Delete selected records',
+      children: (
+        <Text size="sm">
+          {t('inspections.bulk_delete.message', { count: selectedIds.length }) ||
+            `Delete ${selectedIds.length} inspection records? This action cannot be undone.`}
+        </Text>
+      ),
+      labels: {
+        confirm: t('common.delete'),
+        cancel: t('common.cancel'),
+      },
+      confirmProps: { color: 'red', loading: bulkDeleteMutation.isPending },
+      onConfirm: async () => {
+        await bulkDeleteMutation.mutateAsync(selectedIds)
+        setSelectedIds([])
+        showNotification({
+          title: t('inspections.notifications.deleted.title'),
+          message: t('inspections.notifications.bulk_deleted.message', { count: selectedIds.length }) ||
+            `${selectedIds.length} records deleted`,
+          color: 'green',
+        })
+      },
+    })
+  }
+
   return (
     <Container>
       <Group justify="space-between" align="center" mb="xs" wrap="wrap" gap="sm">
@@ -117,7 +164,31 @@ export function InspectionsPage() {
 
       {!isLoading && !isError && (
         <>
+          {selectedIds.length > 0 && (
+            <Group mb="sm" gap="sm" wrap="wrap">
+              <Badge size="sm" variant="light" color="blue">
+                Selected: {selectedIds.length}
+              </Badge>
+              <Button
+                size="xs"
+                color="red"
+                variant="light"
+                leftSection={<IconTrash size={16} />}
+                onClick={confirmBulkDelete}
+                loading={bulkDeleteMutation.isPending}
+              >
+                {t('common.delete_selected') || 'Delete selected'}
+              </Button>
+              <Button size="xs" variant="subtle" onClick={() => setSelectedIds([])}>
+                {t('common.clear_selection') || 'Clear'}
+              </Button>
+            </Group>
+          )}
           <ModernTable
+            selectable
+            selectedIds={selectedIds}
+            
+            onSelectAll={handleSelectAll}
             columns={[
               { key: 'car', title: t('inspections.table.car'), width: 160 },
               { key: 'number', title: t('inspections.table.number'), width: 140 },
@@ -129,6 +200,9 @@ export function InspectionsPage() {
             renderRow={(r) => (
               <ModernTableRow
                 key={r.id}
+                selectable
+                selected={selectedIds.includes(r.id)}
+                onSelect={() => handleSelect(r.id)}
                 cells={[
                   <TableCell key="car" fw={500}>{r.car_numplate ?? r.car}</TableCell>,
                   <TableCell key="number" fw={500}>{r.number}</TableCell>,
@@ -157,6 +231,48 @@ export function InspectionsPage() {
                     </Group>
                   </TableCell>,
                 ]}
+              />
+            )}
+            renderMobileCard={(r) => (
+              <MobileTableCard
+                key={r.id}
+                selectable
+                selected={selectedIds.includes(r.id)}
+                onSelect={() => handleSelect(r.id)}
+                title={r.number}
+                subtitle={r.car_numplate ?? r.car}
+                details={[
+                  { label: t('inspections.table.date'), value: r.inspected_at },
+                  { label: t('inspections.table.cost'), value: formatPrice(r.cost, currency) },
+                ]}
+                actions={
+                  <Group gap="xs" wrap="nowrap">
+                    <ActionIcon
+                      variant="subtle"
+                      color="blue"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        openEdit(r, e)
+                      }}
+                      title={t('common.edit')}
+                    >
+                      <IconEdit size={18} />
+                    </ActionIcon>
+                    <ActionIcon
+                      variant="subtle"
+                      color="red"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        confirmDelete(r, e)
+                      }}
+                      title={t('common.delete')}
+                    >
+                      <IconTrash size={18} />
+                    </ActionIcon>
+                  </Group>
+                }
               />
             )}
             emptyMessage={t('inspections.no_data') || 'No inspection records'}

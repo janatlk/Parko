@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { PaginatedResponse } from '@shared/api/types'
 import type { Car } from '@entities/car/types'
 
-import { createCar, getCar, listCars, updateCar, deleteCar } from '../api/carsApi'
+import { createCar, getCar, listCars, updateCar, deleteCar, bulkDeleteCars } from '../api/carsApi'
 import type { CarCreatePayload, CarListItem, ListCarsParams, CarUpdatePayload } from '../api/carsApi'
 
 type CarsQueryArgs = {
@@ -67,6 +67,16 @@ export function useDeleteCarMutation() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (carId: number) => deleteCar(carId),
+    onSuccess: async () => {
+      await qc.invalidateQueries({ queryKey: ['cars'] })
+    },
+  })
+}
+
+export function useBulkDeleteCarsMutation() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (ids: number[]) => bulkDeleteCars(ids),
     onSuccess: async () => {
       await qc.invalidateQueries({ queryKey: ['cars'] })
     },

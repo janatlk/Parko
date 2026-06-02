@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { PaginatedResponse } from '@shared/api/types'
 import type { User } from '@entities/user/types'
 
-import { createUser, deleteUser, listUsers, updateUser } from '../api/usersApi'
+import { createUser, deleteUser, listUsers, updateUser, bulkDeleteUsers } from '../api/usersApi'
 import type { UserCreatePayload, UserUpdatePayload } from '../api/usersApi'
 
 type UsersQueryArgs = {
@@ -47,6 +47,16 @@ export function useDeleteUserMutation() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (userId: number) => deleteUser(userId),
+    onSuccess: async () => {
+      await qc.invalidateQueries({ queryKey: usersKeys.all })
+    },
+  })
+}
+
+export function useBulkDeleteUsersMutation() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (ids: number[]) => bulkDeleteUsers(ids),
     onSuccess: async () => {
       await qc.invalidateQueries({ queryKey: usersKeys.all })
     },

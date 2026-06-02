@@ -1,16 +1,16 @@
 import { useMemo, useState } from 'react'
 
-import { ActionIcon, Button, Container, Group, Select, Text, TextInput, Title } from '@mantine/core'
+import { ActionIcon, Badge, Button, Container, Group, Select, Text, TextInput, Title } from '@mantine/core'
 import { IconEdit, IconTrash } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
 import { useModals } from '@mantine/modals'
 import { showNotification } from '@mantine/notifications'
 
 import { useCarsQuery } from '@features/cars/hooks/useCars'
-import { useSparesQuery, useCreateSpareMutation, useUpdateSpareMutation, useDeleteSpareMutation } from '@features/spares/hooks/useSpares'
+import { useSparesQuery, useCreateSpareMutation, useUpdateSpareMutation, useDeleteSpareMutation, useBulkDeleteSparesMutation } from '@features/spares/hooks/useSpares'
 import { SpareFormModal } from '@features/spares/ui/SpareFormModal'
 import type { Spare } from '@entities/fleet/types'
-import { ModernTable, ModernTableRow, TableCell } from '@shared/ui/ModernTable'
+import { ModernTable, ModernTableRow, TableCell, MobileTableCard } from '@shared/ui/ModernTable'
 import { formatPrice } from '@shared/utils/formatPrice'
 import { useAuth } from '@features/auth/hooks/useAuth'
 
@@ -83,6 +83,9 @@ export function SparesPage() {
   const [modalOpened, setModalOpened] = useState(false)
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create')
   const [selectedRecord, setSelectedRecord] = useState<Spare | undefined>(undefined)
+  const [selectedIds, setSelectedIds] = useState<number[]>([])
+
+  const bulkDeleteMutation = useBulkDeleteSparesMutation()
 
   const openCreate = () => {
     setSelectedRecord(undefined)
@@ -156,6 +159,50 @@ export function SparesPage() {
     setPage(1)
   }
 
+  const handleSelect = (id: number) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+    )
+  }
+
+  const handleSelectAll = () => {
+    const allIds = records.map((r) => r.id)
+    const allSelected = allIds.every((id) => selectedIds.includes(id))
+    if (allSelected) {
+      setSelectedIds((prev) => prev.filter((id) => !allIds.includes(id)))
+    } else {
+      setSelectedIds((prev) => Array.from(new Set([...prev, ...allIds])))
+    }
+  }
+
+  const confirmBulkDelete = () => {
+    if (selectedIds.length === 0) return
+    modals.openConfirmModal({
+      title: t('spares.bulk_delete.title') || 'Delete selected records',
+      children: (
+        <Text size="sm">
+          {t('spares.bulk_delete.message', { count: selectedIds.length }) ||
+            `Delete ${selectedIds.length} spare parts records? This action cannot be undone.`}
+        </Text>
+      ),
+      labels: {
+        confirm: t('common.delete'),
+        cancel: t('common.cancel'),
+      },
+      confirmProps: { color: 'red', loading: bulkDeleteMutation.isPending },
+      onConfirm: async () => {
+        await bulkDeleteMutation.mutateAsync(selectedIds)
+        setSelectedIds([])
+        showNotification({
+          title: t('spares.notifications.deleted.title'),
+          message: t('spares.notifications.bulk_deleted.message', { count: selectedIds.length }) ||
+            `${selectedIds.length} records deleted`,
+          color: 'green',
+        })
+      },
+    })
+  }
+
   return (
     <Container>
       <Group justify="space-between" align="center" mb="xs" wrap="wrap" gap="sm">
@@ -209,7 +256,31 @@ export function SparesPage() {
 
       {!isLoading && !isError && (
         <>
+          {selectedIds.length > 0 && (
+            <Group mb="sm" gap="sm" wrap="wrap">
+              <Badge size="sm" variant="light" color="blue">
+                Selected: {selectedIds.length}
+              </Badge>
+              <Button
+                size="xs"
+                color="red"
+                variant="light"
+                leftSection={<IconTrash size={16} />}
+                onClick={confirmBulkDelete}
+                loading={bulkDeleteMutation.isPending}
+              >
+                {t('common.delete_selected') || 'Delete selected'}
+              </Button>
+              <Button size="xs" variant="subtle" onClick={() => setSelectedIds([])}>
+                {t('common.clear_selection') || 'Clear'}
+              </Button>
+            </Group>
+          )}
           <ModernTable
+            selectable
+            selectedIds={selectedIds}
+            
+            onSelectAll={handleSelectAll}
             columns={[
               { key: 'car', title: t('spares.table.car'), width: 140 },
               { key: 'title', title: t('spares.table.title'), width: 180 },
@@ -225,6 +296,9 @@ export function SparesPage() {
             renderRow={(record) => (
               <ModernTableRow
                 key={record.id}
+                selectable
+                selected={selectedIds.includes(record.id)}
+                onSelect={() => handleSelect(record.id)}
                 cells={[
                   <TableCell key="car" fw={500}>{record.car_numplate ?? record.car}</TableCell>,
                   <TableCell key="title" fw={500}>{record.title}</TableCell>,
@@ -257,6 +331,55 @@ export function SparesPage() {
                     </Group>
                   </TableCell>,
                 ]}
+              />
+            )}
+            renderMobileCard={(record) => (
+              <MobileTableCard
+                key={record.id}
+                selectable
+                selected={selectedIds.includes(record.id)}
+                onSelect={() => handleSelect(record.id)}
+                title={record.title}
+                subtitle={record.car_numplate ?? record.car}
+                details={[
+                  { label: t('spares.table.description'), value: record.description || '—' },
+                  { label: t('spares.table.part_price'), value: formatPrice(record.part_price, currency) },
+                  { label: t('spares.table.job'), value: record.job_description || '—' },
+                  { label: t('spares.table.job_price'), value: formatPrice(record.job_price, currency) },
+                  {
+                    label: t('spares.table.total'),
+                    value: formatPrice(record.part_price + record.job_price, currency),
+                  },
+                  { label: t('spares.table.date'), value: record.installed_at },
+                ]}
+                actions={
+                  <Group gap="xs" wrap="nowrap">
+                    <ActionIcon
+                      variant="subtle"
+                      color="blue"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        openEdit(record, e)
+                      }}
+                      title={t('common.edit')}
+                    >
+                      <IconEdit size={18} />
+                    </ActionIcon>
+                    <ActionIcon
+                      variant="subtle"
+                      color="red"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        confirmDelete(record, e)
+                      }}
+                      title={t('common.delete')}
+                    >
+                      <IconTrash size={18} />
+                    </ActionIcon>
+                  </Group>
+                }
               />
             )}
             emptyMessage={t('spares.no_data') || 'No spare parts records'}

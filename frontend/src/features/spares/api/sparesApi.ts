@@ -30,3 +30,8 @@ export async function updateSpare(id: number, data: Partial<Spare>): Promise<Spa
 export async function deleteSpare(id: number): Promise<void> {
   await http.delete(`spares/${id}/`)
 }
+
+export async function bulkDeleteSpares(ids: number[]): Promise<{ status: string; deleted: number }> {
+  const { data } = await http.post<{ status: string; deleted: number }>('spares/bulk-delete/', { ids })
+  return data
+}

@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { PaginatedResponse } from '@shared/api/types'
 import type { Inspection } from '@entities/fleet/types'
 
-import { createInspection, listInspections, updateInspection, deleteInspection } from '../api/inspectionsApi'
+import { createInspection, listInspections, updateInspection, deleteInspection, bulkDeleteInspections } from '../api/inspectionsApi'
 import type { InspectionCreatePayload, InspectionUpdatePayload, ListInspectionsParams } from '../api/inspectionsApi'
 
 type InspectionsQueryArgs = {
@@ -55,6 +55,16 @@ export function useDeleteInspectionMutation() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (inspectionId: number) => deleteInspection(inspectionId),
+    onSuccess: async () => {
+      await qc.invalidateQueries({ queryKey: ['inspections'] })
+    },
+  })
+}
+
+export function useBulkDeleteInspectionsMutation() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (ids: number[]) => bulkDeleteInspections(ids),
     onSuccess: async () => {
       await qc.invalidateQueries({ queryKey: ['inspections'] })
     },

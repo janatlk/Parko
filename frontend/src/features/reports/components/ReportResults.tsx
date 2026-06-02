@@ -41,12 +41,14 @@ import {
 import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
 import dayjs from 'dayjs'
+import { useMediaQuery } from '@mantine/hooks'
 
 import type { ChartData, ReportResponse } from '../api/reportsApi'
 import { ShareReportModal } from './ShareReportModal'
 import { SaveReportModal } from './SaveReportModal'
 import { formatPrice } from '@shared/utils/formatPrice'
 import { useAuth } from '@features/auth/hooks/useAuth'
+import { MobileTableCard } from '@shared/ui/ModernTable'
 
 interface ReportResultsProps {
   report: ReportResponse
@@ -55,6 +57,8 @@ interface ReportResultsProps {
 }
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316']
+
+const SUMMARY_COLORS = ['blue', 'green', 'yellow', 'red', 'violet', 'pink', 'teal', 'orange']
 
 const reportTypeLabels: Record<string, string> = {
   fuel_consumption: 'reports.type_fuel',
@@ -190,15 +194,15 @@ function formatNumber(num: number): string {
   return num.toFixed(1)
 }
 
-function SummaryCard({ label, value, t, currency }: { label: string; value: string | number; t: (key: string) => string; currency?: string }) {
+function SummaryCard({ label, value, t, currency, color }: { label: string; value: string | number; t: (key: string) => string; currency?: string; color?: string }) {
   const translatedLabel = label.startsWith('reports.') ? t(label) : label
   const curr = currency || 'KGS'
   return (
-    <Paper p="md" withBorder>
+    <Paper p="md" withBorder style={{ borderTop: `3px solid var(--mantine-color-${color || 'blue'}-filled)` }}>
       <Text size="sm" c="dimmed">
         {translatedLabel}
       </Text>
-      <Text size="xl" fw={700}>
+      <Text size="xl" fw={700} c={`${color || 'blue'}.6`}>
         {typeof value === 'number' ? formatPrice(value, curr) : value}
       </Text>
     </Paper>
@@ -213,6 +217,7 @@ export function ReportResults({ report, onExport, onSave }: ReportResultsProps) 
   const [shareModalOpened, setShareModalOpened] = useState(false)
   const [saveModalOpened, setSaveModalOpened] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  const isDesktop = useMediaQuery('(min-width: 768px)', true)
 
   const handleSave = (name: string) => {
     if (!onSave) return
@@ -229,9 +234,26 @@ export function ReportResults({ report, onExport, onSave }: ReportResultsProps) 
     return (
       <Paper p="md" withBorder>
         <Text c="dimmed" ta="center">
-          {t('reports.no_data') || 'No data available for selected criteria'}
+          {t('reports.no_data')}
         </Text>
       </Paper>
+    )
+  }
+
+  const tableKeys = Object.keys(data[0])
+
+  const renderMobileReportCard = (row: Record<string, any>, idx: number) => {
+    const details = tableKeys.map((key) => ({
+      label: translateLabel(formatLabel(key), t),
+      value: typeof row[key] === 'number' ? formatNumber(row[key]) : String(row[key]),
+    }))
+    return (
+      <MobileTableCard
+        key={idx}
+        title={row[tableKeys[0]] ? String(row[tableKeys[0]]) : `#${idx + 1}`}
+        subtitle={tableKeys[1] ? String(row[tableKeys[1]]) : undefined}
+        details={details.slice(2)}
+      />
     )
   }
 
@@ -247,7 +269,7 @@ export function ReportResults({ report, onExport, onSave }: ReportResultsProps) 
                 {t(reportTypeLabels[report_type] || 'reports.unknown')}
               </Title>
               <Badge variant="light" color="blue">
-                {data.length} {t('reports.records') || 'records'}
+                {data.length} {t('reports.records')}
               </Badge>
             </Group>
             <Group gap="md">
@@ -260,7 +282,7 @@ export function ReportResults({ report, onExport, onSave }: ReportResultsProps) 
               <Group gap={4}>
                 <IconCar size={14} color="var(--mantine-color-dimmed)" />
                 <Text size="sm" c="dimmed">
-                  {t('reports.generated_at') || 'Generated'} {dayjs().format('DD.MM.YYYY HH:mm')}
+                  {t('reports.generated_at')} {dayjs().format('DD.MM.YYYY HH:mm')}
                 </Text>
               </Group>
             </Group>
@@ -268,25 +290,25 @@ export function ReportResults({ report, onExport, onSave }: ReportResultsProps) 
 
           <Group gap="xs">
             {onSave && (
-              <MantineTooltip label={t('reports.save_report') || 'Save Report'}>
+              <MantineTooltip label={t('reports.save_report')}>
                 <Button
                   variant="light"
                   size="sm"
                   leftSection={<IconDeviceFloppy size={16} />}
                   onClick={() => setSaveModalOpened(true)}
                 >
-                  {t('common.save') || 'Save'}
+                  {t('common.save')}
                 </Button>
               </MantineTooltip>
             )}
-            <MantineTooltip label={t('reports.share_email') || 'Share via Email'}>
+            <MantineTooltip label={t('reports.share_email')}>
               <Button
                 variant="light"
                 size="sm"
                 leftSection={<IconShare size={16} />}
                 onClick={() => setShareModalOpened(true)}
               >
-                {t('reports.share') || 'Share'}
+                {t('reports.share')}
               </Button>
             </MantineTooltip>
           </Group>
@@ -297,7 +319,7 @@ export function ReportResults({ report, onExport, onSave }: ReportResultsProps) 
         {/* Export Buttons */}
         <Group gap="xs">
           <Text size="sm" fw={500}>
-            {t('reports.export_as') || 'Export as'}:
+            {t('reports.export_as')}:
           </Text>
           <MantineTooltip label="JSON">
             <Button variant="default" size="xs" leftSection={<IconFileCode size={14} />} onClick={() => onExport('json')}>
@@ -341,8 +363,15 @@ export function ReportResults({ report, onExport, onSave }: ReportResultsProps) 
       {/* Summary Cards */}
       {hasSummary && (
         <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="md">
-          {Object.entries(summary).slice(0, 4).map(([key, value]) => (
-            <SummaryCard key={key} label={formatLabel(key)} value={value as number} t={t} currency={currency} />
+          {Object.entries(summary).slice(0, 4).map(([key, value], idx) => (
+            <SummaryCard
+              key={key}
+              label={formatLabel(key)}
+              value={value as number}
+              t={t}
+              currency={currency}
+              color={SUMMARY_COLORS[idx % SUMMARY_COLORS.length]}
+            />
           ))}
         </SimpleGrid>
       )}
@@ -359,32 +388,40 @@ export function ReportResults({ report, onExport, onSave }: ReportResultsProps) 
       {/* Data Table */}
       <Paper p="md" withBorder>
         <Group justify="space-between" mb="md">
-          <Title order={4}>{t('reports.data_table') || 'Data Table'}</Title>
+          <Title order={4}>{t('reports.data_table')}</Title>
           <ActionIcon variant="subtle">
             <IconTable size={18} />
           </ActionIcon>
         </Group>
 
-        <Table striped highlightOnHover withTableBorder>
-          <Table.Thead>
-            <Table.Tr>
-              {Object.keys(data[0]).map((key) => (
-                <Table.Th key={key}>{translateLabel(formatLabel(key), t)}</Table.Th>
-              ))}
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>
-            {data.map((row, idx) => (
-              <Table.Tr key={idx}>
-                {Object.values(row).map((value, i) => (
-                  <Table.Td key={i}>
-                    {typeof value === 'number' ? formatNumber(value) : String(value)}
-                  </Table.Td>
+        {isDesktop ? (
+          <div style={{ overflowX: 'auto' }}>
+            <Table striped highlightOnHover withTableBorder>
+              <Table.Thead>
+                <Table.Tr>
+                  {tableKeys.map((key) => (
+                    <Table.Th key={key}>{translateLabel(formatLabel(key), t)}</Table.Th>
+                  ))}
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>
+                {data.map((row, idx) => (
+                  <Table.Tr key={idx}>
+                    {Object.values(row).map((value, i) => (
+                      <Table.Td key={i}>
+                        {typeof value === 'number' ? formatNumber(value) : String(value)}
+                      </Table.Td>
+                    ))}
+                  </Table.Tr>
                 ))}
-              </Table.Tr>
-            ))}
-          </Table.Tbody>
-        </Table>
+              </Table.Tbody>
+            </Table>
+          </div>
+        ) : (
+          <Stack gap="sm">
+            {data.map((row, idx) => renderMobileReportCard(row, idx))}
+          </Stack>
+        )}
       </Paper>
     </Stack>
   )
