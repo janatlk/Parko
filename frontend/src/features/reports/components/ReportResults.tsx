@@ -41,14 +41,12 @@ import {
 import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
 import dayjs from 'dayjs'
-import { useMediaQuery } from '@mantine/hooks'
 
 import type { ChartData, ReportResponse } from '../api/reportsApi'
 import { ShareReportModal } from './ShareReportModal'
 import { SaveReportModal } from './SaveReportModal'
 import { formatPrice } from '@shared/utils/formatPrice'
 import { useAuth } from '@features/auth/hooks/useAuth'
-import { MobileTableCard } from '@shared/ui/ModernTable'
 
 interface ReportResultsProps {
   report: ReportResponse
@@ -94,6 +92,7 @@ function ChartRenderer({ chart }: { chart: ChartData }) {
                 fill={dataset.backgroundColor as string}
                 name={dataset.label}
                 activeBar={false}
+                isAnimationActive={false}
               />
             ))}
           </BarChart>
@@ -124,6 +123,7 @@ function ChartRenderer({ chart }: { chart: ChartData }) {
                 fill={dataset.backgroundColor as string}
                 name={dataset.label}
                 activeDot={false}
+                isAnimationActive={false}
               />
             ))}
           </LineChart>
@@ -151,6 +151,7 @@ function ChartRenderer({ chart }: { chart: ChartData }) {
               dataKey="value"
               nameKey="name"
               activeShape={false}
+              isAnimationActive={false}
             >
               {preparePieChartData(data).map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.fill || COLORS[index % COLORS.length]} />
@@ -244,7 +245,6 @@ export function ReportResults({ report, onExport, onSave }: ReportResultsProps) 
   const [shareModalOpened, setShareModalOpened] = useState(false)
   const [saveModalOpened, setSaveModalOpened] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
-  const isDesktop = useMediaQuery('(min-width: 768px)', true)
 
   const handleSave = (name: string) => {
     if (!onSave) return
@@ -268,21 +268,6 @@ export function ReportResults({ report, onExport, onSave }: ReportResultsProps) 
   }
 
   const tableKeys = Object.keys(data[0])
-
-  const renderMobileReportCard = (row: Record<string, any>, idx: number) => {
-    const details = tableKeys.map((key) => ({
-      label: translateLabel(formatLabel(key), t),
-      value: typeof row[key] === 'number' ? formatNumber(row[key]) : String(row[key]),
-    }))
-    return (
-      <MobileTableCard
-        key={idx}
-        title={row[tableKeys[0]] ? String(row[tableKeys[0]]) : `#${idx + 1}`}
-        subtitle={tableKeys[1] ? String(row[tableKeys[1]]) : undefined}
-        details={details.slice(2)}
-      />
-    )
-  }
 
   return (
     <Stack gap="md">
@@ -422,34 +407,28 @@ export function ReportResults({ report, onExport, onSave }: ReportResultsProps) 
           </ActionIcon>
         </Group>
 
-        {isDesktop ? (
-          <div style={{ overflowX: 'auto' }}>
-            <Table striped highlightOnHover withTableBorder>
-              <Table.Thead>
-                <Table.Tr>
-                  {tableKeys.map((key) => (
-                    <Table.Th key={key}>{translateLabel(formatLabel(key), t)}</Table.Th>
+        <div style={{ overflowX: 'auto' }}>
+          <Table striped highlightOnHover withTableBorder>
+            <Table.Thead>
+              <Table.Tr>
+                {tableKeys.map((key) => (
+                  <Table.Th key={key}>{translateLabel(formatLabel(key), t)}</Table.Th>
+                ))}
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
+              {data.map((row, idx) => (
+                <Table.Tr key={idx}>
+                  {Object.values(row).map((value, i) => (
+                    <Table.Td key={i}>
+                      {typeof value === 'number' ? formatNumber(value) : String(value)}
+                    </Table.Td>
                   ))}
                 </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                {data.map((row, idx) => (
-                  <Table.Tr key={idx}>
-                    {Object.values(row).map((value, i) => (
-                      <Table.Td key={i}>
-                        {typeof value === 'number' ? formatNumber(value) : String(value)}
-                      </Table.Td>
-                    ))}
-                  </Table.Tr>
-                ))}
-              </Table.Tbody>
-            </Table>
-          </div>
-        ) : (
-          <Stack gap="sm">
-            {data.map((row, idx) => renderMobileReportCard(row, idx))}
-          </Stack>
-        )}
+              ))}
+            </Table.Tbody>
+          </Table>
+        </div>
       </Paper>
     </Stack>
   )

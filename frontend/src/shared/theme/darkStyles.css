@@ -75,6 +75,7 @@ select {
   /* Chart containers */
   .recharts-wrapper {
     background-color: transparent;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .recharts-text {
@@ -83,6 +84,10 @@ select {
 
   .recharts-cartesian-grid-line {
     stroke: var(--mantine-color-dark-4);
+  }
+
+  .recharts-rectangle {
+    transition: none !important;
   }
 
   /* Smooth transitions */
