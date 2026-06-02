@@ -989,8 +989,8 @@ class DashboardInsightsView(APIView):
         LANG_CONFIG = {
             'ru': {
                 'name': 'русском',
-                'system': 'Ты — аналитик автопарка. На основе данных дашборда сгенерируй 3-5 кратких инсайтов (по 1 предложению каждый)',
-                'focus': 'Фокусируйся на аномалиях, трендах и рекомендациях.',
+                'system': 'Ты — аналитик автопарка. На основе данных дашборда сгенерируй 3-5 кратких инсайтов (по 1 предложению каждый). Будь критичен к данным.',
+                'focus': 'Фокусируйся на аномалиях, трендах и рекомендациях. Если данные выглядят нереалистично (например, расход топлива < 5 л/100км или > 30 л/100км для обычного автопарка, или операционные затраты = 0), укажи на это как на возможную ошибку в данных или неполноту записей, а не как норму.',
                 'data_label': 'ДАННЫЕ',
                 'cars': 'Авто',
                 'active': 'активных',
@@ -1001,6 +1001,9 @@ class DashboardInsightsView(APIView):
                 'trend': 'Тренд затрат (последние 3 мес)',
                 'instruction': 'Верни ТОЛЬКО JSON-массив строк.',
                 'example': '["Расход топлива вырос на 15% vs прошлый месяц","Проверьте страховки 3 авто"]',
+                'note_low_consumption': 'ВНИМАНИЕ: средний расход топлива подозрительно низкий (менее 5 л/100км). Возможно, данные о пробеге указаны в метрах, а не в километрах, или записи неполные.',
+                'note_high_consumption': 'ВНИМАНИЕ: средний расход топлива подозрительно высокий (более 40 л/100км). Возможна ошибка в данных.',
+                'note_zero_cost': 'ВНИМАНИЕ: операционные затраты за месяц равны 0. Возможно, за текущий месяц ещё не внесены записи о топливе и ТО.',
                 'fallback': [
                     "Недостаточно данных для формирования инсайтов.",
                     "Добавьте больше записей о топливе и ТО для аналитики.",
@@ -1008,8 +1011,8 @@ class DashboardInsightsView(APIView):
             },
             'en': {
                 'name': 'English',
-                'system': 'You are a fleet analyst. Based on dashboard data, generate 3-5 short insights (1 sentence each)',
-                'focus': 'Focus on anomalies, trends, and recommendations.',
+                'system': 'You are a fleet analyst. Based on dashboard data, generate 3-5 short insights (1 sentence each). Be critical of the data.',
+                'focus': 'Focus on anomalies, trends, and recommendations. If data looks unrealistic (e.g., fuel consumption < 5 L/100km or > 30 L/100km for a typical fleet, or operational costs = 0), point it out as a possible data error or incomplete records, not as normal.',
                 'data_label': 'DATA',
                 'cars': 'Vehicles',
                 'active': 'active',
@@ -1020,6 +1023,9 @@ class DashboardInsightsView(APIView):
                 'trend': 'Cost trend (last 3 months)',
                 'instruction': 'Return ONLY a JSON array of strings.',
                 'example': '["Fuel consumption increased 15% vs last month","Check insurance for 3 vehicles"]',
+                'note_low_consumption': 'WARNING: average fuel consumption is suspiciously low (less than 5 L/100km). Mileage may be recorded in meters instead of kilometers, or records may be incomplete.',
+                'note_high_consumption': 'WARNING: average fuel consumption is suspiciously high (more than 40 L/100km). Possible data error.',
+                'note_zero_cost': 'WARNING: monthly operational costs are zero. Fuel and maintenance records for the current month may not have been entered yet.',
                 'fallback': [
                     "Not enough data to generate insights.",
                     "Add more fuel and maintenance records for analytics.",
@@ -1027,8 +1033,8 @@ class DashboardInsightsView(APIView):
             },
             'ky': {
                 'name': 'кыргызча',
-                'system': 'Сен автопарк аналитигисиң. Дашборд маалыматтарынын негизинде 3-5 кыскача инсайт (ар бири 1 сүйлөм) түз',
-                'focus': 'Аномалияларга, тренддерге жана сунуштарга көңүл буру.',
+                'system': 'Сен автопарк аналитигисиң. Дашборд маалыматтарынын негизинде 3-5 кыскача инсайт (ар бири 1 сүйлөм) түз. Маалыматтарга сын көз карашта бол.',
+                'focus': 'Аномалияларга, тренддерге жана сунуштарга көңүл буру. Эгер маалыматтар реалдуу эмес көрүнсө (мисалы, отун чыгымы < 5 л/100км же > 30 л/100км, же операциялык чыгымдар = 0), бул норма эмес, маалыматтардагы ката же толук эмес жазуулар деп белгиле.',
                 'data_label': 'МААЛЫМАТТАР',
                 'cars': 'Унаалар',
                 'active': 'активдүү',
@@ -1039,6 +1045,9 @@ class DashboardInsightsView(APIView):
                 'trend': 'Чыгым тренди (акыркы 3 ай)',
                 'instruction': 'ЖЫЛМАА гана JSON строкалар массивин кайтар.',
                 'example': '["Отун чыгымы өткөн айга караганда 15% өстү","3 унаанын камсыздандыруусун текшериңиз"]',
+                'note_low_consumption': 'ЭСКЕРТҮҮ: орточо отун чыгымы шектүү төмөн (5 л/100кмдан аз). Аралык метрде жазылгандыгы же жазуулар толук эмес болушу мүмкүн.',
+                'note_high_consumption': 'ЭСКЕРТҮҮ: орточо отун чыгымы шектүү жогору (40 л/100кмдан көп). Маалыматтарда ката болушу мүмкүн.',
+                'note_zero_cost': 'ЭСКЕРТҮҮ: айлык операциялык чыгымдар нөлгө барабар. Учурку ай үчүн отун жана ТО жазуулары киргизилбеген болушу мүмкүн.',
                 'fallback': [
                     "Инсайттарды түзүү үчүн маалымат жетишсиз.",
                     "Аналитика үчүн көбүрөөк отун жана ТО жазууларын кошуңуз.",
@@ -1048,7 +1057,17 @@ class DashboardInsightsView(APIView):
 
         cfg = LANG_CONFIG.get(lang, LANG_CONFIG['ru'])
 
+        # Sanity checks for data quality
+        data_notes = []
+        if avg_fuel_consumption > 0 and avg_fuel_consumption < 5:
+            data_notes.append(cfg['note_low_consumption'])
+        elif avg_fuel_consumption > 40:
+            data_notes.append(cfg['note_high_consumption'])
+        if total_operational_cost == 0:
+            data_notes.append(cfg['note_zero_cost'])
+
         # Build prompt in user's language
+        notes_text = '\n'.join(data_notes) if data_notes else ''
         prompt = f"""{cfg['system']} на {cfg['name']} языке. {cfg['focus']}
 
 {cfg['data_label']}:
@@ -1058,6 +1077,7 @@ class DashboardInsightsView(APIView):
 - {cfg['expiring']}: {expiring_count}
 - {cfg['top_vehicle']}: {top_vehicle['name'] if top_vehicle else 'N/A'} — {top_vehicle['total']:.0f} с.
 - {cfg['trend']}: {', '.join(history_summary)}
+{notes_text}
 
 {cfg['instruction']} Пример: {cfg['example']}"""
 
