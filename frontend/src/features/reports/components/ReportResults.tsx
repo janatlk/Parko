@@ -83,7 +83,7 @@ function ChartRenderer({ chart }: { chart: ChartData }) {
             <CartesianGrid strokeDasharray="3 3" stroke="var(--mantine-color-gray-6)" />
             <XAxis dataKey="name" />
             <YAxis />
-            <Tooltip />
+            <Tooltip cursor={{ fill: 'transparent' }} />
             <Legend />
             {data.datasets?.map((dataset, idx) => (
               <Bar
@@ -111,7 +111,7 @@ function ChartRenderer({ chart }: { chart: ChartData }) {
             <CartesianGrid strokeDasharray="3 3" stroke="var(--mantine-color-gray-6)" />
             <XAxis dataKey="name" />
             <YAxis />
-            <Tooltip />
+            <Tooltip cursor={{ fill: 'transparent' }} />
             <Legend />
             {data.datasets?.map((dataset, idx) => (
               <Line

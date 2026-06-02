@@ -1,4 +1,4 @@
-import { AppShell, Avatar, Badge, Box, Burger, Button, Divider, Group, NavLink, Select, Stack, Text, ThemeIcon, useMantineColorScheme } from '@mantine/core'
+import { AppShell, Avatar, Badge, Burger, Button, Divider, Group, NavLink, Select, Stack, Text, ThemeIcon, useMantineColorScheme } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { NavLink as RouterNavLink, Outlet, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -95,62 +95,8 @@ export function AppLayout() {
           </Group>
 
           <Group gap="sm">
-            <Box hiddenFrom="sm">
-              <Button
-                variant="outline"
-                color="white"
-                size="compact-xs"
-                onClick={() => void logout()}
-                styles={{
-                  root: {
-                    borderColor: 'rgba(255, 255, 255, 0.5)',
-                    padding: '4px 8px',
-                    minHeight: 28,
-                    '&:hover': { background: 'rgba(255, 255, 255, 0.15)' },
-                  },
-                }}
-              >
-                <IconLogout size={16} />
-              </Button>
-            </Box>
             <Group gap="sm" visibleFrom="sm">
               <ThemeToggle />
-              <Select
-                leftSection={<IconLanguage size={14} color="rgba(255,255,255,0.7)" />}
-                data={LANGUAGES.map((l) => ({ value: l, label: l.toUpperCase() }))}
-                value={user?.language ?? 'ru'}
-                onChange={(value) => {
-                  if (!value) return
-                  if (!user) return
-                  void i18n.changeLanguage(value)
-                  showSuccess(t('common.language_changed', { lang: value.toUpperCase() }))
-                  // Invalidate AI insights so they reload in the new language
-                  queryClient.invalidateQueries({ queryKey: ['dashboard', 'insights'] })
-                  void (async () => {
-                    try {
-                      const updated = await patchMeApi({ language: value as typeof user.language })
-                      setUser(updated)
-                    } catch {
-                      setUser({ ...user, language: value as typeof user.language })
-                    }
-                  })()
-                }}
-                size="xs"
-                w={100}
-                variant="filled"
-                styles={{
-                  input: {
-                    background: 'rgba(255, 255, 255, 0.15)',
-                    border: '1px solid rgba(255, 255, 255, 0.3)',
-                    color: '#ffffff',
-                    '&:hover': { background: 'rgba(255, 255, 255, 0.25)' },
-                  },
-                  dropdown: {
-                    background: isDark ? '#1a1b1e' : '#ffffff',
-                    color: isDark ? '#e9ecef' : '#000000',
-                  },
-                }}
-              />
               <Button
                 variant="outline"
                 color="white"
@@ -168,6 +114,41 @@ export function AppLayout() {
                 {t('dashboard.logout')}
               </Button>
             </Group>
+            <Select
+              leftSection={<IconLanguage size={14} color="rgba(255,255,255,0.7)" />}
+              data={LANGUAGES.map((l) => ({ value: l, label: l.toUpperCase() }))}
+              value={user?.language ?? 'ru'}
+              onChange={(value) => {
+                if (!value) return
+                if (!user) return
+                void i18n.changeLanguage(value)
+                showSuccess(t('common.language_changed', { lang: value.toUpperCase() }))
+                queryClient.invalidateQueries({ queryKey: ['dashboard', 'insights'] })
+                void (async () => {
+                  try {
+                    const updated = await patchMeApi({ language: value as typeof user.language })
+                    setUser(updated)
+                  } catch {
+                    setUser({ ...user, language: value as typeof user.language })
+                  }
+                })()
+              }}
+              size="xs"
+              w={80}
+              variant="filled"
+              styles={{
+                input: {
+                  background: 'rgba(255, 255, 255, 0.15)',
+                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  color: '#ffffff',
+                  '&:hover': { background: 'rgba(255, 255, 255, 0.25)' },
+                },
+                dropdown: {
+                  background: isDark ? '#1a1b1e' : '#ffffff',
+                  color: isDark ? '#e9ecef' : '#000000',
+                },
+              }}
+            />
           </Group>
         </Group>
       </AppShell.Header>
@@ -343,32 +324,6 @@ export function AppLayout() {
             active={activePath.startsWith('/ai')}
             onClick={() => toggle()}
             styles={() => getNavStyles(isDark, activePath.startsWith('/ai'))}
-          />
-        </Stack>
-
-        <Stack gap="sm" mt="auto" py="sm" hiddenFrom="sm">
-          <Divider />
-          <ThemeToggle />
-          <Select
-            leftSection={<IconLanguage size={14} />}
-            data={LANGUAGES.map((l) => ({ value: l, label: l.toUpperCase() }))}
-            value={user?.language ?? 'ru'}
-            onChange={(value) => {
-              if (!value || !user) return
-              void i18n.changeLanguage(value)
-              showSuccess(t('common.language_changed', { lang: value.toUpperCase() }))
-              queryClient.invalidateQueries({ queryKey: ['dashboard', 'insights'] })
-              void (async () => {
-                try {
-                  const updated = await patchMeApi({ language: value as typeof user.language })
-                  setUser(updated)
-                } catch {
-                  setUser({ ...user, language: value as typeof user.language })
-                }
-              })()
-            }}
-            size="xs"
-            variant="filled"
           />
         </Stack>
       </AppShell.Navbar>
